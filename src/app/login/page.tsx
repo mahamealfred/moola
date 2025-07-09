@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Sun, Moon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+export const runtime="edge";
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');

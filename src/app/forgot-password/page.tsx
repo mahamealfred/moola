@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
-
+export const runtime="edge";
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
 

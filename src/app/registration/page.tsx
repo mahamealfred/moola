@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Sun, Moon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
+export const runtime="edge";
 export default function RegistrationPage() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -17,7 +17,7 @@ export default function RegistrationPage() {
     identity: '',
     phoneNumber: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
+ const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isDark, setIsDark] = useState(false);
   const router = useRouter();
 
@@ -152,12 +152,17 @@ export default function RegistrationPage() {
         {/* Right: Welcome Section */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          whileHover={{
-            scale: 1.01,
-            transition: { yoyo: Infinity, duration: 1.5, ease: 'easeInOut' },
-          }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ duration: 0.5, delay: 0.2 }}
+  whileHover={{
+    scale: 1.01,
+    transition: {
+      repeat: Infinity,
+      repeatType: "reverse", // This mimics the old 'yoyo' behavior
+      duration: 1.5,
+      ease: 'easeInOut',
+    },
+  }}
           className="hidden md:flex flex-col justify-center items-center text-center bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 dark:from-blue-900 dark:to-purple-900 text-white px-10 py-12"
         >
           <motion.h2
@@ -239,9 +244,9 @@ function PasswordInput({
           required
         />
         <button
-          type="button"
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-blue-500 hover:text-blue-600"
-          onClick={() => setShowPassword(prev => !prev)}
+           type="button"
+  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-blue-500 hover:text-blue-600"
+  // onClick={() => setShowPassword((prev) => !prev)}
         >
           {showPassword ? 'Hide' : 'Show'}
         </button>
