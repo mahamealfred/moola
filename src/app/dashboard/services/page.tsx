@@ -20,12 +20,12 @@ import {
 } from 'lucide-react';
 
 const paymentServices = [
-  { name: 'Electricity Payment', href: '/services/electricity', icon: Zap },
-  { name: 'RRA Payment', href: '/services/rra', icon: FileText },
-  { name: 'Buy Airtime', href: '/services/airtime', icon: Phone },
-  { name: 'Startimes Payment', href: '/services/startimes', icon: Tv },
-  { name: 'Bulk SMS', href: '/services/sms', icon: MessageSquare },
-  { name: 'Irembo Pay', href: '/services/irembo', icon: Globe },
+  { name: 'Electricity Payment', href: '/dashboard/services/payment-services/electricity', icon: Zap },
+  { name: 'RRA Payment', href: '/dashboard/services/payment-services/rra', icon: FileText },
+  { name: 'Buy Airtime', href: '/dashboard/services/payment-services/airtime', icon: Phone },
+  { name: 'Startimes Payment', href: '/dashboard/services/payment-services/startimes', icon: Tv },
+  { name: 'Bulk SMS', href: '/dashboard/services/payment-services/bulk-sms', icon: MessageSquare },
+  { name: 'Irembo Pay', href: '/dashboard/services/payment-services/irembo', icon: Globe },
 ];
 
 const agencyBankingServices = [
