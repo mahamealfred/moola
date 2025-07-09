@@ -46,9 +46,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Logo & Toggle */}
         <div className="flex items-center justify-between w-full mb-8">
           {isExpanded ? (
-            <span className="text-2xl font-bold">X-pay</span>
+            <span className="text-2xl font-bold">Moola</span>
           ) : (
-            <span className="text-xl font-bold">X</span>
+            <span className="text-xl font-bold">M</span>
           )}
           <button onClick={toggleSidebar} className="ml-auto">
             <Menu size={20} />
@@ -83,7 +83,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <header className="px-6 py-4 bg-white dark:bg-gray-800 shadow-md flex justify-between items-center">
-          <h1 className="text-xl font-bold">Agent Dashboard</h1>
+          <h1 className="text-xl font-bold">Network of the best</h1>
           <div className="flex items-center gap-6">
             {/* Notifications */}
             <div className="relative cursor-pointer">

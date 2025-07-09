@@ -3,7 +3,7 @@ import '../styles/globals.css';
 
 
 export const metadata: Metadata = {
-  title: "X-pay",
+  title: "Moola",
   description: "Implemented By DDIN Team",
 };
 

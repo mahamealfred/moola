@@ -17,9 +17,8 @@ const services = [
   { name: 'Transactions', href: '/dashboard/transactions', icon: CreditCard },
   { name: 'Commissions', href: '/dashboard/commissions', icon: MonitorCheck },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
-  { name: 'Electricity Payment', href: '#', icon: Zap },
-  { name: 'Airtime Top-up', href: '#', icon: Phone },
-  { name: 'RRA Payment', href: '#', icon: FileText },
+  { name: 'Services', href: '/dashboard/services', icon: Zap },
+
 ];
 
 export default function DashboardHome() {
