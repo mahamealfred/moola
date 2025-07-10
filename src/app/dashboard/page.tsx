@@ -8,8 +8,6 @@ import {
   DollarSign,
   Settings,
   Zap,
-  Phone,
-  FileText,
 } from 'lucide-react';
 
 const services = [

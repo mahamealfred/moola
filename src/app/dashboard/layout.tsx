@@ -13,7 +13,6 @@ import {
   Menu,
   LogOut,
   Bell,
-  ChevronDown,
 UserCircle ,
 
 } from 'lucide-react';

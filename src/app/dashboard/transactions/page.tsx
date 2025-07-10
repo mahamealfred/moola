@@ -14,7 +14,6 @@ import { CSVLink } from 'react-csv';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { FiPrinter } from 'react-icons/fi';
-import { QRCodeCanvas } from 'qrcode.react';
 import StatusBadge from './StatusBadge';
 
 interface Transaction {
@@ -91,21 +90,9 @@ const printPDF = (tx: Transaction) => {
   doc.addPage();
   doc.setFontSize(14);
   doc.text('QR Code to verify', 20, 20);
-  const qr = new QRCodeCanvas({
-    value: JSON.stringify(qrData),
-    size: 150,
-    bgColor: '#FFFFFF',
-    fgColor: '#000000',
-    level: 'Q',
-  });
-  const canvas = document.createElement('canvas');
-  qr.props.renderAs === 'canvas' && (canvas.width = 150);
-  qr.props.renderAs === 'canvas' && canvas.getContext('2d')?.drawImage(qr as any, 0, 0);
-  doc.addImage(canvas, 'PNG', 20, 30, 50, 50);
-
-  doc.save(`${tx.id}.pdf`);
-};
-
+}
+  
+  
 export default function TransactionsPage() {
   const [filter, setFilter] = useState('');
   const [data] = useState(sampleData);
@@ -115,7 +102,7 @@ export default function TransactionsPage() {
     columns,
     state: { globalFilter: filter },
     onGlobalFilterChange: setFilter,
-    globalFilterFn: 'contains',
+
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
