@@ -10,7 +10,9 @@
     "pages:build": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.14",
     "@tanstack/react-table": "^8.21.3",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.23.0",
     "html2pdf.js": "^0.9.0",
     "jspdf": "^3.0.1",
@@ -22,7 +24,8 @@
     "react": "^19.0.0",
     "react-csv": "^2.2.2",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.12",

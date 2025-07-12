@@ -29,7 +29,7 @@ export default function BulkSmsForm() {
   const handleBack = () => setStep(step - 1);
 
   return (
-    <div className="mt-20 flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div >
  <motion.div
       className="w-full max-w-2xl bg-white dark:bg-gray-800 shadow-lg p-6 rounded-2xl border dark:border-gray-700"
       initial={{ opacity: 0, y: 20 }}

@@ -106,7 +106,7 @@ export default function RegistrationPage() {
           className="p-8 sm:p-10 space-y-6"
         >
           <header className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Moola</h1>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">MoolaX</h1>
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-800"
@@ -171,7 +171,7 @@ export default function RegistrationPage() {
             transition={{ delay: 0.5, duration: 0.6, type: 'spring', stiffness: 60 }}
             className="text-4xl font-extrabold mb-4"
           >
-            Join Moola Today
+            Join MoolaX Today
           </motion.h2>
           <motion.p
             initial={{ y: 20, opacity: 0 }}

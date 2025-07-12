@@ -1,9 +1,9 @@
-import LoginPage from "./login/page";
+import LandingPage from "./landingPage/page";
 export const runtime="edge";
 export default function HomePage() {
   return (
     <main >
-      <LoginPage/>
+      <LandingPage/>
 
     </main>
   );

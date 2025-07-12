@@ -76,17 +76,17 @@ export default function RraPayment() {
   };
 
   return (
-    <div className="mt-20 flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+    <div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-xl bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-8 space-y-6 border border-gray-200 dark:border-gray-700"
       >
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">RRA Tax Payment</h1>
+        {/* <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white"></h1>
           <FileText className="w-6 h-6 text-blue-600" />
-        </div>
+        </div> */}
 
         <AnimatePresence mode="wait">
           {step === 1 && (

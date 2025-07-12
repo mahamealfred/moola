@@ -26,16 +26,29 @@ interface Transaction {
 }
 
 const sampleData: Transaction[] = [
-  {
-    id: 'TX1001',
-    date: '2025-07-01',
-    service: 'Electricity',
-    status: 'Completed',
-    amount: 120.0,
-    recipient: 'John Doe',
-  },
-  // ... more sample
+   { id: 'TX1001', date: '2025-07-01', service: 'Electricity', status: 'Completed', amount: 120.0, recipient: 'John Doe' },
+  { id: 'TX1002', date: '2025-07-02', service: 'Water', status: 'Pending', amount: 45.5, recipient: 'Jane Smith' },
+  { id: 'TX1003', date: '2025-07-02', service: 'Airtime', status: 'Completed', amount: 10.0, recipient: 'Alex Johnson' },
+  { id: 'TX1004', date: '2025-07-03', service: 'Electricity', status: 'Failed', amount: 75.25, recipient: 'Emily Davis' },
+  { id: 'TX1005', date: '2025-07-03', service: 'RRA', status: 'Completed', amount: 300.0, recipient: 'Michael Brown' },
+  { id: 'TX1006', date: '2025-07-04', service: 'Electricity', status: 'Completed', amount: 90.0, recipient: 'Sarah Wilson' },
+  { id: 'TX1007', date: '2025-07-04', service: 'Airtime', status: 'Pending', amount: 5.0, recipient: 'Chris Lee' },
+  { id: 'TX1008', date: '2025-07-05', service: 'Water', status: 'Completed', amount: 60.0, recipient: 'Anna Moore' },
+  { id: 'TX1009', date: '2025-07-05', service: 'RRA', status: 'Completed', amount: 180.0, recipient: 'Daniel White' },
+  { id: 'TX1010', date: '2025-07-06', service: 'Electricity', status: 'Failed', amount: 110.0, recipient: 'Laura Clark' },
+  { id: 'TX1011', date: '2025-07-06', service: 'Airtime', status: 'Completed', amount: 8.0, recipient: 'James Lewis' },
+  { id: 'TX1012', date: '2025-07-07', service: 'Water', status: 'Completed', amount: 52.0, recipient: 'Sophia Walker' },
+  { id: 'TX1013', date: '2025-07-07', service: 'RRA', status: 'Pending', amount: 250.0, recipient: 'Jacob Hall' },
+  { id: 'TX1014', date: '2025-07-08', service: 'Electricity', status: 'Completed', amount: 130.0, recipient: 'Grace Allen' },
+  { id: 'TX1015', date: '2025-07-08', service: 'Airtime', status: 'Completed', amount: 12.5, recipient: 'Ethan Young' },
+  { id: 'TX1016', date: '2025-07-09', service: 'Water', status: 'Failed', amount: 70.0, recipient: 'Olivia Hernandez' },
+  { id: 'TX1017', date: '2025-07-09', service: 'Electricity', status: 'Pending', amount: 115.0, recipient: 'Liam King' },
+  { id: 'TX1018', date: '2025-07-10', service: 'RRA', status: 'Completed', amount: 200.0, recipient: 'Ava Wright' },
+  { id: 'TX1019', date: '2025-07-10', service: 'Airtime', status: 'Completed', amount: 15.0, recipient: 'Mason Scott' },
+  { id: 'TX1020', date: '2025-07-11', service: 'Electricity', status: 'Completed', amount: 95.0, recipient: 'Chloe Green' },
+  { id: 'TX1021', date: '2025-07-11', service: 'Water', status: 'Completed', amount: 65.0, recipient: 'Benjamin Adams' },
 ];
+
 
 const helper = createColumnHelper<Transaction>();
 

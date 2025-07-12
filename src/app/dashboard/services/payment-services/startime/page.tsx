@@ -2,21 +2,20 @@
 
 import { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 import Link from 'next/link';
 
 type FormData = {
-  meterNumber: string;
+  smartCardNumber: string;
   customerName: string;
   amount: string;
   receiptId: string;
 };
 
-export default function ElectricityPayment() {
+export default function StartimesPayment() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
-    meterNumber: '',
+    smartCardNumber: '',
     customerName: '',
     amount: '',
     receiptId: ''
@@ -30,10 +29,10 @@ export default function ElectricityPayment() {
 
   const handleNext = async () => {
     if (step === 1) {
-      if (!formData.meterNumber) return;
+      if (!formData.smartCardNumber) return;
       setLoading(true);
       setTimeout(() => {
-        setFormData(prev => ({ ...prev, customerName: 'John Doe' }));
+        setFormData(prev => ({ ...prev, customerName: 'Jane Smith' }));
         setStep(2);
         setLoading(false);
       }, 1000);
@@ -41,7 +40,7 @@ export default function ElectricityPayment() {
       if (!formData.amount) return;
       setStep(3);
     } else if (step === 3) {
-      const id = 'REC' + Date.now();
+      const id = 'ST-' + Date.now();
       setFormData(prev => ({ ...prev, receiptId: id }));
       setStep(4);
     }
@@ -50,30 +49,25 @@ export default function ElectricityPayment() {
   const handleDownloadPDF = () => {
     const element = document.getElementById('receipt');
     if (element) {
-      html2pdf().from(element).save(`receipt_${formData.receiptId}.pdf`);
+      html2pdf().from(element).save(`startimes_receipt_${formData.receiptId}.pdf`);
     }
   };
 
   return (
-    <div >
+    <div>
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-xl bg-white dark:bg-gray-900 shadow-2xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700 space-y-6"
       >
-        {/* <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white"></h1>
-          <Zap className="w-6 h-6 text-yellow-500" />
-        </div> */}
-
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="step1" {...stepAnimation}>
               <Input
-                label="Enter Meter Number"
-                name="meterNumber"
-                value={formData.meterNumber}
+                label="Smart Card Number"
+                name="smartCardNumber"
+                value={formData.smartCardNumber}
                 onChange={handleChange}
               />
             </motion.div>
@@ -99,7 +93,7 @@ export default function ElectricityPayment() {
               <div className="bg-yellow-50 dark:bg-yellow-900 p-5 rounded-xl text-sm space-y-2">
                 <p className="font-semibold text-gray-800 dark:text-white">Please confirm your payment:</p>
                 <p className="text-gray-700 dark:text-gray-300">Customer: {formData.customerName}</p>
-                <p className="text-gray-700 dark:text-gray-300">Meter Number: {formData.meterNumber}</p>
+                <p className="text-gray-700 dark:text-gray-300">Smart Card: {formData.smartCardNumber}</p>
                 <p className="text-gray-700 dark:text-gray-300">Amount: RWF {formData.amount}</p>
               </div>
             </motion.div>
@@ -108,10 +102,10 @@ export default function ElectricityPayment() {
           {step === 4 && (
             <motion.div key="step4" {...stepAnimation}>
               <div id="receipt" className="bg-gray-100 dark:bg-gray-800 p-5 rounded-xl text-sm space-y-2">
-                <h2 className="text-lg font-bold text-gray-800 dark:text-white">Payment Receipt</h2>
+                <h2 className="text-lg font-bold text-gray-800 dark:text-white">Startimes Payment Receipt</h2>
                 <p>Receipt ID: <strong>{formData.receiptId}</strong></p>
                 <p>Customer: {formData.customerName}</p>
-                <p>Meter Number: {formData.meterNumber}</p>
+                <p>Smart Card: {formData.smartCardNumber}</p>
                 <p>Amount: RWF {formData.amount}</p>
               </div>
             </motion.div>
