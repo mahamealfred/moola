@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 const services = [
-  { name: 'Check Balance', href: '/dashboard/balance', icon: DollarSign },
+  { name: 'Balance', href: '/dashboard/balance', icon: DollarSign },
   { name: 'Transactions', href: '/dashboard/transactions', icon: CreditCard },
   { name: 'Commissions', href: '/dashboard/commission', icon: MonitorCheck },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
@@ -20,7 +20,7 @@ const services = [
 
 export default function DashboardHome() {
   return (
-    <div className="relative z-10">
+    <div className="relative z-90">
       <h2 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white tracking-tight">
         Available Services
       </h2>

@@ -4,11 +4,14 @@ import { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
 import Link from 'next/link';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 type AirtimeFormData = {
   phoneNumber: string;
   amount: string;
   receiptId: string;
+  requestId?: string;
 };
 
 export default function AirtimePurchase() {
@@ -16,7 +19,7 @@ export default function AirtimePurchase() {
   const [formData, setFormData] = useState<AirtimeFormData>({
     phoneNumber: '',
     amount: '',
-    receiptId: ''
+    receiptId: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -25,21 +28,83 @@ export default function AirtimePurchase() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const validatePhone = async () => {
+    try {
+      const res = await axios.post('http://localhost:3000/v1/agencytest/eco/services/validate/biller', {
+        billerCode: 'airtime',
+        productCode: 'airtime',
+        customerId: formData.phoneNumber,
+        amount: formData.amount || '100',
+      });
+
+      if (res.data.success) {
+        setFormData(prev => ({
+          ...prev,
+          requestId: res.data.data.requestId,
+        }));
+        setStep(2);
+      } else {
+        toast.error(res.data.data.message || 'Validation failed');
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.response?.data.message || 'Validation error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const executePurchase = async (payload: any) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!token) throw new Error('No auth token found. Please log in.');
+
+    const response = await fetch(`http://localhost:3000/v1/agencytest/eco/services/execute/bill-payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText);
+    }
+
+    return response.json();
+  };
+
   const handleNext = async () => {
     if (step === 1) {
       if (!formData.phoneNumber) return;
       setLoading(true);
-      setTimeout(() => {
-        setStep(2);
-        setLoading(false);
-      }, 1000);
+      await validatePhone();
     } else if (step === 2) {
       if (!formData.amount) return;
       setStep(3);
     } else if (step === 3) {
-      const id = 'AIR' + Date.now();
-      setFormData(prev => ({ ...prev, receiptId: id }));
-      setStep(4);
+      setLoading(true);
+      try {
+        const response = await executePurchase({
+          email: 'mahamealfred@gmail.com',
+          clientPhone: formData.phoneNumber,
+          customerId: formData.phoneNumber,
+          billerCode: 'airtime',
+          productCode: 'airtime',
+          amount: formData.amount,
+          ccy: 'RWF',
+          requestId: formData.requestId,
+        });
+
+        const id = `AIR${Date.now()}`;
+        setFormData(prev => ({ ...prev, receiptId: id }));
+        setStep(4);
+      } catch (err: any) {
+        toast.error(err.message || 'Purchase failed');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -58,12 +123,6 @@ export default function AirtimePurchase() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-xl bg-white dark:bg-gray-900 shadow-2xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700 space-y-6"
       >
-        {/* Optional Title */}
-        {/* <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Airtime Purchase</h1>
-          <Phone className="w-6 h-6 text-green-500" />
-        </div> */}
-
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="step1" {...stepAnimation}>
@@ -165,7 +224,7 @@ const stepAnimation = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -20 },
-  transition: { duration: 0.3 }
+  transition: { duration: 0.3 },
 };
 
 type InputProps = {

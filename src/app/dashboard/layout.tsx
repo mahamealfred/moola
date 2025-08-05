@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Home,
@@ -60,8 +60,21 @@ function SidebarItem({
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+
+  const handleLogout = () => {
+    // Clear tokens and user info
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+
+    // Optional: Call backend logout endpoint if needed
+
+    // Redirect to login
+    router.push('/');
+  };
 
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors">
@@ -73,7 +86,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         {/* Logo & Toggle */}
         <div className="flex items-center justify-between w-full mb-10">
-          <span className="text-xl font-bold">{isExpanded ? 'Moola' : 'M'}</span>
+          <span className="text-xl font-bold">{isExpanded ? 'X-pay' : 'X'}</span>
           <button
             onClick={() => setIsExpanded((prev) => !prev)}
             className="ml-auto text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
@@ -122,7 +135,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-700 shadow-lg rounded-md py-2 z-50">
                   <button
                     className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2"
-                    onClick={() => alert('Logging out...')}
+                    onClick={handleLogout}
                   >
                     <LogOut size={16} /> Logout
                   </button>

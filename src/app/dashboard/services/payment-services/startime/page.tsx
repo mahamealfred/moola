@@ -4,12 +4,15 @@ import { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
 import Link from 'next/link';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 type FormData = {
   smartCardNumber: string;
   customerName: string;
   amount: string;
   receiptId: string;
+  requestId?: string;
 };
 
 export default function StartimesPayment() {
@@ -18,7 +21,7 @@ export default function StartimesPayment() {
     smartCardNumber: '',
     customerName: '',
     amount: '',
-    receiptId: ''
+    receiptId: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -27,22 +30,84 @@ export default function StartimesPayment() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const validateCustomer = async () => {
+    try {
+      const res = await axios.post('http://localhost:3000/v1/agencytest/eco/services/validate/biller', {
+        billerCode: 'paytv',
+        productCode: 'paytv',
+        customerId: formData.smartCardNumber,
+        amount: formData.amount || '1000',
+      });
+
+      if (res.data.success) {
+        setFormData(prev => ({
+          ...prev,
+          customerName: res.data.data.customerName,
+          requestId: res.data.data.requestId,
+        }));
+        setStep(2);
+      } else {
+        toast.error(res.data.data.message || 'Validation failed');
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data.message || 'Validation error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const executePayment = async (payload: any) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+
+    if (!token) throw new Error('No auth token found. Please log in.');
+
+    const response = await fetch('http://localhost:3000/v1/agencytest/eco/services/execute/bill-payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText);
+    }
+
+    return response.json();
+  };
+
   const handleNext = async () => {
     if (step === 1) {
       if (!formData.smartCardNumber) return;
       setLoading(true);
-      setTimeout(() => {
-        setFormData(prev => ({ ...prev, customerName: 'Jane Smith' }));
-        setStep(2);
-        setLoading(false);
-      }, 1000);
+      await validateCustomer();
     } else if (step === 2) {
       if (!formData.amount) return;
       setStep(3);
     } else if (step === 3) {
-      const id = 'ST-' + Date.now();
-      setFormData(prev => ({ ...prev, receiptId: id }));
-      setStep(4);
+      setLoading(true);
+      try {
+        const response = await executePayment({
+          email: 'mahamealfred@gmail.com',
+          clientPhone: '+250789595309',
+          customerId: formData.smartCardNumber,
+          billerCode: 'startimes',
+          productCode: 'startimes',
+          amount: formData.amount,
+          ccy: 'RWF',
+          requestId: formData.requestId,
+        });
+
+        const receiptId = `ST-${Date.now()}`;
+        setFormData(prev => ({ ...prev, receiptId }));
+        setStep(4);
+      } catch (err: any) {
+        toast.error(err.message || 'Payment failed');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -167,7 +232,7 @@ const stepAnimation = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -20 },
-  transition: { duration: 0.3 }
+  transition: { duration: 0.3 },
 };
 
 type InputProps = {

@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Sun, Moon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-
 export const runtime = "edge";
 
 export default function LoginPage() {
@@ -31,14 +30,47 @@ export default function LoginPage() {
     document.documentElement.classList.toggle('dark', newTheme);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email && password) {
-      router.push('/dashboard');
-    } else {
-      alert('Invalid credentials');
+  const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    const res= await fetch('http://localhost:3000/v1/auth/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    username: email,
+    password: password,
+  }),
+});
+
+
+    const result = await res.json();
+    console.log("err:",result)
+
+    if (!res.ok || !result.success) {
+      throw new Error(result.message || 'Login failed');
     }
-  };
+
+    const { accessToken, refreshToken, ...userInfo } = result.data;
+
+    // Store tokens and user info in localStorage
+  
+
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('user', JSON.stringify(userInfo));
+
+    // Optionally: You can also update context here (if you're using one)
+
+    // Redirect
+    router.push('/dashboard');
+  } catch (err: any) {
+    alert(err.message || 'Something went wrong during login.');
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 transition-colors">
@@ -57,7 +89,7 @@ export default function LoginPage() {
           className="p-8 sm:p-10 space-y-6"
         >
           <header className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">MoolaX</h1>
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">X-pay</h1>
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-800"
@@ -140,7 +172,7 @@ export default function LoginPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
           whileHover={{
             scale: 1.01,
-            transition: { yoyo: Infinity, duration: 1.5, ease: 'easeInOut' },
+            transition: {  duration: 1.5, ease: 'easeInOut' },
           }}
           className="hidden md:flex flex-col justify-center items-center text-center bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-700 dark:from-blue-900 dark:to-purple-900 text-white px-10 py-12"
         >
@@ -150,7 +182,7 @@ export default function LoginPage() {
             transition={{ delay: 0.5, duration: 0.6, type: 'spring', stiffness: 60 }}
             className="text-4xl font-extrabold mb-4"
           >
-            Welcome to Moolax
+            Welcome to X-pay
           </motion.h2>
           <motion.p
             initial={{ y: 20, opacity: 0 }}

@@ -1,7 +1,7 @@
 'use client';
-import React from 'react';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Zap,
@@ -9,6 +9,8 @@ import {
   FileText,
   Tv,
   MessageSquare,
+  Droplet,
+  BookOpen,
   Globe,
   Building2,
   Landmark,
@@ -21,36 +23,38 @@ import BulkSmsForm from './payment-services/bulk-sms/page';
 import AirtimePurchase from './payment-services/airtme/page';
 import StartimesPayment from './payment-services/startime/page';
 
+// Types
 type PaymentService = {
   name: string;
   icon: React.ElementType;
   content: string | React.ReactElement;
-
 };
 
 type AgencyBankingService = {
   name: string;
   icon: React.ElementType;
+  href: string;
 };
 
-// List of services
+// Services
 const paymentServices: PaymentService[] = [
   { name: 'Electricity Payment', icon: Zap, content: <ElectricityPayment /> },
-  { name: 'RRA Payment', icon: FileText, content: <RraPayment/> },
-  { name: 'Buy Airtime', icon: Phone, content: <AirtimePurchase/> },
-  { name: 'Startimes Payment', icon: Tv, content: <StartimesPayment/>},
-  { name: 'Bulk SMS', icon: MessageSquare, content: <BulkSmsForm/> },
-  { name: 'Irembo Pay', icon: Globe, content: 'Irembo Pay Form' },
+  { name: 'RRA Payment', icon: FileText, content: <RraPayment /> },
+  { name: 'Buy Airtime', icon: Phone, content: <AirtimePurchase /> },
+  { name: 'Startimes Payment', icon: Tv, content: <StartimesPayment /> },
+  { name: 'Bulk SMS', icon: MessageSquare, content: <BulkSmsForm /> },
+  { name: 'Wasac', icon: Droplet, content: 'Service is not available Please contact the Technical Team' },
+  { name: 'School Fees', icon: BookOpen, content: 'Service is not available Please contact the Technical Team' },
 ];
 
 const agencyBankingServices: AgencyBankingService[] = [
-  { name: 'Ecobank', icon: Banknote },
-  { name: 'Bank of Kigali', icon: Building2 },
-  { name: 'Equity Bank', icon: Landmark },
-  { name: 'GT Bank', icon: ShieldCheck },
+  { name: 'Ecobank', icon: Banknote, href: '/dashboard/services/agency-banking/ecobank' },
+  { name: 'Bank of Kigali', icon: Building2, href: '/dashboard/balance' },
+  { name: 'Equity Bank', icon: Landmark, href: '/dashboard/balance' },
+  { name: 'GT Bank', icon: ShieldCheck, href: '/dashboard/balance' },
 ];
 
-// Animation variants
+// Animation Variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -66,6 +70,7 @@ const cardVariants = {
 
 export default function DashboardHome() {
   const [selectedService, setSelectedService] = useState<PaymentService | null>(null);
+  const router = useRouter();
 
   return (
     <motion.div
@@ -100,60 +105,64 @@ export default function DashboardHome() {
         </div>
       )}
 
-      {/* Payment Services */}
-      <section>
-        <h2 className="text-2xl font-bold mb-4  text-gray-900 dark:text-white text-center">
-          Payment Services
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {paymentServices.map(({ name, icon: Icon, content }) => (
-            <motion.div
-              key={name}
-              variants={cardVariants}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 shadow-md rounded-xl p-4 transition-all duration-300 ease-in-out"
-              onClick={() => setSelectedService({ name, icon: Icon, content })}
-            >
-              <div className="flex flex-col items-start gap-3 group cursor-pointer">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full group-hover:rotate-6 transition-transform">
-                  <Icon className="w-5 h-5" />
+      {/* Main two-column layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Payment Services */}
+        <section>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white text-center md:text-center">
+            Payment Services
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {paymentServices.map(({ name, icon: Icon, content }) => (
+              <motion.div
+                key={name}
+                variants={cardVariants}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 shadow-md rounded-xl p-4 transition-all duration-300 ease-in-out cursor-pointer"
+                onClick={() => setSelectedService({ name, icon: Icon, content })}
+              >
+                <div className="flex flex-col items-start gap-3 group">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full group-hover:rotate-6 transition-transform">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-base font-medium text-gray-800 dark:text-white group-hover:underline">
+                    {name}
+                  </span>
                 </div>
-                <span className="text-base font-medium text-gray-800 dark:text-white group-hover:underline">
-                  {name}
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+              </motion.div>
+            ))}
+          </div>
+        </section>
 
-      {/* Agency Banking */}
-      <section>
-        <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white text-center">
-          Agency Banking
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {agencyBankingServices.map(({ name, icon: Icon }) => (
-            <motion.div
-              key={name}
-              variants={cardVariants}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 shadow-md rounded-xl p-4 transition-all duration-300 ease-in-out"
-            >
-              <div className="flex flex-col items-start gap-3 group">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full group-hover:rotate-6 transition-transform">
-                  <Icon className="w-5 h-5" />
+        {/* Agency Banking */}
+        <section>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white text-center md:text-center">
+            Agency Banking
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {agencyBankingServices.map(({ name, icon: Icon, href }) => (
+              <motion.div
+                key={name}
+                variants={cardVariants}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 shadow-md rounded-xl p-4 transition-all duration-300 ease-in-out cursor-pointer"
+                onClick={() => router.push(href)}
+              >
+                <div className="flex flex-col items-start gap-3 group">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full group-hover:rotate-6 transition-transform">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-base font-medium text-gray-800 dark:text-white group-hover:underline">
+                    {name}
+                  </span>
                 </div>
-                <span className="text-base font-medium text-gray-800 dark:text-white group-hover:underline">
-                  {name}
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      </div>
     </motion.div>
   );
 }

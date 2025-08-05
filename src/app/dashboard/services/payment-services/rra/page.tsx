@@ -1,123 +1,158 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText } from 'lucide-react';
+import { QRCodeCanvas } from 'qrcode.react';
 import html2pdf from 'html2pdf.js';
 import Link from 'next/link';
-import { QRCodeCanvas } from 'qrcode.react';
+
+type Step = 1 | 2 | 3 | 4;
+
+interface FormData {
+  tin: string;
+  taxpayerName: string;
+  amountDue: number;       // Actual tax due
+  serviceFee: number;      // Fixed fee
+  receiptId: string;
+}
 
 export default function RraPayment() {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [step, setStep] = useState<Step>(1);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
     tin: '',
     taxpayerName: '',
-    amount: '',
+    amountDue: 0,
+    serviceFee: 0,
     receiptId: ''
   });
-  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: any) => {
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const calculateAmount = (amountDue: number) => {
-    if (amountDue >= 1 && amountDue <= 1000) {
-      return 160;
-    } else if (amountDue >= 1001 && amountDue <= 10000) {
-      return 300;
-    } else if (amountDue >= 10001 && amountDue <= 40000) {
-      return 500;
-    } else if (amountDue >= 40001 && amountDue <= 75000) {
-      return 1000;
-    } else if (amountDue >= 75001 && amountDue <= 150000) {
-      return 1500;
-    } else if (amountDue >= 150001 && amountDue <= 500000) {
-      return 2000;
-    } else if (amountDue >= 500001) {
-      return 3000;
-    } else {
-      return 0;
-    }
+  // Calculate service fee based on amount due
+  const calculateServiceFee = (due: number): number => {
+    if (due >= 1 && due <= 1000) return 160;
+    if (due >= 1001 && due <= 10000) return 300;
+    if (due >= 10001 && due <= 40000) return 500;
+    if (due >= 40001 && due <= 75000) return 1000;
+    if (due >= 75001 && due <= 150000) return 1500;
+    if (due >= 150001 && due <= 500000) return 2000;
+    if (due >= 500001) return 3000;
+    return 0;
   };
 
-  const handleNext = async () => {
-    if (step === 1) {
-      setLoading(true);
+  async function validateTin(tin: string) {
+    // Simulate API call, replace with your real API
+    return new Promise<{ taxpayerName: string; amountDue: number }>((resolve) => {
       setTimeout(() => {
-        // Simulate fetching data from backend
-        const taxpayerName = 'ABC Company Ltd';
-        const amountDue = 89500; // Mocked backend value
+        resolve({
+          taxpayerName: 'ABC Company Ltd',
+          amountDue: 89500,
+        });
+      }, 1200);
+    });
+  }
 
-        const calculatedAmount = calculateAmount(amountDue);
-
+  async function handleNext() {
+    if (step === 1) {
+      if (formData.tin.trim().length < 5) {
+        alert('Please enter a valid TIN.');
+        return;
+      }
+      setLoading(true);
+      try {
+        const data = await validateTin(formData.tin.trim());
+        const fee = calculateServiceFee(data.amountDue);
         setFormData(prev => ({
           ...prev,
-          taxpayerName,
-          amount: String(calculatedAmount)
+          taxpayerName: data.taxpayerName,
+          amountDue: data.amountDue,
+          serviceFee: fee
         }));
         setStep(2);
+      } catch {
+        alert('TIN validation failed. Try again.');
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     } else if (step === 2) {
       setStep(3);
     } else if (step === 3) {
-      const id = 'RRR' + Date.now();
-      setFormData(prev => ({ ...prev, receiptId: id }));
+      setFormData(prev => ({
+        ...prev,
+        receiptId: 'RRR' + Date.now()
+      }));
       setStep(4);
     }
-  };
+  }
 
-  const handleDownloadPDF = () => {
+  function handleBack() {
+    if (loading) return;
+    if (step > 1) setStep(prev => (prev - 1) as Step);
+  }
+
+  function downloadPDF() {
     const element = document.getElementById('receipt');
     if (element) {
       html2pdf().from(element).save(`rra_receipt_${formData.receiptId}.pdf`);
     }
-  };
+  }
+
+  const totalAmount = formData.amountDue + formData.serviceFee;
 
   return (
     <div>
       <motion.div
+        className="max-w-xl w-full p-8 rounded-xl border border-gray-300 dark:border-gray-700 shadow-xl bg-white dark:bg-gray-900"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-xl bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-8 space-y-6 border border-gray-200 dark:border-gray-700"
+        transition={{ duration: 0.4 }}
       >
-        {/* <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white"></h1>
-          <FileText className="w-6 h-6 text-blue-600" />
-        </div> */}
-
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="step1" {...stepAnimation}>
               <Input
-                label="Enter TIN"
+                label="Enter Doc ID"
                 name="tin"
                 value={formData.tin}
-                onChange={handleChange}
+                onChange={onInputChange}
+                disabled={loading}
               />
             </motion.div>
           )}
 
           {step === 2 && (
             <motion.div key="step2" {...stepAnimation}>
-              <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                Taxpayer: <strong>{formData.taxpayerName}</strong>
-              </div>
-              <div className="text-sm text-gray-800 dark:text-white bg-gray-100 dark:bg-gray-800 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700">
-                Amount to Pay (Auto-Calculated): <strong>RWF {formData.amount}</strong>
+              <p className="mb-2 text-gray-700 dark:text-gray-300">
+                <strong>Taxpayer:</strong> {formData.taxpayerName}
+              </p>
+              <div className="text-gray-900 dark:text-white space-y-2">
+                <p>
+                  <strong>Tax Amount Due:</strong> RWF {formData.amountDue.toLocaleString()}
+                </p>
+                <p>
+                  <strong>Service Fee:</strong> RWF {formData.serviceFee.toLocaleString()}
+                </p>
+                <p className="text-lg font-semibold mt-4 border-t pt-2">
+                  <strong>Total Amount to Pay:</strong> RWF {totalAmount.toLocaleString()}
+                </p>
               </div>
             </motion.div>
           )}
 
           {step === 3 && (
             <motion.div key="step3" {...stepAnimation}>
-              <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-xl text-sm space-y-2">
-                <h2 className="font-semibold text-gray-800 dark:text-white">Confirm Tax Payment</h2>
-                <p className="text-gray-700 dark:text-gray-300">Taxpayer: {formData.taxpayerName}</p>
-                <p className="text-gray-700 dark:text-gray-300">TIN: {formData.tin}</p>
-                <p className="text-gray-700 dark:text-gray-300">Amount: RWF {formData.amount}</p>
+              <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-xl">
+                <h2 className="font-semibold mb-2 text-gray-800 dark:text-white">Confirm Payment</h2>
+                <p><strong>TIN:</strong> {formData.tin}</p>
+                <p><strong>Taxpayer:</strong> {formData.taxpayerName}</p>
+                <p><strong>Tax Amount Due:</strong> RWF {formData.amountDue.toLocaleString()}</p>
+                <p><strong>Service Fee:</strong> RWF {formData.serviceFee.toLocaleString()}</p>
+                <p className="text-lg font-semibold mt-4 border-t pt-2">
+                  <strong>Total Amount to Pay:</strong> RWF {totalAmount.toLocaleString()}
+                </p>
               </div>
             </motion.div>
           )}
@@ -126,24 +161,23 @@ export default function RraPayment() {
             <motion.div key="step4" {...stepAnimation}>
               <div
                 id="receipt"
-                className="bg-gray-100 dark:bg-gray-800 p-4 rounded-xl text-sm space-y-3 border border-gray-300 dark:border-gray-700"
+                className="p-5 bg-gray-100 dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-700"
               >
-                <h2 className="text-lg font-bold text-gray-800 dark:text-white">Tax Payment Receipt</h2>
-                <p>Receipt ID: <strong>{formData.receiptId}</strong></p>
-                <p>Taxpayer: {formData.taxpayerName}</p>
-                <p>TIN: {formData.tin}</p>
-                <p>Amount Paid: RWF {formData.amount}</p>
+                <h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">RRA Payment Receipt</h2>
+                <p><strong>Receipt ID:</strong> {formData.receiptId}</p>
+                <p><strong>TIN:</strong> {formData.tin}</p>
+                <p><strong>Taxpayer:</strong> {formData.taxpayerName}</p>
+                <p><strong>Tax Amount Paid:</strong> RWF {formData.amountDue.toLocaleString()}</p>
+                <p><strong>Service Fee Paid:</strong> RWF {formData.serviceFee.toLocaleString()}</p>
+                <p className="text-lg font-semibold mt-4 border-t pt-2">
+                  <strong>Total Paid:</strong> RWF {totalAmount.toLocaleString()}
+                </p>
 
-                <div className="pt-3">
-                  <p className="font-medium mb-2 text-gray-800 dark:text-white">Scan QR Code to verify</p>
+                <div className="mt-5">
+                  <p className="mb-2 font-semibold text-gray-900 dark:text-white">Verify via QR Code:</p>
                   <QRCodeCanvas
-                    value={JSON.stringify({
-                      receiptId: formData.receiptId,
-                      tin: formData.tin,
-                      taxpayerName: formData.taxpayerName,
-                      amount: formData.amount
-                    })}
-                    size={120}
+                    value={JSON.stringify(formData)}
+                    size={140}
                     bgColor="#ffffff"
                     fgColor="#000000"
                     level="Q"
@@ -154,11 +188,12 @@ export default function RraPayment() {
           )}
         </AnimatePresence>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+        <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-between items-center">
           {step > 1 && step < 4 && (
             <button
-              onClick={() => setStep(prev => prev - 1)}
-              className="text-sm text-gray-600 dark:text-gray-300 hover:underline"
+              onClick={handleBack}
+              className="text-gray-600 dark:text-gray-300 hover:underline"
+              disabled={loading}
             >
               ← Back
             </button>
@@ -167,8 +202,8 @@ export default function RraPayment() {
           {step < 3 && (
             <button
               onClick={handleNext}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition w-full sm:w-auto"
               disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl w-full sm:w-auto font-semibold disabled:opacity-60"
             >
               {loading ? 'Validating...' : 'Next'}
             </button>
@@ -177,23 +212,23 @@ export default function RraPayment() {
           {step === 3 && (
             <button
               onClick={handleNext}
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-xl transition w-full sm:w-auto"
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl w-full sm:w-auto font-semibold"
             >
               Confirm Payment
             </button>
           )}
 
           {step === 4 && (
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:justify-end">
+            <div className="flex gap-3 w-full sm:justify-end flex-col sm:flex-row">
               <button
-                onClick={handleDownloadPDF}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-xl transition w-full sm:w-auto"
+                onClick={downloadPDF}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl w-full sm:w-auto font-semibold"
               >
-                Save PDF
+                Download Receipt PDF
               </button>
               <Link
                 href="/dashboard/services"
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-6 py-2 rounded-xl text-center w-full sm:w-auto"
+                className="bg-gray-300 hover:bg-gray-400 text-gray-900 px-6 py-2 rounded-xl w-full sm:w-auto text-center font-semibold"
               >
                 Back to Services
               </Link>
@@ -208,21 +243,39 @@ export default function RraPayment() {
 const stepAnimation = {
   initial: { opacity: 0, y: 15 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -10 },
+  exit: { opacity: 0, y: -15 },
   transition: { duration: 0.3 }
 };
 
-function Input({ label, name, value, onChange, type = 'text' }: any) {
+function Input({
+  label,
+  name,
+  value,
+  onChange,
+  type = 'text',
+  disabled = false
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  type?: string;
+  disabled?: boolean;
+}) {
   return (
-    <div className="w-full space-y-1">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}</label>
+    <div className="mb-6">
+      <label htmlFor={name} className="block mb-2 text-gray-700 dark:text-gray-300 font-medium">
+        {label}
+      </label>
       <input
-        type={type}
+        id={name}
         name={name}
+        type={type}
         value={value}
         onChange={onChange}
-        className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+        disabled={disabled}
         required
+        className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
       />
     </div>
   );
