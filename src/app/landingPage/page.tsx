@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, Variants, easeOut } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   Sun,
   Moon,
@@ -16,6 +17,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+// Features
 const features = [
   { name: 'Electricity Payment', icon: Zap },
   { name: 'RRA Tax Payment', icon: FileText },
@@ -25,6 +27,7 @@ const features = [
   { name: 'Irembo Pay', icon: Globe },
 ];
 
+// Banks
 const banks = [
   { name: 'Equity Bank', icon: Building },
   { name: 'BK', icon: Building },
@@ -53,7 +56,10 @@ export default function LandingPage() {
   const [isDark, setIsDark] = useState(true);
   const [newService, setNewService] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [current, setCurrent] = useState(0);
   const router = useRouter();
+
+  const itemsPerView = 3; // number of services visible at once
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -77,7 +83,6 @@ export default function LandingPage() {
   const handleServiceSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newService.trim().length > 2) {
-      // Simulate submission, you can replace with API call
       setSubmitted(true);
       setNewService('');
       setTimeout(() => setSubmitted(false), 4000);
@@ -86,19 +91,36 @@ export default function LandingPage() {
     }
   };
 
+  const nextSlide = () => {
+    setCurrent((prev) =>
+      prev + itemsPerView >= features.length ? 0 : prev + itemsPerView
+    );
+  };
+
+  const prevSlide = () => {
+    setCurrent((prev) =>
+      prev - itemsPerView < 0
+        ? Math.max(features.length - itemsPerView, 0)
+        : prev - itemsPerView
+    );
+  };
+
   return (
     <div className="relative min-h-screen bg-white dark:bg-gray-950 transition-colors duration-700 overflow-x-hidden">
-      {/* Floating blurred background */}
+      {/* Floating blurred background accents */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute w-96 h-96 bg-blue-300/30 dark:bg-blue-900/30 blur-3xl rounded-full top-10 left-1/4 animate-pulse" />
-        <div className="absolute w-64 h-64 bg-purple-300/20 dark:bg-purple-800/20 blur-2xl rounded-full bottom-10 right-1/4 animate-ping" />
+        <div className="absolute w-96 h-96 bg-[#13294b]/20 dark:bg-[#13294b]/30 blur-3xl rounded-full top-10 left-1/4 animate-pulse" />
+        <div className="absolute w-64 h-64 bg-[#ff6600]/20 dark:bg-[#ff6600]/30 blur-2xl rounded-full bottom-10 right-1/4 animate-ping" />
       </div>
 
       {/* Header */}
       <header className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white select-none tracking-tight">
-          X-pay
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            <span className="text-[#ff6600]">X</span>
+            <span className="text-[#13294b] dark:text-white">-Pay</span>
+          </h1>
+        </div>
         <button
           onClick={toggleTheme}
           aria-label="Toggle Theme"
@@ -120,23 +142,23 @@ export default function LandingPage() {
         variants={fadeUp}
         className="text-center pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto"
       >
-        <h2 className="text-5xl font-extrabold text-gray-900 dark:text-white mb-6 select-none leading-tight">
-          Powering Everyday Services
+        <h2 className="text-5xl font-extrabold text-[#13294b] dark:text-white mb-6 leading-tight">
+          Network of the Best
         </h2>
-        <p className="text-xl max-w-3xl mx-auto text-gray-700 dark:text-gray-300 mb-12 select-none">
+        <p className="text-xl max-w-3xl mx-auto text-gray-700 dark:text-gray-300 mb-12">
           DDIN empowers agents and individuals to perform critical financial and
           public services at the click of a button.
         </p>
         <div className="flex justify-center gap-6">
           <Link
             href="/login"
-            className="px-10 py-3 bg-blue-600 text-white rounded-2xl font-semibold hover:bg-blue-700 transition shadow-lg hover:shadow-xl"
+            className="px-10 py-3 bg-[#13294b] text-white rounded-2xl font-semibold hover:bg-[#0f213d] transition shadow-lg hover:shadow-xl"
           >
             Login
           </Link>
           <Link
             href="/registration"
-            className="px-10 py-3 border border-blue-600 text-blue-600 dark:text-blue-400 rounded-2xl font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition shadow-lg hover:shadow-xl"
+            className="px-10 py-3 border border-[#13294b] text-[#13294b] dark:text-[#ff6600] rounded-2xl font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition shadow-lg hover:shadow-xl"
           >
             Register
           </Link>
@@ -144,37 +166,58 @@ export default function LandingPage() {
       </motion.section>
 
       {/* Features Section */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
-        <h3 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12 select-none">
+      <section className="max-w-7xl mx-auto px-6 py-16 relative">
+        <h3 className="text-3xl font-bold text-center text-[#13294b] dark:text-white mb-12">
           What You Can Do
         </h3>
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10"
-        >
-          {features.map(({ name, icon: Icon }, index) => (
-            <motion.button
-              key={index}
-              variants={fadeUp}
-              onClick={goToLogin}
-              className="flex flex-col items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition focus:outline-none focus:ring-4 focus:ring-blue-400 cursor-pointer"
-              aria-label={`Go to login to access ${name}`}
-              type="button"
-            >
-              <Icon className="w-14 h-14 mb-6 text-blue-600 dark:text-blue-400" />
-              <h4 className="text-xl font-semibold text-gray-800 dark:text-white">
-                {name}
-              </h4>
-            </motion.button>
-          ))}
-        </motion.div>
+
+        <div className="relative flex items-center">
+          {/* Left Arrow */}
+          <button
+            onClick={prevSlide}
+            className="absolute -left-4 md:-left-10 z-10 bg-white dark:bg-gray-800 p-3 rounded-full shadow-md hover:shadow-lg transition"
+          >
+            <ChevronLeft className="w-6 h-6 text-[#13294b] dark:text-white" />
+          </button>
+
+          {/* Cards Container */}
+          <motion.div
+            key={current}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex-1 flex justify-center gap-6"
+          >
+            {features
+              .slice(current, current + itemsPerView)
+              .map(({ name, icon: Icon }, idx) => (
+                <motion.button
+                  key={idx}
+                  onClick={goToLogin}
+                  whileHover={{ scale: 1.05 }}
+                  className="w-72 flex flex-col items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-10 rounded-3xl shadow-lg hover:shadow-2xl transition cursor-pointer"
+                >
+                  <Icon className="w-14 h-14 mb-6 text-[#13294b] dark:text-[#ff6600]" />
+                  <h4 className="text-xl font-semibold text-gray-800 dark:text-white text-center">
+                    {name}
+                  </h4>
+                </motion.button>
+              ))}
+          </motion.div>
+
+          {/* Right Arrow */}
+          <button
+            onClick={nextSlide}
+            className="absolute -right-4 md:-right-10 z-10 bg-white dark:bg-gray-800 p-3 rounded-full shadow-md hover:shadow-lg transition"
+          >
+            <ChevronRight className="w-6 h-6 text-[#13294b] dark:text-white" />
+          </button>
+        </div>
       </section>
 
       {/* Agency Banking Section */}
       <section className="max-w-7xl mx-auto px-6 pb-16">
-        <h3 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12 select-none">
+        <h3 className="text-3xl font-bold text-center text-[#13294b] dark:text-white mb-12">
           Agency Banking Partners
         </h3>
         <motion.div
@@ -188,11 +231,9 @@ export default function LandingPage() {
               key={idx}
               variants={fadeUp}
               onClick={goToLogin}
-              className="flex flex-col items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition focus:outline-none focus:ring-4 focus:ring-blue-400 cursor-pointer"
-              aria-label={`Go to login to access ${name} services`}
-              type="button"
+              className="flex flex-col items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-8 rounded-3xl shadow-lg hover:shadow-2xl transition cursor-pointer"
             >
-              <Icon className="w-12 h-12 mb-5 text-green-600 dark:text-green-400" />
+              <Icon className="w-12 h-12 mb-5 text-[#ff6600]" />
               <h4 className="text-lg font-semibold text-gray-800 dark:text-white">
                 {name}
               </h4>
@@ -203,7 +244,7 @@ export default function LandingPage() {
 
       {/* Add More Service Form Section */}
       <section className="max-w-4xl mx-auto px-6 pb-20">
-        <h3 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8 select-none">
+        <h3 className="text-3xl font-bold text-center text-[#13294b] dark:text-white mb-8">
           Request a New Service
         </h3>
 
@@ -213,7 +254,6 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           className="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-xl max-w-lg mx-auto"
-          aria-label="Add new service request form"
         >
           <label
             htmlFor="newService"
@@ -225,7 +265,7 @@ export default function LandingPage() {
             id="newService"
             type="text"
             placeholder="Enter service name (e.g., Water Bill)"
-            className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 mb-6 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition"
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-700 px-4 py-3 mb-6 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#ff6600] transition"
             value={newService}
             onChange={(e) => setNewService(e.target.value)}
             required
@@ -233,8 +273,7 @@ export default function LandingPage() {
           />
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl py-3 font-semibold transition shadow-lg hover:shadow-xl"
-            aria-live="polite"
+            className="w-full bg-[#ff6600] hover:bg-[#e65c00] text-white rounded-2xl py-3 font-semibold transition shadow-lg hover:shadow-xl"
           >
             Submit Request
           </button>
@@ -243,7 +282,7 @@ export default function LandingPage() {
               role="alert"
               className="mt-4 text-center text-green-600 dark:text-green-400 font-semibold"
             >
-              Thank you! Your request has been submitted.
+              ✅ Thank you! Your request has been submitted.
             </p>
           )}
         </motion.form>

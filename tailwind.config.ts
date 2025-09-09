@@ -2,8 +2,12 @@ import type { Config } from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme';
 
 const config: Config = {
-  darkMode: 'class', // ✅ Add this line
-  content: ['./src/**/*.{js,ts,jsx,tsx}', './app/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class', // ✅ enable dark mode with `class`
+  content: [
+    './src/**/*.{js,ts,jsx,tsx}',
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -21,8 +25,8 @@ const config: Config = {
           700: 'rgb(var(--tw-color-primary-700) / <alpha-value>)',
           800: 'rgb(var(--tw-color-primary-800) / <alpha-value>)',
           900: 'rgb(var(--tw-color-primary-900) / <alpha-value>)',
-          950: 'rgb(var(--tw-color-primary-950) / <alpha-value>)',
         },
+        // Optional: keep a neutral dark gray for backgrounds
         dark: '#222222',
       },
       keyframes: {
@@ -38,12 +42,8 @@ const config: Config = {
           },
         },
         shimmer: {
-          '0%': {
-            backgroundPosition: '-700px 0',
-          },
-          '100%': {
-            backgroundPosition: '700px 0',
-          },
+          '0%': { backgroundPosition: '-700px 0' },
+          '100%': { backgroundPosition: '700px 0' },
         },
       },
       animation: {

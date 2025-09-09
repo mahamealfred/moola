@@ -1,59 +1,39 @@
 'use client';
+
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
-  Zap,
-  Phone,
-  FileText,
-  Tv,
-  MessageSquare,
-  Globe,
-  Building2,
-  Landmark,
-  Banknote,
-  ShieldCheck,
   UserPlus,
   Download,
   Upload,
   SendHorizonal,
   KeyRound,
+  Landmark,
 } from 'lucide-react';
 
-import ElectricityPayment from '../../payment-services/electricity/page';
-import DepositForm from "./deposit/page";
 import OpenAccount from './account-openning/page';
+import DepositForm from './deposit/page';
+import ElectricityPayment from '../../payment-services/electricity/page';
 import RemittanceForm from './remittance/page';
 
-// Types
-type PaymentService = {
-  name: string;
-  icon: React.ElementType;
-  content: string | React.ReactElement;
-};
 type EcobankServices = {
   name: string;
   icon: React.ElementType;
   content: string | React.ReactElement;
 };
 
-
-const ecobankServices:  EcobankServices[] = [
-  { name: 'Open Account', icon: UserPlus, content: <OpenAccount />},
-  { name: 'Deposit', icon: Download, content: <DepositForm />},
-  { name: 'Withdrawal', icon: Upload,content: <ElectricityPayment /> },
-  { name: 'Remittance', icon: SendHorizonal, content: <RemittanceForm/> },
-  { name: 'Express Cash Token', icon: KeyRound, content: <ElectricityPayment />},
+const ecobankServices: EcobankServices[] = [
+  { name: 'Open Account', icon: UserPlus, content: <OpenAccount /> },
+  { name: 'Deposit', icon: Download, content: <DepositForm /> },
+  { name: 'Withdrawal', icon: Upload, content: <ElectricityPayment /> },
+  { name: 'Remittance', icon: SendHorizonal, content: <RemittanceForm /> },
+  { name: 'Express Cash Token', icon: KeyRound, content: <ElectricityPayment /> },
   { name: 'Interbank', icon: Landmark, content: <ElectricityPayment /> },
 ];
 
-// Animation
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const cardVariants = {
@@ -62,7 +42,7 @@ const cardVariants = {
 };
 
 export default function DashboardHome() {
-  const [selectedService, setSelectedService] = useState<PaymentService | null>(null);
+  const [selectedService, setSelectedService] = useState<EcobankServices | null>(null);
 
   return (
     <motion.div
@@ -73,15 +53,15 @@ export default function DashboardHome() {
     >
       {/* Dialog */}
       {selectedService && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-xl max-w-lg w-full shadow-xl">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl max-w-lg w-full shadow-2xl">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                 {selectedService.name}
               </h3>
               <button
                 onClick={() => setSelectedService(null)}
-                className="text-gray-500 hover:text-gray-800 dark:hover:text-white"
+                className="text-gray-500 hover:text-gray-800 dark:hover:text-white text-2xl font-bold"
               >
                 ✕
               </button>
@@ -99,7 +79,7 @@ export default function DashboardHome() {
 
       {/* Ecobank Services */}
       <section>
-        <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white text-center">
+        <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white text-center">
           Ecobank Services
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -107,17 +87,16 @@ export default function DashboardHome() {
             <motion.div
               key={name}
               variants={cardVariants}
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
-              className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 shadow-md rounded-xl p-4 transition-all duration-300 ease-in-out"
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-2xl p-5 cursor-pointer transition-all duration-300 backdrop-blur-sm"
               onClick={() => setSelectedService({ name, icon: Icon, content })}
-              // className="transition-all duration-300 ease-in-out"
             >
-              <div className="flex flex-col items-start gap-3 group cursor-pointer">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full group-hover:rotate-6 transition-transform">
-                  <Icon className="w-5 h-5" />
+              <div className="flex flex-col items-start gap-3 group">
+                <div className="p-3 bg-[#ff660020] dark:bg-[#ff660030] text-[#ff6600] rounded-full group-hover:rotate-6 transition-transform duration-300">
+                  <Icon className="w-6 h-6" />
                 </div>
-                <span className="text-base font-medium text-gray-800 dark:text-white group-hover:underline">
+                <span className="text-base font-medium text-gray-800 dark:text-white group-hover:text-[#ff6600] transition-colors">
                   {name}
                 </span>
               </div>

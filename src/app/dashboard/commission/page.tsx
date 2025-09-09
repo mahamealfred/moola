@@ -9,14 +9,13 @@ export default function CommissionPage() {
   const [withdrawAmount, setWithdrawAmount] = useState('');
 
   const handleWithdraw = () => {
-    // TODO: Implement withdraw logic
     alert(`Withdrawing RWF ${withdrawAmount} from commission`);
     setWithdrawAmount('');
   };
 
   return (
-    <div className="relative z-10 space-y-8">
-      <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+    <div className="relative z-10 space-y-8 max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
+      <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#13294b] dark:text-white text-center">
         Commission Dashboard
       </h2>
 
@@ -27,15 +26,15 @@ export default function CommissionPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md"
+          className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all"
         >
           <div className="flex items-center gap-4">
-            <div className="bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400 rounded-full p-3">
+            <div className="bg-[#ff660020] dark:bg-[#ff660030] text-[#ff6600] rounded-full p-3">
               <Coins className="w-6 h-6" />
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Available Commission</p>
-              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">RWF 45,500</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#ff6600]">RWF 45,500</p>
               <p className="text-xs text-gray-400 mt-1">Ready to withdraw</p>
             </div>
           </div>
@@ -46,15 +45,15 @@ export default function CommissionPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md"
+          className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all"
         >
           <div className="flex items-center gap-4">
-            <div className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full p-3">
+            <div className="bg-[#ff660020] dark:bg-[#ff660030] text-[#ff6600] rounded-full p-3">
               <Timer className="w-6 h-6" />
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Delayed Commission</p>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">RWF 8,000</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#ff6600]">RWF 8,000</p>
               <p className="text-xs text-gray-400 mt-1">Pending release</p>
             </div>
           </div>
@@ -66,21 +65,23 @@ export default function CommissionPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-md"
+        className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-2xl transition-all"
       >
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Withdraw Commission</h3>
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
+        <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-4 text-center sm:text-left">
+          Withdraw Commission
+        </h3>
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end justify-center sm:justify-start">
           <input
             type="number"
             placeholder="Enter amount (RWF)"
             value={withdrawAmount}
             onChange={(e) => setWithdrawAmount(e.target.value)}
-            className="w-full sm:w-1/2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full sm:w-1/2 px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#ff6600]"
           />
           <button
             onClick={handleWithdraw}
             disabled={!withdrawAmount}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#ff6600] text-white hover:bg-[#e65c00] transition disabled:opacity-50 font-semibold"
           >
             <Download className="w-5 h-5" />
             Withdraw Now
