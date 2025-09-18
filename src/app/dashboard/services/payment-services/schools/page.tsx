@@ -7,24 +7,26 @@ import html2pdf from 'html2pdf.js';
 type Step = 1 | 2 | 3 | 4;
 
 interface FormData {
-  accountNumber: string;
-  accountName: string;
-  accountType: string;
+  studentId: string;
+  studentName: string;
+  schoolName: string;
+  academicYear: string;
+  term: string;
   amount: number;
   receiptId: string;
-  reference: string;
 }
 
-export default function EcoBankDeposit() {
+export default function SchoolFeesPayment() {
   const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    accountNumber: '',
-    accountName: '',
-    accountType: '',
+    studentId: '',
+    studentName: '',
+    schoolName: '',
+    academicYear: '',
+    term: '',
     amount: 0,
-    receiptId: '',
-    reference: ''
+    receiptId: ''
   });
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -37,16 +39,33 @@ export default function EcoBankDeposit() {
     }
   };
 
-  async function validateAccount(accountNumber: string) {
-    return new Promise<{ accountName: string; accountType: string }>((resolve) => {
+  async function validateStudent(studentId: string) {
+    return new Promise<{ studentName: string; schoolName: string; academicYear: string; term: string; amount: number }>((resolve) => {
       setTimeout(() => {
-        // Generate random account details
-        const accountTypes = ["Savings Account", "Current Account", "Fixed Deposit"];
-        const accountType = accountTypes[Math.floor(Math.random() * accountTypes.length)];
+        // Generate random school and student details
+        const schools = [
+          "Green Hills Academy",
+          "APADE Primary School",
+          "Kigali International School",
+          "Wellspring Academy",
+          "Gashora Girls Academy"
+        ];
+        const terms = ["Term 1", "Term 2", "Term 3"];
+        const academicYears = ["2023-2024", "2024-2025"];
+        
+        const schoolName = schools[Math.floor(Math.random() * schools.length)];
+        const term = terms[Math.floor(Math.random() * terms.length)];
+        const academicYear = academicYears[Math.floor(Math.random() * academicYears.length)];
+        
+        // Generate random fee amount between 100,000 - 500,000 RWF
+        const amount = Math.floor(Math.random() * 400000) + 100000;
         
         resolve({
-          accountName: 'Jean Paul',
-          accountType
+          studentName: 'Alice Uwase',
+          schoolName,
+          academicYear,
+          term,
+          amount
         });
       }, 1200);
     });
@@ -54,23 +73,25 @@ export default function EcoBankDeposit() {
 
   async function handleNext() {
     if (step === 1) {
-      if (formData.accountNumber.trim().length < 5) {
-        alert('Please enter a valid account number.');
+      if (formData.studentId.trim().length < 5) {
+        alert('Please enter a valid student ID.');
         return;
       }
       setLoading(true);
       try {
-        const data = await validateAccount(formData.accountNumber.trim());
+        const data = await validateStudent(formData.studentId.trim());
         
         setFormData(prev => ({
           ...prev,
-          accountName: data.accountName,
-          accountType: data.accountType,
-          reference: 'DEP' + Math.floor(Math.random() * 10000)
+          studentName: data.studentName,
+          schoolName: data.schoolName,
+          academicYear: data.academicYear,
+          term: data.term,
+          amount: data.amount
         }));
         setStep(2);
       } catch {
-        alert('Account validation failed. Try again.');
+        alert('Student validation failed. Try again.');
       } finally {
         setLoading(false);
       }
@@ -83,7 +104,7 @@ export default function EcoBankDeposit() {
     } else if (step === 3) {
       setFormData(prev => ({
         ...prev,
-        receiptId: 'ECO' + Date.now()
+        receiptId: 'SCHOOL' + Date.now()
       }));
       setStep(4);
     }
@@ -99,10 +120,10 @@ export default function EcoBankDeposit() {
     if (element) {
       const opt = {
         margin: 0.5,
-        filename: `ecobank_deposit_receipt_${formData.receiptId}.pdf`,
+        filename: `school_fees_receipt_${formData.receiptId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        jsPDF极速赛车开奖直播 : { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
       html2pdf().set(opt).from(element).save();
     }
@@ -116,26 +137,27 @@ export default function EcoBankDeposit() {
         transition={{ duration: 0.3 }}
         className="w-full bg-white dark:bg-gray-800 rounded-lg p-3 md:p-4 border border-gray-200 dark:border-gray-700"
       >
-        {/* EcoBank Header */}
+        {/* School Fees Header */}
         <div className="mb-4 md:mb-5 text-center border-b border-gray-200 dark:border-gray-700 pb-3">
           <div className="flex items-center justify-center space-x-2">
             <div className="bg-[#ff6600] text-white p-1.5 md:p-2 rounded-full">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-2m-9 0H3m2 0h2M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
               </svg>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">EcoBank Deposit</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">School Fees Payment</h1>
           </div>
-          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Deposit money to your EcoBank account</p>
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Pay school fees securely</p>
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-4 md:mb-5">
+        <div className="mb-4极速赛车开奖直播 md:mb-5">
           <div className="flex justify-between items-center relative">
-            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 -translate-y-1/2 z-0"></div>
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 dark:bg极速赛车开奖直播 -gray-700 -translate-y-1/2 z-0"></div>
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="relative z-10">
-                <div className={`极速赛车开奖直播 w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-xs md:text-sm font-medium ${
+                <div className={`w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-xs md:text-sm font-medium ${
                   step >= i 
                     ? 'bg-[#ff6600] text-white' 
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
@@ -145,8 +167,8 @@ export default function EcoBankDeposit() {
               </div>
             ))}
           </div>
-          <div className="flex justify-between mt-1 text-[10px] md:text-xs text极速赛车开奖直播 -gray-500">
-            <span>Account Info</span>
+          <div className="flex justify-between mt-1 text-[10px] md:text-xs text-gray-500">
+            <span>Student Info</span>
             <span>Amount</span>
             <span>Confirm</span>
             <span>Receipt</span>
@@ -156,16 +178,16 @@ export default function EcoBankDeposit() {
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="step1" {...stepAnimation}>
-              <h2 className="text-lg md:text-xl font-bold mb-3 text-gray-900 dark:text-white">Enter Account Information</h2>
+              <h2 className="text-lg md:text-xl font-bold mb-3 text-gray-900 dark:text-white">Enter Student Information</h2>
               <div className="grid grid-cols-1 gap-3 md:gap-4">
                 <div className="mb-3 md:mb-4">
                   <Input
-                    label="Enter Account Number"
-                    name="accountNumber"
-                    value={formData.accountNumber}
+                    label="Enter Student ID"
+                    name="studentId"
+                    value={formData.studentId}
                     onChange={onInputChange}
                     disabled={loading}
-                    placeholder="e.g., 1234567890"
+                    placeholder="e.g., STU123456"
                   />
                 </div>
               </div>
@@ -174,43 +196,51 @@ export default function EcoBankDeposit() {
 
           {step === 2 && (
             <motion.div key="step2" {...stepAnimation}>
-              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Enter Deposit Amount</h2>
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">School Fees Details</h2>
               <div className="grid grid-cols-1 gap-3 md:gap-4">
                 <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-lg">
                   <h3 className="font-semibold mb-2 text-gray-700 dark:text-gray-300 text-sm md:text-base flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s极速赛车开奖直播 1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8极速赛车开奖直播 c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1极速赛车开奖直播 m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    Account Information
+                    Student Information
                   </h3>
                   <div className="text-gray-900 dark:text-white space-y-1 md:space-y-2 text-sm md:text-base mb-4">
                     <p>
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Account Name</strong>
-                      {formData.accountName}
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Student Name</strong>
+                      {formData.studentName}
                     </p>
                     <p>
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Account Number</strong>
-                      {formData.accountNumber}
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Student ID</strong>
+                      {formData.studentId}
                     </p>
                     <p>
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Account Type</strong>
-                      {formData.accountType}
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">School</strong>
+                      {formData.schoolName}
+                    </p>
+                    <p>
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Academic Year</strong>
+                      {formData.academicYear}
+                    </p>
+                    <p>
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Term</strong>
+                      {formData.term}
                     </p>
                   </div>
                   
                   <div className="mt-4">
                     <Input
-                      label="Enter Deposit Amount (RWF)"
+                      label="Enter Amount (RWF)"
                       name="amount"
                       type="number"
                       value={formData.amount.toString()}
                       onChange={onInputChange}
-                      placeholder="e.g., 50000"
+                      placeholder="e.g., 250000"
                     />
                   </div>
                   
                   <p className="font-semibold mt-2 md:mt-3 border-t pt-2 text-[#ff6600] text-base md:text-lg">
-                    <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Amount to Deposit</strong>
+                    <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Amount to Pay</strong>
                     RWF {formData.amount.toLocaleString()}
                   </p>
                 </div>
@@ -220,39 +250,43 @@ export default function EcoBankDeposit() {
 
           {step === 3 && (
             <motion.div key="step3" {...stepAnimation}>
-              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Confirm Deposit</h2>
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Confirm Payment</h2>
               <div className="bg-[#ff660010] dark:bg-[#ff660020] p-3 md:p-4 rounded-lg">
-                <h3 className="font-semibold mb-2 text-gray-700 dark:text-gray-300 text-sm md:text-base">Please confirm your deposit details</h3>
+                <h3 className="font-semibold mb-2 text-gray-700 dark:text-gray-300 text-sm md:text-base">Please confirm your school fees payment</h3>
                 <div className="grid grid-cols-2 gap-2 md:gap-3 text-sm md:text-base">
                   <div>
                     <p>
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Account Name</strong>
-                      {formData.accountName}
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Student Name</strong>
+                      {formData.studentName}
                     </p>
                     <p className="mt-1 md:mt-2">
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Account Number</strong>
-                      {formData.accountNumber}
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Student ID</strong>
+                      {formData.studentId}
                     </p>
                   </div>
                   <div>
                     <p>
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Account Type</strong>
-                      {formData.accountType}
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">School</strong>
+                      {formData.schoolName}
                     </p>
                     <p className="mt-1 md:mt-2">
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Reference</strong>
-                      {formData.reference}
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Academic Year</strong>
+                      {formData.academicYear}
                     </p>
                   </div>
                 </div>
                 <div className="mt-3">
                   <p>
+                    <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Term</strong>
+                    {formData.term}
+                  </p>
+                  <p className="mt-1 md:mt-2">
                     <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Amount</strong>
                     RWF {formData.amount.toLocaleString()}
                   </p>
                 </div>
-                <p className="font-semibold mt-3 md:mt-4 border-t pt-2 md:pt-3 text-[#ff6600] text-base md:text-lg">
-                  <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Amount to Deposit</strong>
+                <p className="font-semibold mt-3 md:mt-4 border-t pt-2 md:极速赛车开奖直播 pt-3 text-[#ff6600] text-base md:text-lg">
+                  <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Amount to Pay</strong>
                   RWF {formData.amount.toLocaleString()}
                 </p>
               </div>
@@ -261,21 +295,21 @@ export default function EcoBankDeposit() {
 
           {step === 4 && (
             <motion.div key="step4" {...stepAnimation}>
-              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Deposit Successful</h2>
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Payment Successful</h2>
               <div
                 id="receipt"
                 className="p-3 md:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
               >
                 <div className="text-center mb-3 md:mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 md:pb-3">
-                  <div className="flex items-center justify-center space-x-1 md:space极速赛车开奖直播 -x-2">
+                  <div className="flex items-center justify-center space-x-1 md:space-x-2">
                     <div className="bg-[#ff6600] text-white p-1.5 md:p-2 rounded-full">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.极速赛车开奖直播 04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                       </svg>
                     </div>
-                    <h3 className="text-md md:text-lg font-bold text-[#ff6600] dark:text-[#ff6600]">EcoBank Deposit Receipt</h3>
+                    <h3 className="text-md md:text-lg font-bold text-[#ff6600] dark:text-[#ff6600]">School Fees Payment Receipt</h3>
                   </div>
-                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Official Deposit Receipt</p>
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Official Payment Receipt</p>
                 </div>
                 
                 <div className="space-y-2 md:space-y-3 text-sm md:text-base">
@@ -292,33 +326,37 @@ export default function EcoBankDeposit() {
                     </div>
                     <div>
                       <p>
-                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Account Number</strong>
-                        {formData.accountNumber}
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Student ID</strong>
+                        {formData.studentId}
                       </p>
                       <p className="mt-1 md:mt-2">
-                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Account Name</strong>
-                        {formData.accountName}
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Student Name</strong>
+                        {formData.studentName}
                       </p>
                     </div>
                   </div>
 
                   <div className="bg-[#ff660010] dark:bg-[#ff660020] p-2 md:p-3 rounded">
-                    <h4 className="font-semibold text-[极速赛车开奖直播 #ff6600] dark:text-[#ff6600] mb-1 text-sm md:text-base">Deposit Details</h4>
+                    <h4 className="font-semibold text-[#ff6600] dark:text-[#ff6600] mb-1 text-sm md:text-base">Payment Details</h4>
                     <div className="space-y-1 text-xs md:text-sm">
                       <div className="flex justify-between">
-                        <span>Account Type:</span>
-                        <span>{formData.accountType}</span>
+                        <span>School:</span>
+                        <span>{formData.schoolName}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Reference:</span>
-                        <span>{formData.reference}</span>
+                        <span>Academic Year:</span>
+                        <span>{formData.academicYear}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Term:</span>
+                        <span>{formData.term}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Amount:</span>
                         <span>RWF {formData.amount.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between font-semibold border-t pt-1 text-[#ff6600] dark:text-[#ff6600]">
-                        <span>Total Deposited:</span>
+                        <span>Total Paid:</span>
                         <span>RWF {formData.amount.toLocaleString()}</span>
                       </div>
                     </div>
@@ -327,7 +365,7 @@ export default function EcoBankDeposit() {
 
                 <div className="mt-3 md:mt-4 pt-2 md:pt-3 border-t border-gray-200 dark:border-gray-600 text-center">
                   <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                    Thank you for your deposit. Funds have been credited to your account successfully.
+                    Thank you for your payment. School fees have been paid successfully.
                   </p>
                   <p className="text-[10px] md:text-xs text-gray-400 dark:text-gray-500 mt-1">
                     ID: {formData.receiptId} | {new Date().toLocaleString()}
@@ -361,9 +399,9 @@ export default function EcoBankDeposit() {
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-1 h-3 w-3 md:h-4 md:w-4 text-white" xmlns="http://www.w3.org/2000/svg极速赛车开奖直播 " fill="none" viewBox="0 0 24 极速赛车开奖直播 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12极速赛车开奖直播 H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg className="animate-spin -ml-1 mr-1 h-3 w-3 md:h-4 md:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25极速赛车开奖直播 " cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a极速赛车开奖直播 8 8 极速赛车开奖直播 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Validating...
                 </>
@@ -371,7 +409,7 @@ export default function EcoBankDeposit() {
                 <>
                   Next
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2 } d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7极速赛车开奖直播 H3" />
                   </svg>
                 </>
               )}
@@ -383,7 +421,7 @@ export default function EcoBankDeposit() {
               onClick={handleNext}
               className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full sm:w-auto font-semibold flex items-center justify-center"
             >
-              Confirm Deposit
+              Confirm Payment
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
@@ -394,10 +432,10 @@ export default function EcoBankDeposit() {
             <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full">
               <button
                 onClick={downloadPDF}
-                className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full font-semibold flex items-center justify-center"
+                className="bg-[#ff660极速赛车开奖直播 0] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full font-semibold flex items-center justify-center"
               >
-                <svg className="w-3 h-3 md:w-4 md:h极速赛车开奖直播 -4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m极速赛车开奖直播 0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 极速赛车开奖直播 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                <svg className="w-3 h-3 md:w-4 md:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
                 Download Receipt
               </button>
@@ -405,7 +443,7 @@ export default function EcoBankDeposit() {
                 onClick={() => window.location.reload()}
                 className="bg-gray-200 hover:bg-gray-300 text-gray-900 px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full text-center font-semibold"
               >
-                New Deposit
+                New Payment
               </button>
             </div>
           )}

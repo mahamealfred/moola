@@ -81,7 +81,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         {/* Logo & Toggle */}
         <div className="flex items-center justify-between w-full mb-10">
-          <span className="text-xl font-bold">{isExpanded ? 'X-pay' : 'X'}</span>
+          <span className="text-xl font-bold">{isExpanded ? 
+         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            <span className="text-[#ff6600]">X</span>
+            <span className="text-[#13294b] dark:text-white">-Pay</span>
+          </h1> :
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            <span className="text-[#ff6600]">X</span>
+          </h1>  
+        }</span>
           <button
             onClick={() => setIsExpanded((prev) => !prev)}
             className="ml-auto text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"

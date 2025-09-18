@@ -15,6 +15,8 @@ import OpenAccount from './account-openning/page';
 import DepositForm from './deposit/page';
 import ElectricityPayment from '../../payment-services/electricity/page';
 import RemittanceForm from './remittance/page';
+import Withdrawal from './withdral/page';
+import ExpressCashToken from './expressCashToken/page';
 
 type EcobankServices = {
   name: string;
@@ -25,9 +27,9 @@ type EcobankServices = {
 const ecobankServices: EcobankServices[] = [
   { name: 'Open Account', icon: UserPlus, content: <OpenAccount /> },
   { name: 'Deposit', icon: Download, content: <DepositForm /> },
-  { name: 'Withdrawal', icon: Upload, content: <ElectricityPayment /> },
+  { name: 'Withdrawal', icon: Upload, content: <Withdrawal/> },
   { name: 'Remittance', icon: SendHorizonal, content: <RemittanceForm /> },
-  { name: 'Express Cash Token', icon: KeyRound, content: <ElectricityPayment /> },
+  { name: 'Express Cash Token', icon: KeyRound, content: <ExpressCashToken /> },
   { name: 'Interbank', icon: Landmark, content: <ElectricityPayment /> },
 ];
 

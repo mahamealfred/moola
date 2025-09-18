@@ -1,229 +1,380 @@
 'use client';
 
-import { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
-import Link from 'next/link';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
 
-type FormData = {
+type Step = 1 | 2 | 3 | 4;
+
+interface FormData {
   meterNumber: string;
   customerName: string;
-  amount: string;
+  amount: number;
   receiptId: string;
-  requestId?: string;
-};
+}
 
 export default function ElectricityPayment() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<Step>(1);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     meterNumber: '',
     customerName: '',
-    amount: '',
-    receiptId: '',
+    amount: 0,
+    receiptId: ''
   });
-  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const validateCustomer = async () => {
-    try {
-      const res = await axios.post('http://localhost:3000/v1/agencytest/eco/services/validate/biller', {
-        billerCode: 'electricity',
-        productCode: 'electricity',
-        customerId: formData.meterNumber,
-        amount: formData.amount || '100'
-      });
-
-      if (res.data.success) {
-        setFormData(prev => ({
-          ...prev,
-          customerName: res.data.data.customerName,
-          requestId: res.data.data.requestId
-        }));
-        setStep(2);
-      } else {
-        toast.error(res.data.data.message || 'Validation failed');
-      }
-    } catch (error: any) {
-      console.error(error);
-      toast.error(error.response?.data.message || 'Validation error');
-    } finally {
-      setLoading(false);
+    
+    if (name === 'amount') {
+      setFormData(prev => ({ ...prev, [name]: Number(value) }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  const executePayment = async (payload: any) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-
-    if (!token) {
-      throw new Error('No auth token found. Please log in.');
-    }
-
-    const response = await fetch(`http://localhost:3000/v1/agencytest/eco/services/execute/bill-payment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(payload),
+  async function validateMeter(meter: string) {
+    return new Promise<{ customerName: string; amount: number }>((resolve) => {
+      setTimeout(() => {
+        resolve({
+          customerName: 'John Doe',
+          amount: 0, // Default amount, user will input their own
+        });
+      }, 1200);
     });
+  }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
-    }
-
-    return response.json();
-  };
-
-  const handleNext = async () => {
+  async function handleNext() {
     if (step === 1) {
-      if (!formData.meterNumber) return;
-      setLoading(true);
-      await validateCustomer();
-    } else if (step === 2) {
-      if (!formData.amount) return;
-      setStep(3);
-    } else if (step === 3) {
+      if (formData.meterNumber.trim().length < 5) {
+        alert('Please enter a valid Meter Number.');
+        return;
+      }
       setLoading(true);
       try {
-        const response = await executePayment({
-          email: 'mahamealfred@gmail.com',
-          clientPhone: '+250789595309',
-          customerId: formData.meterNumber,
-          billerCode: 'electricity',
-          productCode: 'electricity',
-          amount: formData.amount,
-          ccy: 'RWF',
-          requestId: formData.requestId,
-        });
-
-        const receiptId = `REC${Date.now()}`;
-        setFormData(prev => ({ ...prev, receiptId }));
-        setStep(4);
-      } catch (err: any) {
-        toast.error(err.message || 'Payment failed');
+        const data = await validateMeter(formData.meterNumber.trim());
+        
+        setFormData(prev => ({
+          ...prev,
+          customerName: data.customerName,
+        }));
+        setStep(2);
+      } catch {
+        alert('Meter validation failed. Try again.');
       } finally {
         setLoading(false);
       }
+    } else if (step === 2) {
+      if (formData.amount <= 0) {
+        alert('Please enter a valid amount.');
+        return;
+      }
+      setStep(3);
+    } else if (step === 3) {
+      setFormData(prev => ({
+        ...prev,
+        receiptId: 'ELEC' + Date.now()
+      }));
+      setStep(4);
     }
-  };
+  }
 
-  const handleDownloadPDF = () => {
+  function handleBack() {
+    if (loading) return;
+    if (step > 1) setStep(prev => (prev - 1) as Step);
+  }
+
+  function downloadPDF() {
     const element = document.getElementById('receipt');
     if (element) {
-      html2pdf().from(element).save(`receipt_${formData.receiptId}.pdf`);
+      const opt = {
+        margin: 0.5,
+        filename: `electricity_payment_receipt_${formData.receiptId}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
     }
-  };
+  }
 
   return (
-    <div>
+    <div className="w-full h-full overflow-hidden">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-xl bg-white dark:bg-gray-900 shadow-2xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700 space-y-6"
+        transition={{ duration: 0.3 }}
+        className="w-full bg-white dark:bg-gray-800 rounded-lg p-3 md:p-4 border border-gray-200 dark:border-gray-700"
       >
+        {/* Electricity Header with Original Colors */}
+        <div className="mb-4 md:mb-5 text-center border-b border-gray-200 dark:border-gray-700 pb-3">
+          <div className="flex items-center justify-center space-x-2">
+            <div className="bg-[#ff6600] text-white p-1.5 md:p-2 rounded-full">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">Electricity Payment</h1>
+          </div>
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Pay your electricity bill securely</p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-4 md:mb-5">
+          <div className="flex justify-between items-center relative">
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 -translate-y-1/2 z-0"></div>
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="relative z-10">
+                <div className={`w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-xs md:text-sm font-medium ${
+                  step >= i 
+                    ? 'bg-[#ff6600] text-white' 
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                }`}>
+                  {i}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between mt-1 text-[10px] md:text-xs text-gray-500">
+            <span>Meter Info</span>
+            <span>Amount</span>
+            <span>Confirm</span>
+            <span>Receipt</span>
+          </div>
+        </div>
+
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="step1" {...stepAnimation}>
-              <Input
-                label="Enter Meter Number"
-                name="meterNumber"
-                value={formData.meterNumber}
-                onChange={handleChange}
-              />
+              <h2 className="text-lg md:text-xl font-bold mb-3 text-gray-900 dark:text-white">Validate Meter Number</h2>
+              <div>
+                <div className="mb-3 md:mb-4">
+                  <Input
+                    label="Enter Meter Number"
+                    name="meterNumber"
+                    value={formData.meterNumber}
+                    onChange={onInputChange}
+                    disabled={loading}
+                    placeholder="e.g., 123456789"
+                  />
+                </div>
+              </div>
             </motion.div>
           )}
 
           {step === 2 && (
             <motion.div key="step2" {...stepAnimation}>
-              <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                Customer: <strong>{formData.customerName}</strong>
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Enter Payment Amount</h2>
+              <div className="grid grid-cols-1 gap-3 md:gap-4">
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-lg">
+                  <h3 className="font-semibold mb-2 text-gray-700 dark:text-gray-300 text-sm md:text-base flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Customer Information
+                  </h3>
+                  <div className="text-gray-900 dark:text-white space-y-1 md:space-y-2 text-sm md:text-base mb-4">
+                    <p>
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Name</strong>
+                      {formData.customerName}
+                    </p>
+                    <p>
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Meter Number</strong>
+                      {formData.meterNumber}
+                    </p>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <Input
+                      label="Enter Amount (RWF)"
+                      name="amount"
+                      type="number"
+                      value={formData.amount.toString()}
+                      onChange={onInputChange}
+                      placeholder="e.g., 10000"
+                    />
+                  </div>
+                  
+                  <p className="font-semibold mt-2 md:mt-3 border-t pt-2 text-[#ff6600] text-base md:text-lg">
+                    <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Amount to Pay</strong>
+                    RWF {formData.amount.toLocaleString()}
+                  </p>
+                </div>
               </div>
-              <Input
-                label="Amount to Pay"
-                name="amount"
-                type="number"
-                value={formData.amount}
-                onChange={handleChange}
-              />
             </motion.div>
           )}
 
           {step === 3 && (
             <motion.div key="step3" {...stepAnimation}>
-              <div className="bg-yellow-50 dark:bg-yellow-900 p-5 rounded-xl text-sm space-y-2">
-                <p className="font-semibold text-gray-800 dark:text-white">Please confirm your payment:</p>
-                <p className="text-gray-700 dark:text-gray-300">Customer: {formData.customerName}</p>
-                <p className="text-gray-700 dark:text-gray-300">Meter Number: {formData.meterNumber}</p>
-                <p className="text-gray-700 dark:text-gray-300">Amount: RWF {formData.amount}</p>
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Confirm Payment</h2>
+              <div className="bg-[#ff660010] dark:bg-[#ff660020] p-3 md:p-4 rounded-lg">
+                <h3 className="font-semibold mb-2 text-gray-700 dark:text-gray-300 text-sm md:text-base">Please confirm your payment details</h3>
+                <div className="grid grid-cols-2 gap-2 md:gap-3 text-sm md:text-base">
+                  <div>
+                    <p>
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Customer Name</strong>
+                      {formData.customerName}
+                    </p>
+                    <p className="mt-1 md:mt-2">
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Meter Number</strong>
+                      {formData.meterNumber}
+                    </p>
+                  </div>
+                  <div>
+                    <p>
+                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Amount</strong>
+                      RWF {formData.amount.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+                <p className="font-semibold mt-3 md:mt-4 border-t pt-2 md:pt-3 text-[#ff6600] text-base md:text-lg">
+                  <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Amount to Pay</strong>
+                  RWF {formData.amount.toLocaleString()}
+                </p>
               </div>
             </motion.div>
           )}
 
           {step === 4 && (
             <motion.div key="step4" {...stepAnimation}>
-              <div id="receipt" className="bg-gray-100 dark:bg-gray-800 p-5 rounded-xl text-sm space-y-2">
-                <h2 className="text-lg font-bold text-gray-800 dark:text-white">Payment Receipt</h2>
-                <p>Receipt ID: <strong>{formData.receiptId}</strong></p>
-                <p>Customer: {formData.customerName}</p>
-                <p>Meter Number: {formData.meterNumber}</p>
-                <p>Amount: RWF {formData.amount}</p>
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Payment Successful</h2>
+              <div
+                id="receipt"
+                className="p-3 md:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+              >
+                <div className="text-center mb-3 md:mb-4 border-b border-gray-200 dark:border-gray-600 pb-2 md:pb-3">
+                  <div className="flex items-center justify-center space-x-1 md:space-x-2">
+                    <div className="bg-[#ff6600] text-white p-1.5 md:p-2 rounded-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-md md:text-lg font-bold text-[#ff6600] dark:text-[#ff6600]">Electricity Payment Receipt</h3>
+                  </div>
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Official Payment Receipt</p>
+                </div>
+                
+                <div className="space-y-2 md:space-y-3 text-sm md:text-base">
+                  <div className="grid grid-cols-2 gap-2 md:gap-3">
+                    <div>
+                      <p>
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Receipt ID</strong>
+                        {formData.receiptId}
+                      </p>
+                      <p className="mt-1 md:mt-2">
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Date</strong>
+                        {new Date().toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p>
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Meter Number</strong>
+                        {formData.meterNumber}
+                      </p>
+                      <p className="mt-1 md:mt-2">
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Customer Name</strong>
+                        {formData.customerName}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#ff660010] dark:bg-[#ff660020] p-2 md:p-3 rounded">
+                    <h4 className="font-semibold text-[#ff6600] dark:text-[#ff6600] mb-1 text-sm md:text-base">Payment Details</h4>
+                    <div className="space-y-1 text-xs md:text-sm">
+                      <div className="flex justify-between">
+                        <span>Amount:</span>
+                        <span>RWF {formData.amount.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between font-semibold border-t pt-1 text-[#ff6600] dark:text-[#ff6600]">
+                        <span>Total Paid:</span>
+                        <span>RWF {formData.amount.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 md:mt-4 pt-2 md:pt-3 border-t border-gray-200 dark:border-gray-600 text-center">
+                  <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
+                    Thank you for your payment. Transaction completed successfully.
+                  </p>
+                  <p className="text-[10px] md:text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    ID: {formData.receiptId} | {new Date().toLocaleString()}
+                  </p>
+                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-6">
+        {/* Navigation Buttons */}
+        <div className="mt-4 md:mt-5 flex flex-col-reverse sm:flex-row gap-2 md:gap-3 justify-between items-center">
           {step > 1 && step < 4 && (
             <button
-              onClick={() => setStep(prev => prev - 1)}
-              className="text-sm text-gray-600 dark:text-gray-300 hover:underline"
+              onClick={handleBack}
+              className="text-gray-600 dark:text-gray-300 hover:underline py-1.5 px-3 md:py-2 md:px-4 rounded text-sm md:text-base w-full sm:w-auto text-center flex items-center justify-center"
+              disabled={loading}
             >
-              ← Back
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back
             </button>
           )}
 
           {step < 3 && (
             <button
               onClick={handleNext}
-              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition"
               disabled={loading}
+              className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full sm:w-auto font-semibold transition disabled:opacity-60 flex items-center justify-center"
             >
-              {loading ? 'Validating...' : 'Next'}
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-1 h-3 w-3 md:h-4 md:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Validating...
+                </>
+              ) : (
+                <>
+                  Next
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </>
+              )}
             </button>
           )}
 
           {step === 3 && (
             <button
               onClick={handleNext}
-              className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-xl transition"
+              className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full sm:w-auto font-semibold flex items-center justify-center"
             >
               Confirm Payment
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
             </button>
           )}
 
           {step === 4 && (
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:justify-end">
+            <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full">
               <button
-                onClick={handleDownloadPDF}
-                className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-xl transition"
+                onClick={downloadPDF}
+                className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full font-semibold flex items-center justify-center"
               >
-                Save PDF
+                <svg className="w-3 h-3 md:w-4 md:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Download Receipt
               </button>
-              <Link
-                href="/dashboard/services"
-                className="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-6 py-2 rounded-xl text-center"
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-900 px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full text-center font-semibold"
               >
-                Back to Services
-              </Link>
+                New Payment
+              </button>
             </div>
           )}
         </div>
@@ -233,33 +384,45 @@ export default function ElectricityPayment() {
 }
 
 const stepAnimation = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 10 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 },
-  transition: { duration: 0.3 }
+  exit: { opacity: 0, y: -10 },
+  transition: { duration: 0.2 }
 };
 
-type InputProps = {
+function Input({
+  label,
+  name,
+  value,
+  onChange,
+  type = 'text',
+  disabled = false,
+  placeholder = ''
+}: {
   label: string;
   name: string;
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   type?: string;
-};
-
-const Input: React.FC<InputProps> = ({ label, name, value, onChange, type = 'text' }) => (
-  <div className="w-full space-y-1">
-    <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-      {label}
-    </label>
-    <input
-      id={name}
-      name={name}
-      type={type}
-      value={value}
-      onChange={onChange}
-      className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
-      required
-    />
-  </div>
-);
+  disabled?: boolean;
+  placeholder?: string;
+}) {
+  return (
+    <div className="mb-3 md:mb-4">
+      <label htmlFor={name} className="block mb-1 text-sm md:text-base text-gray-700 dark:text-gray-300 font-medium">
+        {label}
+      </label>
+      <input
+        id={name}
+        name={name}
+        type={type}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        placeholder={placeholder}
+        required
+        className="w-full px-2.5 py-1.5 md:px-3 md:py-2 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 md:focus:ring-2 focus:ring-[#ff6600] disabled:opacity-50 disabled:cursor-not-allowed transition text-sm md:text-base"
+      />
+    </div>
+  );
+}
