@@ -33,6 +33,9 @@ import BulkSalaryPayment from './business-services/bulk-salary/page';
 import InvoicePayment from './business-services/invoice-payment/page';
 import TaxCalculation from './business-services/tax-calculation/page';
 import ExpenseManagement from './business-services/expense-management/page';
+import IremboPayment from './payment-services/irembopay/page';
+import RNITPayment from './payment-services/rnit/page';
+import BulkAirtimeForm from './payment-services/bulk-airtime/page';
 
 type PaymentService = {
   name: string;
@@ -66,7 +69,10 @@ const paymentServices: PaymentService[] = [
   { name: 'Buy Airtime', icon: Phone, content: <AirtimePurchase /> },
   { name: 'Startimes Payment', icon: Tv, content: <StartimesPayment /> },
   { name: 'Bulk SMS', icon: MessageSquare, content: <BulkSmsForm /> },
+  { name: 'Bulk Airtime', icon: MessageSquare, content: <BulkAirtimeForm /> },
   { name: 'Wasac', icon: Droplet, content: <WASACPayment/>},
+  { name: 'Irembo Pay', icon: Droplet, content: <IremboPayment/>},
+  { name: 'RNIT', icon: Droplet, content: <RNITPayment/>},
   { name: 'School Fees', icon: BookOpen, content: <SchoolFeesPayment/> },
 ];
 

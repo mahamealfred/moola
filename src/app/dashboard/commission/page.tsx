@@ -150,17 +150,16 @@ export default function CommissionPage() {
         throw new Error('Authentication required. Please login again.');
       }
 
-      // Replace with your actual withdrawal endpoint
-      const response = await fetch('http://localhost:4000/v1/agency/commission/withdraw', {
+      // Use the correct withdrawal endpoint
+      const response = await fetch('http://localhost:4000/v1/agency/accounts/self-serve/withdrawals/commissions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: amount,
-          accountId: instantCommissionAccount.accountId,
-          currency: 'RWF'
+          amount: amount
+          // Only sending amount as specified
         }),
       });
 
@@ -170,7 +169,7 @@ export default function CommissionPage() {
         throw new Error(data.message || 'Withdrawal failed');
       }
 
-      setWithdrawSuccess(`Successfully withdrawn RWF ${amount.toLocaleString()}`);
+      setWithdrawSuccess(data.message || `Successfully withdrawn RWF ${amount.toLocaleString()}`);
       setWithdrawAmount('');
       setValidationError('');
       
@@ -453,6 +452,7 @@ export default function CommissionPage() {
                 <li>• Instant commission only</li>
                 <li>• Processed within 24 hours</li>
                 <li>• No withdrawal fees</li>
+                <li>• Requires administrative approval</li>
               </ul>
             </div>
           </div>

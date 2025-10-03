@@ -3,8 +3,8 @@
 import { useState } from 'react';
 
 interface Recipient {
-  name: string;
   phone: string;
+  amount: number;
 }
 
 interface RecipientListProps {
@@ -13,7 +13,7 @@ interface RecipientListProps {
 }
 
 export default function RecipientList({ recipients, setRecipients }: RecipientListProps) {
-  const [newRecipient, setNewRecipient] = useState({ name: '', phone: '' });
+  const [newRecipient, setNewRecipient] = useState({ phone: '', amount: '' });
   const [showAddForm, setShowAddForm] = useState(false);
 
   const removeRecipient = (index: number) => {
@@ -27,6 +27,12 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
       return;
     }
 
+    const amount = parseInt(newRecipient.amount);
+    if (!amount || amount < 100) {
+      alert('Please enter a valid amount (minimum 100 RWF)');
+      return;
+    }
+
     // Basic phone validation
     const phoneRegex = /^\+?[\d\s-()]{10,}$/;
     if (!phoneRegex.test(newRecipient.phone)) {
@@ -34,8 +40,8 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
       return;
     }
 
-    setRecipients([...recipients, { ...newRecipient }]);
-    setNewRecipient({ name: '', phone: '' });
+    setRecipients([...recipients, { phone: newRecipient.phone, amount }]);
+    setNewRecipient({ phone: '', amount: '' });
     setShowAddForm(false);
   };
 
@@ -44,6 +50,8 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
       setRecipients([]);
     }
   };
+
+  const totalAmount = recipients.reduce((sum, recipient) => sum + recipient.amount, 0);
 
   return (
     <div>
@@ -70,22 +78,23 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
           <h3 className="font-semibold text-blue-900 dark:text-blue-100 text-sm mb-2">Add New Recipient</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Name (Optional)</label>
-              <input
-                type="text"
-                value={newRecipient.name}
-                onChange={(e) => setNewRecipient({ ...newRecipient, name: e.target.value })}
-                placeholder="Recipient name"
-                className="w-full px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
-              />
-            </div>
-            <div>
               <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Phone Number *</label>
               <input
                 type="text"
                 value={newRecipient.phone}
                 onChange={(e) => setNewRecipient({ ...newRecipient, phone: e.target.value })}
                 placeholder="+250788123456"
+                className="w-full px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Amount (RWF) *</label>
+              <input
+                type="number"
+                value={newRecipient.amount}
+                onChange={(e) => setNewRecipient({ ...newRecipient, amount: e.target.value })}
+                placeholder="1000"
+                min="100"
                 className="w-full px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
               />
             </div>
@@ -142,9 +151,11 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
               >
                 <div className="flex-1">
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {recipient.name || <span className="italic text-gray-400">No Name</span>}
+                    {recipient.phone}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{recipient.phone}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Amount: RWF {recipient.amount.toLocaleString()}
+                  </p>
                 </div>
                 <button
                   onClick={() => removeRecipient(index)}
@@ -163,10 +174,20 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
 
       {/* Summary */}
       {recipients.length > 0 && (
-        <div className="mt-3 p-2 bg-[#ff660010] dark:bg-[#ff660020] rounded-lg">
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-700 dark:text-gray-300">Total Recipients:</span>
-            <span className="font-semibold text-[#ff6600]">{recipients.length}</span>
+        <div className="mt-3 p-3 bg-[#ff660010] dark:bg-[#ff660020] rounded-lg">
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <span className="text-gray-700 dark:text-gray-300">Total Recipients:</span>
+            </div>
+            <div className="text-right">
+              <span className="font-semibold text-[#ff6600]">{recipients.length}</span>
+            </div>
+            <div>
+              <span className="text-gray-700 dark:text-gray-300">Total Amount:</span>
+            </div>
+            <div className="text-right">
+              <span className="font-semibold text-[#ff6600]">RWF {totalAmount.toLocaleString()}</span>
+            </div>
           </div>
         </div>
       )}

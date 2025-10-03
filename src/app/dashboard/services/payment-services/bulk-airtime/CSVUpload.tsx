@@ -4,17 +4,17 @@ import { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 interface CSVUploadProps {
-  onUpload: (recipients: { name: string; phone: string }[]) => void;
+  onUpload: (recipients: { phone: string; amount: number }[]) => void;
 }
 
 export default function CSVUpload({ onUpload }: CSVUploadProps) {
   const downloadTemplate = () => {
-    const csvContent = "name,phone\nJohn Doe,+250788123456\nJane Smith,+250789987654\nAlice Uwase,+250783456789";
+    const csvContent = "phone,amount\n+250788123456,1000\n+250789987654,500\n+250783456789,2000";
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'sms_recipients_template.csv';
+    link.download = 'airtime_recipients_template.csv';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -31,10 +31,13 @@ export default function CSVUpload({ onUpload }: CSVUploadProps) {
       const recipients = lines.slice(1) // Skip header
         .filter(line => line.trim())
         .map(line => {
-          const [name, phone] = line.split(',');
-          return { name: name?.trim() || '', phone: phone?.trim() || '' };
+          const [phone, amount] = line.split(',');
+          return { 
+            phone: phone?.trim() || '', 
+            amount: parseInt(amount?.trim()) || 0 
+          };
         })
-        .filter(recipient => recipient.phone);
+        .filter(recipient => recipient.phone && recipient.amount > 0);
       
       onUpload(recipients);
     };
@@ -94,7 +97,7 @@ export default function CSVUpload({ onUpload }: CSVUploadProps) {
           {isDragActive ? 'Drop the CSV file here' : 'Drag & drop a CSV file here, or click to select'}
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          CSV should have columns: name, phone
+          CSV should have columns: phone, amount
         </p>
       </div>
 
@@ -102,10 +105,11 @@ export default function CSVUpload({ onUpload }: CSVUploadProps) {
       <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
         <h4 className="font-semibold text-sm text-gray-900 dark:text-white mb-2">CSV Format Requirements:</h4>
         <ul className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-          <li>• First row must be header: <code className="bg-gray-200 dark:bg-gray-600 px-1 rounded">name,phone</code></li>
+          <li>• First row must be header: <code className="bg-gray-200 dark:bg-gray-600 px-1 rounded">phone,amount</code></li>
           <li>• Phone numbers should include country code (e.g., +250788123456)</li>
-          <li>• Names are optional but recommended</li>
-          <li>• Maximum 10,000 recipients per file</li>
+          <li>• Amount should be in RWF (e.g., 1000 for 1000 RWF)</li>
+          <li>• Minimum amount: 100 RWF per recipient</li>
+          <li>• Maximum 1,000 recipients per file</li>
         </ul>
       </div>
     </div>

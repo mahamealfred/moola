@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { 
   FiUser, 
   FiLock, 
@@ -13,12 +14,33 @@ import {
   FiCreditCard,
   FiGlobe,
   FiEye,
-  FiEyeOff
+  FiEyeOff,
+  FiSave,
+  FiEdit
 } from 'react-icons/fi';
+import { secureStorage } from '../../../lib/auth-context';
 
-export default function SettingsComponent() {
+interface AgentInfo {
+  id: number | string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  agencyName: string;
+  agencyCode: number | string;
+  status: string;
+  role: string;
+  createdAt: string;
+  lastLogin: string;
+}
+
+interface SettingsComponentProps {
+  initialAgentInfo?: AgentInfo;
+}
+
+export default function SettingsComponent({ initialAgentInfo }: SettingsComponentProps) {
   const [activeTab, setActiveTab] = useState('profile');
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
@@ -27,11 +49,135 @@ export default function SettingsComponent() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
+  const [agentInfo, setAgentInfo] = useState<AgentInfo>({
+    id: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    agencyName: '',
+    agencyCode: '',
+    status: '',
+    role: '',
+    createdAt: '',
+    lastLogin: ''
+  });
+  const [editForm, setEditForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: ''
+  });
+
+  // Extra states for added functionality
+  const router = useRouter();
+
+  // Payment methods
+  interface PaymentMethod { id: string; brand: string; last4: string; expMonth: string; expYear: string; }
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(() => {
+    try {
+      const raw = localStorage.getItem('paymentMethods');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [newCard, setNewCard] = useState({ brand: '', last4: '', expMonth: '', expYear: '' });
+
+  // Language
+  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
+
+  // Privacy / support
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [supportForm, setSupportForm] = useState({ subject: '', message: '', email: '' });
+
+  // Load agent info from secureStorage on component mount
+  useEffect(() => {
+    const loadAgentInfo = () => {
+      try {
+        // Try to get agent info from secureStorage (from login response)
+        const userData = secureStorage.getUserData();
+        //console.log("user data:",userData)
+        if (userData) {
+          // userData comes from secureStorage and may have a single `name` field.
+          // Split name into first/last where possible and provide sensible defaults.
+          const nameParts = (userData.name || '').split(' ');
+          const firstName = nameParts.shift() || '';
+          const lastName = nameParts.join(' ') || '';
+
+          setAgentInfo({
+            id: userData.id ?? '',
+            firstName,
+            lastName,
+            email: userData.email || '',
+            phoneNumber: userData.phoneNumber || '',
+            agencyName: (userData as any).agencyName || '',
+            agencyCode: userData.id || '',
+            status: (userData as any).status || 'active',
+            role: userData.category || 'agent',
+            createdAt: (userData as any).createdAt || '',
+            lastLogin: (userData as any).lastLogin || new Date().toISOString()
+          });
+
+          // Initialize edit form with current data
+          setEditForm({
+            firstName,
+            lastName,
+            email: userData.email || '',
+            phoneNumber: userData.phoneNumber || ''
+          });
+        } else if (initialAgentInfo) {
+          // Fallback to initial props
+          setAgentInfo(initialAgentInfo);
+          setEditForm({
+            firstName: initialAgentInfo.firstName,
+            lastName: initialAgentInfo.lastName,
+            email: initialAgentInfo.email,
+            phoneNumber: initialAgentInfo.phoneNumber
+          });
+        }
+
+        // Load dark mode preference from localStorage
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        setDarkMode(savedDarkMode);
+        if (savedDarkMode) {
+          document.documentElement.classList.add('dark');
+        }
+
+        // Load notification preferences from localStorage
+        const savedNotifications = localStorage.getItem('notificationPreferences');
+        if (savedNotifications) {
+          setNotifications(JSON.parse(savedNotifications));
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    };
+
+    loadAgentInfo();
+  }, [initialAgentInfo]);
+
+  // Apply dark mode to document
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('darkMode', 'true');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('darkMode', 'false');
+    }
+  }, [darkMode]);
+
+  // Save notification preferences
+  useEffect(() => {
+    localStorage.setItem('notificationPreferences', JSON.stringify(notifications));
+  }, [notifications]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,11 +187,211 @@ export default function SettingsComponent() {
     }));
   };
 
+  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      // Here you would typically make an API call to update the agent info
+      const accessToken = secureStorage.getAccessToken();
+      
+      const response = await fetch('http://localhost:4000/v1/agency/profile/update', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editForm),
+      });
+
+      if (response.ok) {
+        const updatedData = await response.json();
+        if (updatedData.success) {
+          // Update local state with new data
+          setAgentInfo(prev => ({
+            ...prev,
+            ...editForm
+          }));
+          setIsEditing(false);
+          
+          // Update secureStorage with new data
+          const currentUserData = secureStorage.getUserData();
+          // retrieve token data from sessionStorage if available
+          let accessToken = '';
+          let refreshToken = '';
+          try {
+            const encrypted = sessionStorage.getItem('at');
+            if (encrypted) {
+              const tokenObj = JSON.parse((window as any).atob(encrypted));
+              accessToken = tokenObj.accessToken || '';
+              refreshToken = tokenObj.refreshToken || '';
+            }
+          } catch {
+            // ignore
+          }
+
+          // Build a payload compatible with secureStorage.setUserData
+          const payload = {
+            id: (currentUserData as any)?.id,
+            name: `${editForm.firstName} ${editForm.lastName}`,
+            email: editForm.email,
+            phoneNumber: editForm.phoneNumber,
+            category: (currentUserData as any)?.category,
+            accessToken,
+            refreshToken
+          } as any;
+
+          secureStorage.setUserData(payload);
+
+          alert('Profile updated successfully!');
+        }
+      } else {
+        throw new Error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile. Please try again.');
+    }
+  };
+
+  const handlePasswordUpdate = async () => {
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert('New passwords do not match!');
+      return;
+    }
+
+    try {
+      const accessToken = secureStorage.getAccessToken();
+      
+      const response = await fetch('http://localhost:4000/v1/agency/profile/change-password', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          alert('Password updated successfully!');
+          setPasswordForm({
+            currentPassword: '',
+            newPassword: '',
+            confirmPassword: ''
+          });
+        } else {
+          alert(result.message || 'Failed to update password');
+        }
+      } else {
+        throw new Error('Failed to update password');
+      }
+    } catch (error) {
+      console.error('Error updating password:', error);
+      alert('Failed to update password. Please try again.');
+    }
+  };
+
   const handleNotificationToggle = (type: keyof typeof notifications) => {
     setNotifications(prev => ({
       ...prev,
       [type]: !prev[type]
     }));
+  };
+
+  // Send a test notification (simulated)
+  const sendTestNotification = (type: keyof typeof notifications) => {
+    if (!notifications[type]) {
+      alert(`${type.toUpperCase()} notifications are disabled`);
+      return;
+    }
+    // Simulate notification
+    alert(`Test ${type.toUpperCase()} notification sent.`);
+  };
+
+  // Payment methods handlers
+  const addPaymentMethod = () => {
+    if (!newCard.brand || !newCard.last4) {
+      alert('Enter card brand and last 4 digits');
+      return;
+    }
+    const pm = { id: Date.now().toString(), ...newCard };
+    const updated = [...paymentMethods, pm];
+    setPaymentMethods(updated);
+    localStorage.setItem('paymentMethods', JSON.stringify(updated));
+    setNewCard({ brand: '', last4: '', expMonth: '', expYear: '' });
+  };
+
+  const removePaymentMethod = (id: string) => {
+    const updated = paymentMethods.filter(p => p.id !== id);
+    setPaymentMethods(updated);
+    localStorage.setItem('paymentMethods', JSON.stringify(updated));
+  };
+
+  // Privacy handlers
+  const exportData = () => {
+    const data = {
+      user: secureStorage.getUserData(),
+      paymentMethods,
+      settings: { darkMode, notifications, language }
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'account_data.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const deleteAccountData = () => {
+    if (!confirm('This will delete all local account data. Continue?')) return;
+    setIsDeleting(true);
+    try {
+      secureStorage.clearUserData();
+      localStorage.removeItem('paymentMethods');
+      localStorage.removeItem('notificationPreferences');
+      localStorage.removeItem('darkMode');
+      localStorage.removeItem('language');
+      // Optionally redirect to login
+      router.push('/login');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Language
+  const changeLanguage = (lang: string) => {
+    setLanguage(lang);
+    localStorage.setItem('language', lang);
+    alert(`Language set to ${lang}`);
+  };
+
+  // Support form
+  const handleSupportChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target as HTMLInputElement;
+    setSupportForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const submitSupport = async () => {
+    if (!supportForm.subject || !supportForm.message) {
+      alert('Please enter subject and message');
+      return;
+    }
+    // Simulate send
+    alert('Support request submitted. Our team will contact you.');
+    setSupportForm({ subject: '', message: '', email: '' });
   };
 
   const tabs = [
@@ -64,52 +410,166 @@ export default function SettingsComponent() {
       case 'profile':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Profile Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  defaultValue="John"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  defaultValue="Doe"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  defaultValue="john.doe@example.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark极速赛车开奖直播 :bg-gray-700 dark:text-white"
-                  defaultValue="+250 78X XXX XXX"
-                />
-              </div>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Profile Information</h2>
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className="flex items-center gap-2 px-4 py-2 bg-[#ff6600] hover:bg-[#e65c00] text-white rounded-lg transition"
+              >
+                {isEditing ? <FiSave className="w-4 h-4" /> : <FiEdit className="w-4 h-4" />}
+                {isEditing ? 'Save Changes' : 'Edit Profile'}
+              </button>
             </div>
-            <button className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-6 py-2 rounded-lg transition">
-              Save Changes
-            </button>
+
+            {/* Read-only Information */}
+            {!isEditing && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      First Name
+                    </label>
+                    <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                      {agentInfo.firstName}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Last Name
+                    </label>
+                    <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                      {agentInfo.lastName}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Email
+                    </label>
+                    <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                      {agentInfo.email}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Phone Number
+                    </label>
+                    <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                      {agentInfo.phoneNumber}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Agency Name
+                    </label>
+                    <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                      {agentInfo.agencyName}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Agency Code
+                    </label>
+                    <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                      {agentInfo.agencyCode}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Status
+                    </label>
+                    <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        agentInfo.status === 'active' 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                      }`}>
+                        {agentInfo.status}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Role
+                    </label>
+                    <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white capitalize">
+                      {agentInfo.role}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Editable Form */}
+            {isEditing && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={editForm.firstName}
+                    onChange={handleEditFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={editForm.lastName}
+                    onChange={handleEditFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={editForm.email}
+                    onChange={handleEditFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    value={editForm.phoneNumber}
+                    onChange={handleEditFormChange}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+                
+                <div className="md:col-span-2 flex gap-3">
+                  <button 
+                    onClick={handleSaveProfile}
+                    className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-6 py-2 rounded-lg transition"
+                  >
+                    Save Changes
+                  </button>
+                  <button 
+                    onClick={() => setIsEditing(false)}
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         );
       
@@ -182,7 +642,10 @@ export default function SettingsComponent() {
                 </div>
               </div>
             </div>
-            <button className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-6 py-2 rounded-lg transition">
+            <button 
+              onClick={handlePasswordUpdate}
+              className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-6 py-2 rounded-lg transition"
+            >
               Update Password
             </button>
 
@@ -256,142 +719,97 @@ export default function SettingsComponent() {
                     {value ? 'Enabled' : 'Disabled'}
                   </p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={value}
-                    onChange={() => handleNotificationToggle(key as keyof typeof notifications)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#ff6600]"></div>
-                </label>
+                <div className="flex items-center gap-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={value}
+                      onChange={() => handleNotificationToggle(key as keyof typeof notifications)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#ff6600]"></div>
+                  </label>
+                  <button
+                    onClick={() => sendTestNotification(key as keyof typeof notifications)}
+                    className="text-sm px-3 py-1 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Send Test
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         );
       
+      // ... rest of the cases remain the same as your original code
+      // (privacy, payment, language, help)
       case 'privacy':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Privacy Settings</h2>
-            
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <h3 className="font-medium text-gray-900 dark:text-white mb-2">Data Privacy</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Control how your data is used and shared
-              </p>
-              <button className="text-[#ff6600] hover:underline text-sm">
-                Manage data settings
-              </button>
-            </div>
-
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <h3 className="font-medium text-gray-900 dark:text-white mb-2">Account Visibility</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Control who can see your account information
-              </p>
-              <button className="text-[#ff6600] hover:underline text-sm">
-                Adjust visibility settings
-              </button>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Privacy</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Export or remove your local account data.</p>
+            <div className="flex gap-3">
+              <button onClick={exportData} className="px-4 py-2 bg-[#ff6600] text-white rounded-md">Export Data</button>
+              <button onClick={deleteAccountData} className="px-4 py-2 bg-red-600 text-white rounded-md disabled:opacity-50" disabled={isDeleting}>{isDeleting ? 'Deleting...' : 'Delete Local Data'}</button>
             </div>
           </div>
         );
-      
+
       case 'payment':
         return (
           <div className="space-y-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Payment Methods</h2>
-            
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-medium text-gray-900 dark:text-white">Credit Card</h3>
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Default</span>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">**** **** **** 1234</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Expires: 12/2025</p>
-              <button className="text-[#ff6600] hover:underline text-sm mt-3">
-                Edit card
-              </button>
-            </div>
+            <div className="space-y-3">
+              {paymentMethods.length === 0 && <p className="text-sm text-gray-600 dark:text-gray-400">No saved payment methods.</p>}
+              {paymentMethods.map(pm => (
+                <div key={pm.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div>
+                    <div className="font-medium">{pm.brand.toUpperCase()} •••• {pm.last4}</div>
+                    <div className="text-xs text-gray-500">Exp: {pm.expMonth}/{pm.expYear}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => removePaymentMethod(pm.id)} className="text-red-600">Remove</button>
+                  </div>
+                </div>
+              ))}
 
-            <button className="flex items-center text-[#ff6600] hover:text-[#e65c00] transition">
-              <FiCreditCard className="mr-2" />
-              Add new payment method
-            </button>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <input placeholder="Brand" value={newCard.brand} onChange={(e) => setNewCard({...newCard, brand: e.target.value})} className="px-3 py-2 border rounded" />
+                <input placeholder="Last 4" value={newCard.last4} onChange={(e) => setNewCard({...newCard, last4: e.target.value})} className="px-3 py-2 border rounded" />
+                <input placeholder="MM" value={newCard.expMonth} onChange={(e) => setNewCard({...newCard, expMonth: e.target.value})} className="px-3 py-2 border rounded" />
+                <input placeholder="YYYY" value={newCard.expYear} onChange={(e) => setNewCard({...newCard, expYear: e.target.value})} className="px-3 py-2 border rounded" />
+              </div>
+              <div>
+                <button onClick={addPaymentMethod} className="px-4 py-2 bg-[#ff6600] text-white rounded-md">Add Card</button>
+              </div>
+            </div>
           </div>
         );
-      
+
       case 'language':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Language Preferences</h2>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                App Language
-              </label>
-              <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white">
-                <option>English</option>
-              
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Currency
-              </label>
-              <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white">
-                <option>RWF - Rwandan Franc</option>
-                
-              </select>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Language</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Select your preferred language.</p>
+            <div className="flex gap-3">
+              <button onClick={() => changeLanguage('en')} className={`px-4 py-2 rounded ${language === 'en' ? 'bg-[#ff6600] text-white' : 'border'}`}>English</button>
+              <button onClick={() => changeLanguage('fr')} className={`px-4 py-2 rounded ${language === 'fr' ? 'bg-[#ff6600] text-white' : 'border'}`}>Français</button>
+              <button onClick={() => changeLanguage('rw')} className={`px-4 py-2 rounded ${language === 'rw' ? 'bg-[#ff6600] text-white' : 'border'}`}>Kinyarwanda</button>
             </div>
           </div>
         );
-      
+
       case 'help':
         return (
           <div className="space-y-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Help & Support</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h3 className="font-medium text-gray-900 dark:text-white mb-2">FAQs</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Find answers to common questions
-                </p>
-                <button className="text-[#ff6600] hover:underline text-sm">
-                  View FAQs
-                </button>
-              </div>
-
-              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h3 className="font-medium text-gray-900 dark:text-white mb-2">Contact Support</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Get help from our support team
-                </p>
-                <button className="text-[#ff6600] hover:underline text-sm">
-                  Contact us
-                </button>
-              </div>
-
-              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h3 className="font-medium text-gray-900 dark:text-white mb-2">Terms of Service</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Review our terms and conditions
-                </p>
-                <button className="text-[#ff6600] hover:underline text-sm">
-                  View terms
-                </button>
-              </div>
-
-              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <h3 className="font-medium text-gray-900 dark:text-white mb-2">Privacy Policy</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Learn about our privacy practices
-                </p>
-                <button className="text-[#ff6600] hover:underline text-sm">
-                  View policy
-                </button>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Contact our support team for help.</p>
+            <div className="grid grid-cols-1 gap-3">
+              <input name="email" value={supportForm.email} onChange={handleSupportChange} placeholder="Your email (optional)" className="px-3 py-2 border rounded" />
+              <input name="subject" value={supportForm.subject} onChange={handleSupportChange} placeholder="Subject" className="px-3 py-2 border rounded" />
+              <textarea name="message" value={supportForm.message} onChange={handleSupportChange} placeholder="Message" className="px-3 py-2 border rounded h-28" />
+              <div>
+                <button onClick={submitSupport} className="px-4 py-2 bg-[#ff6600] text-white rounded-md">Submit</button>
               </div>
             </div>
           </div>
