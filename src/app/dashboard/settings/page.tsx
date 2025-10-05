@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import { 
   FiUser, 
   FiLock, 
@@ -27,7 +26,7 @@ interface AgentInfo {
   email: string;
   phoneNumber: string;
   agencyName: string;
-  agencyCode: number | string;
+  agencyCode: string;
   status: string;
   role: string;
   createdAt: string;
@@ -75,35 +74,12 @@ export default function SettingsComponent({ initialAgentInfo }: SettingsComponen
     phoneNumber: ''
   });
 
-  // Extra states for added functionality
-  const router = useRouter();
-
-  // Payment methods
-  interface PaymentMethod { id: string; brand: string; last4: string; expMonth: string; expYear: string; }
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(() => {
-    try {
-      const raw = localStorage.getItem('paymentMethods');
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  });
-  const [newCard, setNewCard] = useState({ brand: '', last4: '', expMonth: '', expYear: '' });
-
-  // Language
-  const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'en');
-
-  // Privacy / support
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [supportForm, setSupportForm] = useState({ subject: '', message: '', email: '' });
-
   // Load agent info from secureStorage on component mount
   useEffect(() => {
     const loadAgentInfo = () => {
       try {
         // Try to get agent info from secureStorage (from login response)
         const userData = secureStorage.getUserData();
-        //console.log("user data:",userData)
         if (userData) {
           // userData comes from secureStorage and may have a single `name` field.
           // Split name into first/last where possible and provide sensible defaults.
@@ -118,7 +94,7 @@ export default function SettingsComponent({ initialAgentInfo }: SettingsComponen
             email: userData.email || '',
             phoneNumber: userData.phoneNumber || '',
             agencyName: (userData as any).agencyName || '',
-            agencyCode: userData.id || '',
+            agencyCode: (userData as any).agencyCode || '',
             status: (userData as any).status || 'active',
             role: userData.category || 'agent',
             createdAt: (userData as any).createdAt || '',
@@ -306,92 +282,6 @@ export default function SettingsComponent({ initialAgentInfo }: SettingsComponen
       ...prev,
       [type]: !prev[type]
     }));
-  };
-
-  // Send a test notification (simulated)
-  const sendTestNotification = (type: keyof typeof notifications) => {
-    if (!notifications[type]) {
-      alert(`${type.toUpperCase()} notifications are disabled`);
-      return;
-    }
-    // Simulate notification
-    alert(`Test ${type.toUpperCase()} notification sent.`);
-  };
-
-  // Payment methods handlers
-  const addPaymentMethod = () => {
-    if (!newCard.brand || !newCard.last4) {
-      alert('Enter card brand and last 4 digits');
-      return;
-    }
-    const pm = { id: Date.now().toString(), ...newCard };
-    const updated = [...paymentMethods, pm];
-    setPaymentMethods(updated);
-    localStorage.setItem('paymentMethods', JSON.stringify(updated));
-    setNewCard({ brand: '', last4: '', expMonth: '', expYear: '' });
-  };
-
-  const removePaymentMethod = (id: string) => {
-    const updated = paymentMethods.filter(p => p.id !== id);
-    setPaymentMethods(updated);
-    localStorage.setItem('paymentMethods', JSON.stringify(updated));
-  };
-
-  // Privacy handlers
-  const exportData = () => {
-    const data = {
-      user: secureStorage.getUserData(),
-      paymentMethods,
-      settings: { darkMode, notifications, language }
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'account_data.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
-
-  const deleteAccountData = () => {
-    if (!confirm('This will delete all local account data. Continue?')) return;
-    setIsDeleting(true);
-    try {
-      secureStorage.clearUserData();
-      localStorage.removeItem('paymentMethods');
-      localStorage.removeItem('notificationPreferences');
-      localStorage.removeItem('darkMode');
-      localStorage.removeItem('language');
-      // Optionally redirect to login
-      router.push('/login');
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  // Language
-  const changeLanguage = (lang: string) => {
-    setLanguage(lang);
-    localStorage.setItem('language', lang);
-    alert(`Language set to ${lang}`);
-  };
-
-  // Support form
-  const handleSupportChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target as HTMLInputElement;
-    setSupportForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  const submitSupport = async () => {
-    if (!supportForm.subject || !supportForm.message) {
-      alert('Please enter subject and message');
-      return;
-    }
-    // Simulate send
-    alert('Support request submitted. Our team will contact you.');
-    setSupportForm({ subject: '', message: '', email: '' });
   };
 
   const tabs = [
@@ -719,23 +609,15 @@ export default function SettingsComponent({ initialAgentInfo }: SettingsComponen
                     {value ? 'Enabled' : 'Disabled'}
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={value}
-                      onChange={() => handleNotificationToggle(key as keyof typeof notifications)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#ff6600]"></div>
-                  </label>
-                  <button
-                    onClick={() => sendTestNotification(key as keyof typeof notifications)}
-                    className="text-sm px-3 py-1 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    Send Test
-                  </button>
-                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={value}
+                    onChange={() => handleNotificationToggle(key as keyof typeof notifications)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#ff6600]"></div>
+                </label>
               </div>
             ))}
           </div>
@@ -743,77 +625,6 @@ export default function SettingsComponent({ initialAgentInfo }: SettingsComponen
       
       // ... rest of the cases remain the same as your original code
       // (privacy, payment, language, help)
-      case 'privacy':
-        return (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Privacy</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Export or remove your local account data.</p>
-            <div className="flex gap-3">
-              <button onClick={exportData} className="px-4 py-2 bg-[#ff6600] text-white rounded-md">Export Data</button>
-              <button onClick={deleteAccountData} className="px-4 py-2 bg-red-600 text-white rounded-md disabled:opacity-50" disabled={isDeleting}>{isDeleting ? 'Deleting...' : 'Delete Local Data'}</button>
-            </div>
-          </div>
-        );
-
-      case 'payment':
-        return (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Payment Methods</h2>
-            <div className="space-y-3">
-              {paymentMethods.length === 0 && <p className="text-sm text-gray-600 dark:text-gray-400">No saved payment methods.</p>}
-              {paymentMethods.map(pm => (
-                <div key={pm.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div>
-                    <div className="font-medium">{pm.brand.toUpperCase()} •••• {pm.last4}</div>
-                    <div className="text-xs text-gray-500">Exp: {pm.expMonth}/{pm.expYear}</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => removePaymentMethod(pm.id)} className="text-red-600">Remove</button>
-                  </div>
-                </div>
-              ))}
-
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                <input placeholder="Brand" value={newCard.brand} onChange={(e) => setNewCard({...newCard, brand: e.target.value})} className="px-3 py-2 border rounded" />
-                <input placeholder="Last 4" value={newCard.last4} onChange={(e) => setNewCard({...newCard, last4: e.target.value})} className="px-3 py-2 border rounded" />
-                <input placeholder="MM" value={newCard.expMonth} onChange={(e) => setNewCard({...newCard, expMonth: e.target.value})} className="px-3 py-2 border rounded" />
-                <input placeholder="YYYY" value={newCard.expYear} onChange={(e) => setNewCard({...newCard, expYear: e.target.value})} className="px-3 py-2 border rounded" />
-              </div>
-              <div>
-                <button onClick={addPaymentMethod} className="px-4 py-2 bg-[#ff6600] text-white rounded-md">Add Card</button>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'language':
-        return (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Language</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Select your preferred language.</p>
-            <div className="flex gap-3">
-              <button onClick={() => changeLanguage('en')} className={`px-4 py-2 rounded ${language === 'en' ? 'bg-[#ff6600] text-white' : 'border'}`}>English</button>
-              <button onClick={() => changeLanguage('fr')} className={`px-4 py-2 rounded ${language === 'fr' ? 'bg-[#ff6600] text-white' : 'border'}`}>Français</button>
-              <button onClick={() => changeLanguage('rw')} className={`px-4 py-2 rounded ${language === 'rw' ? 'bg-[#ff6600] text-white' : 'border'}`}>Kinyarwanda</button>
-            </div>
-          </div>
-        );
-
-      case 'help':
-        return (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Help & Support</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Contact our support team for help.</p>
-            <div className="grid grid-cols-1 gap-3">
-              <input name="email" value={supportForm.email} onChange={handleSupportChange} placeholder="Your email (optional)" className="px-3 py-2 border rounded" />
-              <input name="subject" value={supportForm.subject} onChange={handleSupportChange} placeholder="Subject" className="px-3 py-2 border rounded" />
-              <textarea name="message" value={supportForm.message} onChange={handleSupportChange} placeholder="Message" className="px-3 py-2 border rounded h-28" />
-              <div>
-                <button onClick={submitSupport} className="px-4 py-2 bg-[#ff6600] text-white rounded-md">Submit</button>
-              </div>
-            </div>
-          </div>
-        );
       
       default:
         return <div>Select a settings category</div>;

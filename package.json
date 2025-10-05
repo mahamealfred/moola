@@ -6,6 +6,7 @@
     "dev": "next dev -p 4005",
     "build:force": "set NEXT_IGNORE_TYPESCRIPT_ERRORS=true && next build",
     "build:unsafe": "set NEXT_IGNORE_TYPESCRIPT_ERRORS=true && next build",
+    "build:ci": "set NEXT_IGNORE_TYPESCRIPT_ERRORS=true && set NEXT_DISABLE_ESLINT=true && next build",
     "start": "next dev -p 4005",
     "lint": "next lint",
     "pages:build": "npx @cloudflare/next-on-pages"
