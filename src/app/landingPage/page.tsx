@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion, Variants, easeOut } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Filter, X } from 'lucide-react';
 import {
   Sun,
   Moon,
@@ -16,19 +16,34 @@ import {
   Shield,
   Users,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  Droplet,
+  BookOpen,
+  CreditCard,
+  Calculator,
+  FileSpreadsheet,
+  Banknote,
+  Landmark,
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-// Features
-const features = [
-  { name: 'Electricity Payment', icon: Zap, description: 'Pay electricity bills instantly' },
-  { name: 'RRA Tax Payment', icon: FileText, description: 'Handle tax payments efficiently' },
-  { name: 'Buy Airtime', icon: Phone, description: 'Top up any mobile network' },
-  { name: 'Startimes TV', icon: Tv, description: 'Subscribe to TV packages' },
-  { name: 'Bulk SMS', icon: MessageSquare, description: 'Send messages to multiple recipients' },
-  { name: 'Irembo Services', icon: Globe, description: 'Access government services' },
+// All Services Data
+const allServices = [
+  { name: 'Electricity Payment', icon: Zap, category: 'Utilities', description: 'Pay electricity bills instantly' },
+  { name: 'RRA Tax Payment', icon: FileText, category: 'Government', description: 'Handle tax payments efficiently' },
+  { name: 'Buy Airtime', icon: Phone, category: 'Telecom', description: 'Top up any mobile network' },
+  { name: 'Startimes TV', icon: Tv, category: 'Entertainment', description: 'Subscribe to TV packages' },
+  { name: 'Bulk SMS', icon: MessageSquare, category: 'Communication', description: 'Send messages to multiple recipients' },
+  { name: 'Irembo Services', icon: Globe, category: 'Government', description: 'Access government services' },
+  { name: 'WASAC Water', icon: Droplet, category: 'Utilities', description: 'Pay water bills online' },
+  { name: 'School Fees', icon: BookOpen, category: 'Education', description: 'Education fee payments' },
+  { name: 'Bulk Salary', icon: Users, category: 'Business', description: 'Manage payroll payments' },
+  { name: 'Invoice Payments', icon: CreditCard, category: 'Business', description: 'Handle invoice processing' },
+  { name: 'Tax Calculation', icon: Calculator, category: 'Business', description: 'Automated tax calculations' },
+  { name: 'Expense Management', icon: FileSpreadsheet, category: 'Business', description: 'Track business expenses' },
 ];
 
 // Banks
@@ -68,9 +83,35 @@ export default function LandingPage() {
   const [newService, setNewService] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [current, setCurrent] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
   const router = useRouter();
 
-  const itemsPerView = 3; // number of services visible at once
+  const itemsPerView = 3;
+
+  // Get unique categories
+  const categories = ['All', ...new Set(allServices.map(service => service.category))];
+
+  // Filter services
+  const filteredServices = useMemo(() => {
+    let filtered = allServices;
+
+    if (searchTerm) {
+      filtered = filtered.filter(service =>
+        service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        service.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (activeCategory !== 'All') {
+      filtered = filtered.filter(service => service.category === activeCategory);
+    }
+
+    return filtered;
+  }, [searchTerm, activeCategory]);
+
+  // Update carousel to use filtered services
+  const displayServices = filteredServices.length > 0 ? filteredServices : allServices;
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -88,7 +129,6 @@ export default function LandingPage() {
     document.documentElement.classList.toggle('dark', nextTheme);
   };
 
-  // Navigate to login on clicking any service/bank
   const goToLogin = () => router.push('/login');
 
   const handleServiceSubmit = (e: React.FormEvent) => {
@@ -104,16 +144,21 @@ export default function LandingPage() {
 
   const nextSlide = () => {
     setCurrent((prev) =>
-      prev + itemsPerView >= features.length ? 0 : prev + itemsPerView
+      prev + itemsPerView >= displayServices.length ? 0 : prev + itemsPerView
     );
   };
 
   const prevSlide = () => {
     setCurrent((prev) =>
       prev - itemsPerView < 0
-        ? Math.max(features.length - itemsPerView, 0)
+        ? Math.max(displayServices.length - itemsPerView, 0)
         : prev - itemsPerView
     );
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setActiveCategory('All');
   };
 
   return (
@@ -126,7 +171,6 @@ export default function LandingPage() {
 
       {/* Header */}
       <header className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-      
         <div className="flex items-center gap-3">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             <span className="text-[#ff6600]">X</span>
@@ -217,25 +261,103 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Services Section with Advanced Filters */}
       <section className="max-w-7xl mx-auto px-6 py-12 relative">
-        <h3 className="text-2xl sm:text-3xl font-bold text-center text-[#13294b] dark:text-white mb-8">
-          Our Services
-        </h3>
-        <p className="text-center text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-12">
-          Access a wide range of financial and utility services through our secure platform
-        </p>
+        <div className="text-center mb-12">
+          <h3 className="text-2xl sm:text-3xl font-bold text-[#13294b] dark:text-white mb-4">
+            All Services
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Access a comprehensive range of financial and utility services through our secure platform
+          </p>
+        </div>
 
+        {/* Advanced Filter Bar */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg mb-8"
+        >
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            {/* Search Box */}
+            <div className="flex-1 w-full sm:max-w-xs">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search services..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2 justify-center">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeCategory === category
+                      ? 'bg-[#ff6600] text-white shadow-lg'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Active Filters Display */}
+          {(searchTerm || activeCategory !== 'All') && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="mt-4 flex flex-wrap gap-2 items-center"
+            >
+              <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+              {searchTerm && (
+                <span className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-sm px-3 py-1 rounded-full">
+                  Search: "{searchTerm}"
+                  <button onClick={() => setSearchTerm('')} className="hover:text-blue-600">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {activeCategory !== 'All' && (
+                <span className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 text-sm px-3 py-1 rounded-full">
+                  Category: {activeCategory}
+                  <button onClick={() => setActiveCategory('All')} className="hover:text-green-600">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              <button
+                onClick={clearFilters}
+                className="text-sm text-[#ff6600] hover:text-[#e65c00] font-medium ml-2"
+              >
+                Clear all
+              </button>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Services Carousel */}
         <div className="relative flex items-center">
           {/* Left Arrow */}
-          <button
-            onClick={prevSlide}
-            className="absolute -left-4 md:-left-8 z-10 bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:shadow-lg transition"
-          >
-            <ChevronLeft className="w-5 h-5 text-[#13294b] dark:text-white" />
-          </button>
+          {displayServices.length > itemsPerView && (
+            <button
+              onClick={prevSlide}
+              className="absolute -left-4 md:-left-8 z-10 bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:shadow-lg transition border border-gray-200 dark:border-gray-700"
+            >
+              <ChevronLeft className="w-5 h-5 text-[#13294b] dark:text-white" />
+            </button>
+          )}
 
-          {/* Cards Container */}
+          {/* Services Grid */}
           <motion.div
             key={current}
             initial={{ opacity: 0, x: 100 }}
@@ -243,15 +365,22 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             className="flex-1 flex justify-center gap-6 overflow-hidden"
           >
-            {features
+            {displayServices
               .slice(current, current + itemsPerView)
-              .map(({ name, icon: Icon, description }, idx) => (
+              .map(({ name, icon: Icon, description, category }, idx) => (
                 <motion.button
-                  key={idx}
+                  key={`${name}-${idx}`}
                   onClick={goToLogin}
                   whileHover={{ scale: 1.03 }}
-                  className="w-64 flex flex-col items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer"
+                  className="w-64 flex flex-col items-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-md hover:shadow-lg transition cursor-pointer relative"
                 >
+                  {/* Category Badge */}
+                  <div className="absolute top-3 right-3">
+                    <span className="bg-[#ff6600]/10 text-[#ff6600] text-xs px-2 py-1 rounded-full font-medium">
+                      {category}
+                    </span>
+                  </div>
+
                   <div className="bg-[#13294b]/10 dark:bg-[#13294b]/20 p-3 rounded-lg mb-4">
                     <Icon className="w-8 h-8 text-[#13294b] dark:text-[#ff6600]" />
                   </div>
@@ -266,25 +395,57 @@ export default function LandingPage() {
           </motion.div>
 
           {/* Right Arrow */}
-          <button
-            onClick={nextSlide}
-            className="absolute -right-4 md:-right-8 z-10 bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:shadow-lg transition"
-          >
-            <ChevronRight className="w-5 h-5 text-[#13294b] dark:text-white" />
-          </button>
+          {displayServices.length > itemsPerView && (
+            <button
+              onClick={nextSlide}
+              className="absolute -right-4 md:-right-8 z-10 bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:shadow-lg transition border border-gray-200 dark:border-gray-700"
+            >
+              <ChevronRight className="w-5 h-5 text-[#13294b] dark:text-white" />
+            </button>
+          )}
         </div>
 
-        <div className="flex justify-center mt-6">
-          {Array.from({ length: Math.ceil(features.length / itemsPerView) }).map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrent(idx * itemsPerView)}
-              className={`w-2 h-2 rounded-full mx-1 ${
-                current === idx * itemsPerView ? 'bg-[#ff6600]' : 'bg-gray-300 dark:bg-gray-600'
-              }`}
-            />
-          ))}
+        {/* Carousel Indicators */}
+        {displayServices.length > itemsPerView && (
+          <div className="flex justify-center mt-6">
+            {Array.from({ length: Math.ceil(displayServices.length / itemsPerView) }).map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrent(idx * itemsPerView)}
+                className={`w-2 h-2 rounded-full mx-1 ${
+                  current === idx * itemsPerView ? 'bg-[#ff6600]' : 'bg-gray-300 dark:bg-gray-600'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Services Count */}
+        <div className="text-center mt-6">
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
+            Showing {Math.min(displayServices.length, itemsPerView)} of {displayServices.length} services
+            {filteredServices.length !== allServices.length && ` (filtered from ${allServices.length} total)`}
+          </p>
         </div>
+
+        {/* No Results State */}
+        {filteredServices.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <div className="text-gray-400 dark:text-gray-500 text-lg mb-4">
+              No services found matching your criteria
+            </div>
+            <button
+              onClick={clearFilters}
+              className="text-[#ff6600] hover:text-[#e65c00] font-medium"
+            >
+              Show all services
+            </button>
+          </motion.div>
+        )}
       </section>
 
       {/* Agency Banking Section */}
@@ -317,6 +478,59 @@ export default function LandingPage() {
             </motion.button>
           ))}
         </motion.div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg"
+          >
+            <div className="text-2xl sm:text-3xl font-bold text-[#ff6600] mb-2">
+              {allServices.length}+
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Services</div>
+          </motion.div>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ delay: 0.1 }}
+            className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg"
+          >
+            <div className="text-2xl sm:text-3xl font-bold text-[#ff6600] mb-2">
+              {banks.length}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Bank Partners</div>
+          </motion.div>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ delay: 0.2 }}
+            className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg"
+          >
+            <div className="text-2xl sm:text-3xl font-bold text-[#ff6600] mb-2">
+              24/7
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Available</div>
+          </motion.div>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            transition={{ delay: 0.3 }}
+            className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg"
+          >
+            <div className="text-2xl sm:text-3xl font-bold text-[#ff6600] mb-2">
+              100%
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Secure</div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Add More Service Form Section */}
@@ -373,12 +587,12 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-6 md:mb-0">
-             <div className="flex items-center gap-3">
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            <span className="text-[#ff6600]">X</span>
-            <span className="text-[#13294b] dark:text-white">-Pay</span>
-          </h1>
-        </div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                  <span className="text-[#ff6600]">X</span>
+                  <span className="text-white">-Pay</span>
+                </h1>
+              </div>
               <p className="text-gray-400 mt-2">Simplifying digital payments in Rwanda</p>
             </div>
             <div className="flex gap-6">

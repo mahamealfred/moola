@@ -65,7 +65,9 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.5
+      duration: 0.5,
+      // use numeric easing (cubic-bezier) to satisfy framer-motion's TypeScript types
+      ease: [0.22, 1, 0.36, 1]
     }
   }
 };
@@ -99,7 +101,7 @@ export default function DashboardHome() {
         {services.map(({ name, href, icon: Icon, description, gradient }) => (
           <motion.div
             key={name}
-            variants={itemVariants}
+            variants={itemVariants as any}
             whileHover={{ 
               y: -8, 
               scale: 1.02,

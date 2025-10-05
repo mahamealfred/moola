@@ -128,9 +128,10 @@ export default function DashboardHome() {
   const router = useRouter();
   const { user } = useAuth();
   const userRole = user?.category;
+  
 
-  const isAgent = userRole === 'Agent';
-  const isBusiness = userRole === 'Corporate';
+  const isAgent = userRole === user?.category;
+  const isBusiness = userRole === user?.category;
 
   // Get unique categories for filtering
   const categories = ['All', ...new Set(paymentServices.map(service => service.category))];
@@ -195,8 +196,10 @@ export default function DashboardHome() {
     }
   };
 
+  type Service = PaymentService | AgencyBankingService | BusinessService;
+
   const renderServiceCard = (
-    service: { name: string; icon: React.ElementType; content?: any; href?: string; isNew?: boolean; isFeatured?: boolean; status?: string },
+    service: Service & { isNew?: boolean; isFeatured?: boolean; status?: string; href?: string },
     sectionType: 'payment' | 'agency' | 'business' = 'payment'
   ) => {
     const getCardColors = () => {
@@ -291,17 +294,22 @@ export default function DashboardHome() {
 
         {/* Popularity indicator for payment services */}
         {sectionType === 'payment' && 'popularity' in service && (
-          <div className="mt-3 flex items-center gap-2">
-            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-              <div 
-                className="bg-[#ff6600] h-1.5 rounded-full transition-all duration-500"
-                style={{ width: `${service.popularity}%` }}
-              ></div>
-            </div>
-            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-              {service.popularity}%
-            </span>
-          </div>
+          (() => {
+            const popularity = (service as PaymentService).popularity;
+            return (
+              <div className="mt-3 flex items-center gap-2">
+                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                  <div 
+                    className="bg-[#ff6600] h-1.5 rounded-full transition-all duration-500"
+                    style={{ width: `${popularity}%` }}
+                  ></div>
+                </div>
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                  {popularity}%
+                </span>
+              </div>
+            );
+          })()
         )}
       </motion.div>
     );
@@ -326,10 +334,7 @@ export default function DashboardHome() {
             Welcome back, {user?.name || 'User'}
           </span>
         </div>
-{/*         
-        <h4 className="text-3xl sm:text-4xl lg:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white mb-3">
-          Dashboard Portal
-        </h4> */}
+        
         <p className="text-gray-500 dark:text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">
           {isAgent ? 'Comprehensive Agency Services Platform' : 'Advanced Business Services Platform'}
         </p>

@@ -148,10 +148,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300">
       {/* Security Indicator */}
-      {/* <div className="fixed top-4 left-4 z-50 flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-3 py-1 rounded-full text-xs border border-green-200 dark:border-green-800">
+      <div className="fixed top-4 left-4 z-50 flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-3 py-1 rounded-full text-xs border border-green-200 dark:border-green-800">
         <Shield className="w-3 h-3" />
         Secure Session
-      </div> */}
+      </div>
 
       {/* Desktop Sidebar */}
       <motion.aside

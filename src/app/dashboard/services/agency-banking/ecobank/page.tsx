@@ -262,9 +262,7 @@ export default function DashboardHome() {
           </span>
         </div>
         
-        {/* <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[#13294b] dark:text-white mb-3">
-          Ecobank Services
-        </h1> */}
+      
         <p className="text-gray-500 dark:text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">
           Complete banking solutions at your fingertips
         </p>
