@@ -37,7 +37,11 @@ interface SettingsComponentProps {
   initialAgentInfo?: AgentInfo;
 }
 
-export default function SettingsComponent({ initialAgentInfo }: SettingsComponentProps) {
+// Next.js app router expects page components to have a generic props signature.
+// Accept an optional props bag to avoid type incompatibilities between the
+// component props and the framework's inferred PageProps type.
+export default function SettingsComponent(props?: any) {
+  const initialAgentInfo: AgentInfo | undefined = props?.initialAgentInfo;
   const [activeTab, setActiveTab] = useState('profile');
   const [darkMode, setDarkMode] = useState(true);
   const [notifications, setNotifications] = useState({

@@ -1,0 +1,235 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "dynamicRoutes": [],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/dashboard",
+      "regex": "^/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard(?:/)?$"
+    },
+    {
+      "page": "/dashboard/balance",
+      "regex": "^/dashboard/balance(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/balance(?:/)?$"
+    },
+    {
+      "page": "/dashboard/commission",
+      "regex": "^/dashboard/commission(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/commission(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services",
+      "regex": "^/dashboard/services(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/agency-banking/ecobank",
+      "regex": "^/dashboard/services/agency\\-banking/ecobank(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/agency\\-banking/ecobank(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/agency-banking/ecobank/account-openning",
+      "regex": "^/dashboard/services/agency\\-banking/ecobank/account\\-openning(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/agency\\-banking/ecobank/account\\-openning(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/agency-banking/ecobank/deposit",
+      "regex": "^/dashboard/services/agency\\-banking/ecobank/deposit(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/agency\\-banking/ecobank/deposit(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/agency-banking/ecobank/expressCashToken",
+      "regex": "^/dashboard/services/agency\\-banking/ecobank/expressCashToken(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/agency\\-banking/ecobank/expressCashToken(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/agency-banking/ecobank/remittance",
+      "regex": "^/dashboard/services/agency\\-banking/ecobank/remittance(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/agency\\-banking/ecobank/remittance(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/agency-banking/ecobank/withdral",
+      "regex": "^/dashboard/services/agency\\-banking/ecobank/withdral(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/agency\\-banking/ecobank/withdral(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/business-services/bulk-salary",
+      "regex": "^/dashboard/services/business\\-services/bulk\\-salary(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/business\\-services/bulk\\-salary(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/business-services/expense-management",
+      "regex": "^/dashboard/services/business\\-services/expense\\-management(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/business\\-services/expense\\-management(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/business-services/invoice-payment",
+      "regex": "^/dashboard/services/business\\-services/invoice\\-payment(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/business\\-services/invoice\\-payment(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/business-services/tax-calculation",
+      "regex": "^/dashboard/services/business\\-services/tax\\-calculation(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/business\\-services/tax\\-calculation(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/payment-services/airtme",
+      "regex": "^/dashboard/services/payment\\-services/airtme(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/payment\\-services/airtme(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/payment-services/bulk-airtime",
+      "regex": "^/dashboard/services/payment\\-services/bulk\\-airtime(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/payment\\-services/bulk\\-airtime(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/payment-services/bulk-sms",
+      "regex": "^/dashboard/services/payment\\-services/bulk\\-sms(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/payment\\-services/bulk\\-sms(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/payment-services/electricity",
+      "regex": "^/dashboard/services/payment\\-services/electricity(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/payment\\-services/electricity(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/payment-services/irembopay",
+      "regex": "^/dashboard/services/payment\\-services/irembopay(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/payment\\-services/irembopay(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/payment-services/rnit",
+      "regex": "^/dashboard/services/payment\\-services/rnit(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/payment\\-services/rnit(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/payment-services/rra",
+      "regex": "^/dashboard/services/payment\\-services/rra(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/payment\\-services/rra(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/payment-services/schools",
+      "regex": "^/dashboard/services/payment\\-services/schools(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/payment\\-services/schools(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/payment-services/startime",
+      "regex": "^/dashboard/services/payment\\-services/startime(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/payment\\-services/startime(?:/)?$"
+    },
+    {
+      "page": "/dashboard/services/payment-services/wasac",
+      "regex": "^/dashboard/services/payment\\-services/wasac(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/services/payment\\-services/wasac(?:/)?$"
+    },
+    {
+      "page": "/dashboard/settings",
+      "regex": "^/dashboard/settings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/settings(?:/)?$"
+    },
+    {
+      "page": "/dashboard/transactions",
+      "regex": "^/dashboard/transactions(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/dashboard/transactions(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/forgot-password",
+      "regex": "^/forgot\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/forgot\\-password(?:/)?$"
+    },
+    {
+      "page": "/landingPage",
+      "regex": "^/landingPage(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/landingPage(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/registration",
+      "regex": "^/registration(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/registration(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "RSC",
+    "varyHeader": "RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch",
+    "prefetchHeader": "Next-Router-Prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "Next-Router-Segment-Prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  },
+  "rewrites": []
+}
