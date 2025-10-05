@@ -130,8 +130,8 @@ export default function DashboardHome() {
   const userRole = user?.category;
   
 
-  const isAgent = userRole === user?.category;
-  const isBusiness = userRole === user?.category;
+  const isAgent = userRole === "Agent";
+  const isBusiness = userRole === "Corporate";
 
   // Get unique categories for filtering
   const categories = ['All', ...new Set(paymentServices.map(service => service.category))];

@@ -94,7 +94,7 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
                 value={newRecipient.amount}
                 onChange={(e) => setNewRecipient({ ...newRecipient, amount: e.target.value })}
                 placeholder="1000"
-                min="100"
+                min={100}
                 className="w-full px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
               />
             </div>

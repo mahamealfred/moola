@@ -3,12 +3,12 @@
 import React, { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
-import Link from 'next/link';
+import { secureStorage } from '@/lib/auth-context';
 
 type Step = 1 | 2 | 3 | 4;
 
 interface FormData {
-  meterNumber: string;
+  docNumber: string;
   customerName: string;
   amount: number;
   serviceFee: number;
@@ -17,11 +17,39 @@ interface FormData {
   receiptId: string;
 }
 
+interface ValidationResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    productId: string;
+    productName: string;
+    customerId: string;
+    customerName: string;
+    maxAmount: number;
+    requestId: string;
+  };
+}
+
+interface PaymentResponse {
+  success: boolean;
+  message: string;
+  data: {
+    transactionId: number;
+    requestId: string;
+    amount: string;
+    subagentCode: number;
+    agentName: string;
+    token: string | null;
+    units: string | null;
+    deliveryMethod: string;
+  };
+}
+
 export default function RRAPayment() {
   const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    meterNumber: '',
+    docNumber: '',
     customerName: '',
     amount: 0,
     serviceFee: 0,
@@ -29,9 +57,46 @@ export default function RRAPayment() {
     rraTax: 0,
     receiptId: ''
   });
+  const [validationData, setValidationData] = useState<ValidationResponse['data'] | null>(null);
+  const [paymentData, setPaymentData] = useState<PaymentResponse['data'] | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [apiError, setApiError] = useState<string>('');
+
+  // Input validation rules
+  const validateField = (name: string, value: string): string => {
+    switch (name) {
+      case 'docNumber':
+        if (!value.trim()) return 'Document number is required';
+        if (!/^\d+$/.test(value)) return 'Document number must contain only digits';
+        if (value.length < 5) return 'Document number must be at least 5 digits';
+        if (value.length > 20) return 'Document number is too long';
+        return '';
+      
+      default:
+        return '';
+    }
+  };
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    
+    // Clear errors for this field and API errors
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    if (apiError) {
+      setApiError('');
+    }
+    
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const onInputBlur = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const error = validateField(name, value);
+    if (error) {
+      setErrors(prev => ({ ...prev, [name]: error }));
+    }
   };
 
   // Service fee calculator for RRA
@@ -56,52 +121,150 @@ export default function RRAPayment() {
     return amount * 0.01;
   };
 
-  async function validateMeter(meter: string) {
-    return new Promise<{ customerName: string; amount: number }>((resolve) => {
-      setTimeout(() => {
-        resolve({
-          customerName: 'Prince Rushema',
-          amount: 12500,
-        });
-      }, 1200);
-    });
+  async function validateDocument(docNumber: string) {
+    try {
+  const response = await fetch('https://core-api.ddin.rw/v1/agency/thirdpartyagency/services/validate/biller', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          billerCode: "tax",
+          productCode: "tax",
+          customerId: docNumber
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Validation failed');
+      }
+
+      const data: ValidationResponse = await response.json();
+      
+      if (data.success) {
+        setValidationData(data.data!);
+        
+        // Calculate fees based on the amount from API
+        const amount = data.data!.maxAmount || 0;
+        const serviceFee = calculateServiceFee(amount);
+        const vat = calculateVAT(serviceFee);
+        const rraTax = calculateRRATax(amount);
+        
+        setFormData(prev => ({
+          ...prev,
+          customerName: data.data!.customerName,
+          amount: amount,
+          serviceFee: serviceFee,
+          vat: vat,
+          rraTax: rraTax
+        }));
+        
+        return { isValid: true, validationData: data.data };
+      } else {
+        // Return the API error message directly
+        return { isValid: false, message: data.message };
+      }
+    } catch (error) {
+      console.error('Validation error:', error);
+      throw error;
+    }
+  }
+
+  async function processPayment() {
+    if (!validationData) {
+      throw new Error('Validation data not found');
+    }
+
+    try {
+      const accessToken = secureStorage.getAccessToken();
+            
+      if (!accessToken) {
+        throw new Error('Authentication required. Please login again.');
+      }
+
+  const response = await fetch('https://core-api.ddin.rw/v1/agency/thirdpartyagency/services/execute/bill-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          email: "mahamealfred@gmail.com",
+          clientPhone: "+250789595309", // You might want to make this dynamic
+          customerId: formData.docNumber,
+          billerCode: "tax",
+          productCode: "tax",
+          amount: totalAmount.toString(),
+          ccy: "RWF",
+          requestId: validationData.requestId
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Payment failed');
+      }
+
+      const data: PaymentResponse = await response.json();
+      
+      if (data.success) {
+        setPaymentData(data.data);
+        return { success: true, paymentData: data.data };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      throw error;
+    }
   }
 
   async function handleNext() {
     if (step === 1) {
-      if (formData.meterNumber.trim().length < 5) {
-        alert('Please enter a valid Doc ID.');
+      const docError = validateField('docNumber', formData.docNumber);
+      if (docError) {
+        setErrors({ docNumber: docError });
         return;
       }
+
       setLoading(true);
+      setApiError(''); // Clear previous API errors
       try {
-        const data = await validateMeter(formData.meterNumber.trim());
-        const fee = calculateServiceFee(data.amount);
-        const vat = calculateVAT(fee);
-        const rraTax = calculateRRATax(data.amount);
+        const data = await validateDocument(formData.docNumber.trim());
         
-        setFormData(prev => ({
-          ...prev,
-          customerName: data.customerName,
-          amount: data.amount,
-          serviceFee: fee,
-          vat: vat,
-          rraTax: rraTax
-        }));
+        if (!data.isValid) {
+          // Display the API error message directly in the form
+          setApiError(data.message || 'Document validation failed. Please check the document number and try again.');
+          return;
+        }
+        
         setStep(2);
-      } catch {
-        alert('Doc ID validation failed. Try again.');
+      } catch (error) {
+        setApiError('Document validation failed. Please try again.');
       } finally {
         setLoading(false);
       }
     } else if (step === 2) {
       setStep(3);
     } else if (step === 3) {
-      setFormData(prev => ({
-        ...prev,
-        receiptId: 'RRA' + Date.now()
-      }));
-        setStep(4);
+      setLoading(true);
+      setApiError(''); // Clear previous API errors
+      try {
+        const result = await processPayment();
+        
+        if (result.success) {
+          setFormData(prev => ({
+            ...prev,
+            receiptId: `RRA${result.paymentData?.transactionId || Date.now()}`
+          }));
+          setStep(4);
+        } else {
+          setApiError(result.message || 'Payment failed. Please try again.');
+        }
+      } catch (error) {
+        setApiError('Payment processing failed. Please try again.');
+      } finally {
+        setLoading(false);
+      }
     }
   }
 
@@ -144,7 +307,7 @@ export default function RRAPayment() {
             </div>
             <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">Rwanda Revenue Authority</h1>
           </div>
-          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">RRA Payment Portal</p>
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Tax Payment Portal</p>
         </div>
 
         {/* Progress Bar */}
@@ -171,20 +334,52 @@ export default function RRAPayment() {
           </div>
         </div>
 
+        {/* API Error Message Display */}
+        {apiError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+          >
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                  Validation Error
+                </h3>
+                <div className="mt-1 text-sm text-red-700 dark:text-red-300">
+                  {apiError}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="step1" {...stepAnimation}>
-              <h2 className="text-lg md:text-xl font-bold mb-3 text-gray-900 dark:text-white">Validate Doc ID</h2>
+              <h2 className="text-lg md:text-xl font-bold mb-3 text-gray-900 dark:text-white">Validate Document Number</h2>
               <div>
                 <div className="mb-3 md:mb-4">
                   <Input
-                    label="Enter Doc ID"
-                    name="meterNumber"
-                    value={formData.meterNumber}
+                    label="Enter Document Number"
+                    name="docNumber"
+                    value={formData.docNumber}
                     onChange={onInputChange}
+                    onBlur={onInputBlur}
                     disabled={loading}
                     placeholder="e.g., 123456789"
+                    error={errors.docNumber}
                   />
+                  {!errors.docNumber && !apiError && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Enter your RRA document number (numbers only)
+                    </p>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -193,32 +388,71 @@ export default function RRAPayment() {
           {step === 2 && (
             <motion.div key="step2" {...stepAnimation}>
               <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Payment Details</h2>
-              <div className="grid grid-cols-1 gap-3 md:gap-4">
-                <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2 text-gray-700 dark:text-gray-300 text-sm md:text-base flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Payment Details
-                  </h3>
-                  <div className="text-gray-900 dark:text-white space-y-1 md:space-y-2 text-sm md:text-base">
-                    <p>
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Name</strong>
-                      Prince Rushema
-                    </p>
-                    <p>
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Customer Doc ID</strong>
-                      1234567388
-                    </p>
-                    <p>
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Service Fee</strong>
-                      RWF {formData.serviceFee.toLocaleString()}
-                    </p>
-                    <p className="font-semibold mt-2 md:mt-3 border-t pt-2 text-[#ff6600] text-base md:text-lg">
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Amount to Pay</strong>
-                      RWF {totalAmount.toLocaleString()}
-                    </p>
+              
+              {/* Horizontal Layout for Customer Information */}
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-lg mb-4">
+                <h3 className="font-semibold mb-3 text-gray-700 dark:text-gray-300 text-sm md:text-base flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Taxpayer Information
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 text-sm md:text-base">
+                  <div className="bg-white dark:bg-gray-600 p-3 rounded">
+                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">Taxpayer Name</p>
+                    <p className="text-gray-900 dark:text-white font-semibold">{formData.customerName}</p>
                   </div>
+                  
+                  <div className="bg-white dark:bg-gray-600 p-3 rounded">
+                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">Document Number</p>
+                    <p className="text-gray-900 dark:text-white font-semibold">{formData.docNumber}</p>
+                  </div>
+                  
+                  {validationData && (
+                    <div className="bg-white dark:bg-gray-600 p-3 rounded">
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">Service</p>
+                      <p className="text-gray-900 dark:text-white font-semibold">
+                        {validationData.productName || 'Tax Payment'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Payment Breakdown */}
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-lg">
+                <h3 className="font-semibold mb-3 text-gray-700 dark:text-gray-300 text-sm md:text-base flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Payment Breakdown
+                </h3>
+                
+                <div className="space-y-2 text-sm md:text-base">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Tax Amount:</span>
+                    <span className="text-gray-900 dark:text-white">RWF {formData.amount.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">Service Fee:</span>
+                    <span className="text-gray-900 dark:text-white">RWF {formData.serviceFee.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">VAT (18%):</span>
+                    <span className="text-gray-900 dark:text-white">RWF {formData.vat.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">RRA Tax (1%):</span>
+                    <span className="text-gray-900 dark:text-white">RWF {formData.rraTax.toLocaleString()}</span>
+                  </div>
+                </div>
+                
+                <div className="border-t pt-3 mt-3">
+                  <p className="font-semibold text-[#ff6600] text-base md:text-lg">
+                    <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">Total Amount to Pay</span>
+                    RWF {totalAmount.toLocaleString()}
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -228,33 +462,60 @@ export default function RRAPayment() {
             <motion.div key="step3" {...stepAnimation}>
               <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Confirm Payment</h2>
               <div className="bg-[#ff660010] dark:bg-[#ff660020] p-3 md:p-4 rounded-lg">
-                <h3 className="font-semibold mb-2 text-gray-700 dark:text-gray-300 text-sm md:text-base">Please confirm your payment details</h3>
-                <div className="grid grid-cols-2 gap-2 md:gap-3 text-sm md:text-base">
-                  <div>
-                    <p>
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Customer Name</strong>
-                      {formData.customerName}
-                    </p>
-                    <p className="mt-1 md:mt-2">
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Customer Doc ID</strong>
-                      {formData.meterNumber}
-                    </p>
+                <h3 className="font-semibold mb-3 text-gray-700 dark:text-gray-300 text-sm md:text-base">Please confirm your payment details</h3>
+                
+                {/* Horizontal confirmation layout */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
+                    <div className="bg-white dark:bg-gray-600 p-3 rounded">
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Taxpayer Name</p>
+                      <p className="text-gray-900 dark:text-white font-semibold">{formData.customerName}</p>
+                    </div>
+                    <div className="bg-white dark:bg-gray-600 p-3 rounded">
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Document Number</p>
+                      <p className="text-gray-900 dark:text-white font-semibold">{formData.docNumber}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p>
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Amount</strong>
-                      RWF {formData.amount.toLocaleString()}
-                    </p>
-                    <p className="mt-1 md:mt-2">
-                      <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Service Fee</strong>
-                      RWF {formData.serviceFee.toLocaleString()}
-                    </p>
+                  
+                  <div className="space-y-3">
+                    <div className="bg-white dark:bg-gray-600 p-3 rounded">
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Tax Amount</p>
+                      <p className="text-gray-900 dark:text-white font-semibold">RWF {formData.amount.toLocaleString()}</p>
+                    </div>
+                    {validationData && (
+                      <div className="bg-white dark:bg-gray-600 p-3 rounded">
+                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Request ID</p>
+                        <p className="text-gray-900 dark:text-white font-semibold text-xs">{validationData.requestId}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <p className="font-semibold mt-3 md:mt-4 border-t pt-2 md:pt-3 text-[#ff6600] text-base md:text-lg">
-                  <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Amount to Pay</strong>
-                  RWF {totalAmount.toLocaleString()}
-                </p>
+
+                {/* Fee Breakdown */}
+                <div className="bg-white dark:bg-gray-600 p-3 rounded mb-4">
+                  <h4 className="font-semibold mb-2 text-sm md:text-base">Fee Breakdown</h4>
+                  <div className="space-y-1 text-xs md:text-sm">
+                    <div className="flex justify-between">
+                      <span>Service Fee:</span>
+                      <span>RWF {formData.serviceFee.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>VAT (18%):</span>
+                      <span>RWF {formData.vat.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>RRA Tax (1%):</span>
+                      <span>RWF {formData.rraTax.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border-t pt-3">
+                  <p className="font-semibold text-[#ff6600] text-base md:text-lg">
+                    <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Amount to Pay</span>
+                    RWF {totalAmount.toLocaleString()}
+                  </p>
+                </div>
               </div>
             </motion.div>
           )}
@@ -275,11 +536,11 @@ export default function RRAPayment() {
                     </div>
                     <h3 className="text-md md:text-lg font-bold text-[#ff6600] dark:text-[#ff6600]">Rwanda Revenue Authority</h3>
                   </div>
-                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Official Payment Receipt</p>
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Official Tax Payment Receipt</p>
                 </div>
                 
                 <div className="space-y-2 md:space-y-3 text-sm md:text-base">
-                  <div className="grid grid-cols-2 gap-2 md:gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                     <div>
                       <p>
                         <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Receipt ID</strong>
@@ -289,16 +550,28 @@ export default function RRAPayment() {
                         <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Date</strong>
                         {new Date().toLocaleDateString()}
                       </p>
+                      {paymentData && (
+                        <p className="mt-1 md:mt-2">
+                          <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Transaction ID</strong>
+                          {paymentData.transactionId}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <p>
-                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Doc ID</strong>
-                        {formData.meterNumber}
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Document Number</strong>
+                        {formData.docNumber}
                       </p>
                       <p className="mt-1 md:mt-2">
-                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Customer Name</strong>
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Taxpayer Name</strong>
                         {formData.customerName}
                       </p>
+                      {paymentData && (
+                        <p className="mt-1 md:mt-2">
+                          <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Request ID</strong>
+                          {paymentData.requestId}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -306,13 +579,27 @@ export default function RRAPayment() {
                     <h4 className="font-semibold text-[#ff6600] dark:text-[#ff6600] mb-1 text-sm md:text-base">Payment Details</h4>
                     <div className="space-y-1 text-xs md:text-sm">
                       <div className="flex justify-between">
-                        <span>Amount:</span>
+                        <span>Tax Amount:</span>
                         <span>RWF {formData.amount.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Service Fee:</span>
                         <span>RWF {formData.serviceFee.toLocaleString()}</span>
                       </div>
+                      <div className="flex justify-between">
+                        <span>VAT (18%):</span>
+                        <span>RWF {formData.vat.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>RRA Tax (1%):</span>
+                        <span>RWF {formData.rraTax.toLocaleString()}</span>
+                      </div>
+                      {paymentData && (
+                        <div className="flex justify-between">
+                          <span>Delivery Method:</span>
+                          <span>{paymentData.deliveryMethod}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between font-semibold border-t pt-1 text-[#ff6600] dark:text-[#ff6600]">
                         <span>Total Paid:</span>
                         <span>RWF {totalAmount.toLocaleString()}</span>
@@ -323,7 +610,7 @@ export default function RRAPayment() {
 
                 <div className="mt-3 md:mt-4 pt-2 md:pt-3 border-t border-gray-200 dark:border-gray-600 text-center">
                   <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                    Thank you for your payment. Transaction completed successfully.
+                    Thank you for your tax payment. Transaction completed successfully.
                   </p>
                   <p className="text-[10px] md:text-xs text-gray-400 dark:text-gray-500 mt-1">
                     ID: {formData.receiptId} | {new Date().toLocaleString()}
@@ -361,7 +648,7 @@ export default function RRAPayment() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Validating...
+                  {step === 1 ? 'Validating...' : 'Processing...'}
                 </>
               ) : (
                 <>
@@ -377,12 +664,25 @@ export default function RRAPayment() {
           {step === 3 && (
             <button
               onClick={handleNext}
-              className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full sm:w-auto font-semibold flex items-center justify-center"
+              disabled={loading}
+              className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full sm:w-auto font-semibold flex items-center justify-center disabled:opacity-60"
             >
-              Confirm Payment
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-1 h-3 w-3 md:h-4 md:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing Payment...
+                </>
+              ) : (
+                <>
+                  Confirm Payment
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </>
+              )}
             </button>
           )}
 
@@ -418,22 +718,31 @@ const stepAnimation = {
   transition: { duration: 0.2 }
 };
 
+// Input component with error handling
 function Input({
   label,
   name,
   value,
   onChange,
+  onBlur,
   type = 'text',
   disabled = false,
-  placeholder = ''
+  placeholder = '',
+  error = '',
+  min,
+  max
 }: {
   label: string;
   name: string;
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: ChangeEvent<HTMLInputElement>) => void;
   type?: string;
   disabled?: boolean;
   placeholder?: string;
+  error?: string;
+  min?: number;
+  max?: number;
 }) {
   return (
     <div className="mb-3 md:mb-4">
@@ -446,11 +755,21 @@ function Input({
         type={type}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         disabled={disabled}
         placeholder={placeholder}
+        min={min}
+        max={max}
         required
-        className="w-full px-2.5 py-1.5 md:px-3 md:py-2 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 md:focus:ring-2 focus:ring-[#ff6600] disabled:opacity-50 disabled:cursor-not-allowed transition text-sm md:text-base"
+        className={`w-full px-2.5 py-1.5 md:px-3 md:py-2 rounded border bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 md:focus:ring-2 focus:ring-[#ff6600] disabled:opacity-50 disabled:cursor-not-allowed transition text-sm md:text-base ${
+          error 
+            ? 'border-red-500 dark:border-red-400' 
+            : 'border-gray-300 dark:border-gray-600'
+        }`}
       />
+      {error && (
+        <p className="text-red-500 text-xs mt-1">{error}</p>
+      )}
     </div>
   );
 }

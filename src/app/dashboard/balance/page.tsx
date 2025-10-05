@@ -55,7 +55,7 @@ export default function BalancePage() {
         throw new Error('Authentication required. Please login again.');
       }
 
-      const response = await fetch('http://localhost:4000/v1/agency/accounts/all/accounts/info/balance', {
+  const response = await fetch('https://core-api.ddin.rw/v1/agency/accounts/all/accounts/info/balance', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,

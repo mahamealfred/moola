@@ -54,7 +54,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('http://localhost:4000/v1/agency/auth/login', {
+  const res = await fetch('https://core-api.ddin.rw/v1/agency/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

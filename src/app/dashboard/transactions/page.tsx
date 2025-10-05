@@ -14,7 +14,7 @@ import { motion } from 'framer-motion';
 import { CSVLink } from 'react-csv';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { FiPrinter, FiSearch, FiDownload, FiChevronLeft, FiChevronRight, FiRefreshCw, FiEye, FiX } from 'react-icons/fi';
+import { FiPrinter, FiSearch, FiDownload, FiChevronLeft, FiChevronRight, FiRefreshCw, FiEye, FiX, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import StatusBadge from './StatusBadge';
 import { secureStorage } from '../../../lib/auth-context';
 
@@ -57,7 +57,136 @@ const globalFilterFn: FilterFn<Transaction> = (row, columnId, filterValue) => {
   return searchableFields.some(field => field.includes(search));
 };
 
-// columns are created inside the component so they can reference handlers like handleViewTransaction
+// Mobile Transaction Card Component
+const MobileTransactionCard: React.FC<{
+  transaction: Transaction;
+  onView: (tx: Transaction) => void;
+  onPrint: (tx: Transaction) => void;
+}> = ({ transaction, onView, onPrint }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-3 shadow-sm"
+    >
+      {/* Header */}
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-mono text-xs text-gray-500 dark:text-gray-400">
+              ID: {transaction.id}
+            </span>
+            <StatusBadge status={transaction.status} />
+          </div>
+          <h3 className="font-medium text-gray-800 dark:text-white text-sm capitalize">
+            {transaction.serviceName}
+          </h3>
+          <p className="text-xs text-gray-600 dark:text-gray-400">
+            {transaction.formattedDate}
+          </p>
+        </div>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+        >
+          {isExpanded ? (
+            <FiChevronUp className="w-4 h-4 text-gray-500" />
+          ) : (
+            <FiChevronDown className="w-4 h-4 text-gray-500" />
+          )}
+        </button>
+      </div>
+
+      {/* Basic Info */}
+      <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+        <div>
+          <span className="text-gray-500 dark:text-gray-400 text-xs">Amount:</span>
+          <p className="font-medium text-gray-800 dark:text-white">
+            RWF {transaction.amount.toLocaleString('en-US', { 
+              minimumFractionDigits: 2, 
+              maximumFractionDigits: 2 
+            })}
+          </p>
+        </div>
+        {transaction.token && (
+          <div>
+            <span className="text-gray-500 dark:text-gray-400 text-xs">Token:</span>
+            <p className="font-mono text-xs text-gray-800 dark:text-white truncate">
+              {transaction.token}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Expanded Details */}
+      {isExpanded && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3"
+        >
+          <div className="space-y-2 text-sm">
+            <div>
+              <span className="text-gray-500 dark:text-gray-400 text-xs">Description:</span>
+              <p className="text-gray-800 dark:text-white text-xs leading-relaxed">
+                {transaction.description}
+              </p>
+            </div>
+            {transaction.processDate && (
+              <div>
+                <span className="text-gray-500 dark:text-gray-400 text-xs">Processed:</span>
+                <p className="text-gray-800 dark:text-white text-xs">
+                  {transaction.formattedProcessDate}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => onView(transaction)}
+              className="flex-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 py-2 px-3 rounded-lg text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors flex items-center justify-center gap-1"
+            >
+              <FiEye className="w-3 h-3" />
+              View
+            </button>
+            <button
+              onClick={() => onPrint(transaction)}
+              className="flex-1 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 py-2 px-3 rounded-lg text-xs font-medium hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors flex items-center justify-center gap-1"
+            >
+              <FiPrinter className="w-3 h-3" />
+              Print
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Collapsed Actions */}
+      {!isExpanded && (
+        <div className="flex gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => onView(transaction)}
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs flex items-center gap-1"
+          >
+            <FiEye className="w-3 h-3" />
+            View
+          </button>
+          <button
+            onClick={() => onPrint(transaction)}
+            className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 text-xs flex items-center gap-1"
+          >
+            <FiPrinter className="w-3 h-3" />
+            Print
+          </button>
+        </div>
+      )}
+    </motion.div>
+  );
+};
 
 const printPDF = (tx: Transaction) => {
   const doc = new jsPDF();
@@ -101,12 +230,12 @@ const TransactionDetailModal: React.FC<{
         className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
           <div>
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">
               Transaction Details
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               ID: {transaction.id}
             </p>
           </div>
@@ -119,29 +248,29 @@ const TransactionDetailModal: React.FC<{
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {/* Basic Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white border-b pb-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white border-b pb-2">
                 Basic Information
               </h3>
               
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                     Transaction ID
                   </label>
-                  <p className="text-sm text-gray-800 dark:text-white font-mono">
+                  <p className="text-xs sm:text-sm text-gray-800 dark:text-white font-mono">
                     {transaction.id}
                   </p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                     Date & Time
                   </label>
-                  <p className="text-sm text-gray-800 dark:text-white">
+                  <p className="text-xs sm:text-sm text-gray-800 dark:text-white">
                     {transaction.formattedDate}
                   </p>
                   {transaction.processDate && (
@@ -152,16 +281,16 @@ const TransactionDetailModal: React.FC<{
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                     Service
                   </label>
-                  <p className="text-sm text-gray-800 dark:text-white capitalize">
+                  <p className="text-xs sm:text-sm text-gray-800 dark:text-white capitalize">
                     {transaction.serviceName}
                   </p>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                     Status
                   </label>
                   <div className="mt-1">
@@ -173,16 +302,16 @@ const TransactionDetailModal: React.FC<{
 
             {/* Financial Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white border-b pb-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white border-b pb-2">
                 Financial Details
               </h3>
               
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                     Amount
                   </label>
-                  <p className="text-lg font-bold text-gray-800 dark:text-white">
+                  <p className="text-sm sm:text-lg font-bold text-gray-800 dark:text-white">
                     RWF {transaction.amount.toLocaleString('en-US', { 
                       minimumFractionDigits: 2, 
                       maximumFractionDigits: 2 
@@ -192,10 +321,10 @@ const TransactionDetailModal: React.FC<{
 
                 {transaction.customerCharge > 0 && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                       Customer Charge
                     </label>
-                    <p className="text-sm text-gray-800 dark:text-white">
+                    <p className="text-xs sm:text-sm text-gray-800 dark:text-white">
                       RWF {transaction.customerCharge.toLocaleString('en-US', { 
                         minimumFractionDigits: 2, 
                         maximumFractionDigits: 2 
@@ -206,10 +335,10 @@ const TransactionDetailModal: React.FC<{
 
                 {transaction.token && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                       Token
                     </label>
-                    <p className="text-sm text-gray-800 dark:text-white font-mono break-all">
+                    <p className="text-xs sm:text-sm text-gray-800 dark:text-white font-mono break-all">
                       {transaction.token}
                     </p>
                   </div>
@@ -219,10 +348,10 @@ const TransactionDetailModal: React.FC<{
 
             {/* Description */}
             <div className="md:col-span-2 space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white border-b pb-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white border-b pb-2">
                 Description
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                 {transaction.description}
               </p>
             </div>
@@ -230,10 +359,10 @@ const TransactionDetailModal: React.FC<{
         </div>
 
         {/* Modal Footer */}
-        <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+            className="px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors order-2 sm:order-1"
           >
             Close
           </button>
@@ -242,7 +371,7 @@ const TransactionDetailModal: React.FC<{
               printPDF(transaction);
               onClose();
             }}
-            className="px-4 py-2 text-sm font-medium text-white bg-[#ff6600] rounded-lg hover:bg-[#e65c00] transition-colors flex items-center gap-2"
+            className="px-4 py-2 text-xs sm:text-sm font-medium text-white bg-[#ff6600] rounded-lg hover:bg-[#e65c00] transition-colors flex items-center justify-center gap-2 order-1 sm:order-2"
           >
             <FiPrinter className="w-4 h-4" />
             Print Receipt
@@ -261,6 +390,18 @@ export default function TransactionsPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleViewTransaction = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
@@ -289,10 +430,10 @@ export default function TransactionsPage() {
 
       // Try different endpoint variations
       const endpoints = [
-        'http://localhost:4000/v1/agency/thirdpartyagency/services/transactions/history',
-        'http://localhost:4000/v1/agency/thirdpartyagency/transactions/history',
-        'http://localhost:4000/v1/agency/transactions/history',
-        'http://localhost:4000/v1/transactions/history'
+  'https://core-api.ddin.rw/v1/agency/thirdpartyagency/services/transactions/history',
+  'https://core-api.ddin.rw/v1/agency/thirdpartyagency/transactions/history',
+  'https://core-api.ddin.rw/v1/agency/transactions/history',
+  'https://core-api.ddin.rw/v1/transactions/history'
       ];
 
       let response = null;
@@ -553,68 +694,88 @@ export default function TransactionsPage() {
           </div>
         )}
 
-        {/* Table Container */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="overflow-x-auto bg-white/70 dark:bg-black/40 backdrop-blur-md shadow-lg rounded-xl border border-gray-200 dark:border-gray-700 w-full"
-        >
-          <table className="w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-100 dark:bg-gray-800">
-              {table.getHeaderGroups().map((hg) => (
-                <tr key={hg.id}>
-                  {hg.headers.map((h) => (
-                    <th
-                      key={h.id}
-                      className="px-2 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap"
-                      style={{ 
-                        width: `${h.getSize()}px`,
-                        minWidth: `${h.getSize()}px`,
-                        maxWidth: `${h.getSize()}px`
-                      }}
-                    >
-                      {flexRender(h.column.columnDef.header, h.getContext())}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-              {table.getRowModel().rows.length > 0 ? (
-                table.getRowModel().rows.map((row) => (
-                  <motion.tr
-                    key={row.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.2 }}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-800"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <td 
-                        key={cell.id} 
-                        className="px-2 py-3 text-xs sm:text-sm text-gray-800 dark:text-gray-200 whitespace-nowrap"
+        {/* Mobile View */}
+        {isMobile ? (
+          <div className="space-y-3">
+            {table.getRowModel().rows.length > 0 ? (
+              table.getRowModel().rows.map((row) => (
+                <MobileTransactionCard
+                  key={row.id}
+                  transaction={row.original}
+                  onView={handleViewTransaction}
+                  onPrint={printPDF}
+                />
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                {data.length === 0 ? 'No transactions found.' : 'No transactions match your search.'}
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Desktop Table View */
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="overflow-x-auto bg-white/70 dark:bg-black/40 backdrop-blur-md shadow-lg rounded-xl border border-gray-200 dark:border-gray-700 w-full"
+          >
+            <table className="w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-100 dark:bg-gray-800">
+                {table.getHeaderGroups().map((hg) => (
+                  <tr key={hg.id}>
+                    {hg.headers.map((h) => (
+                      <th
+                        key={h.id}
+                        className="px-2 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap"
                         style={{ 
-                          width: `${cell.column.getSize()}px`,
-                          minWidth: `${cell.column.getSize()}px`,
-                          maxWidth: `${cell.column.getSize()}px`
+                          width: `${h.getSize()}px`,
+                          minWidth: `${h.getSize()}px`,
+                          maxWidth: `${h.getSize()}px`
                         }}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
+                        {flexRender(h.column.columnDef.header, h.getContext())}
+                      </th>
                     ))}
-                  </motion.tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={columns.length} className="px-4 py-6 text-center text-gray-500 dark:text-gray-400 text-sm">
-                    {data.length === 0 ? 'No transactions found.' : 'No transactions match your search.'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </motion.div>
+                  </tr>
+                ))}
+              </thead>
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+                {table.getRowModel().rows.length > 0 ? (
+                  table.getRowModel().rows.map((row) => (
+                    <motion.tr
+                      key={row.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.2 }}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td 
+                          key={cell.id} 
+                          className="px-2 py-3 text-xs sm:text-sm text-gray-800 dark:text-gray-200 whitespace-nowrap"
+                          style={{ 
+                            width: `${cell.column.getSize()}px`,
+                            minWidth: `${cell.column.getSize()}px`,
+                            maxWidth: `${cell.column.getSize()}px`
+                          }}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </motion.tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={columns.length} className="px-4 py-6 text-center text-gray-500 dark:text-gray-400 text-sm">
+                      {data.length === 0 ? 'No transactions found.' : 'No transactions match your search.'}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </motion.div>
+        )}
 
         {/* Pagination */}
         {table.getFilteredRowModel().rows.length > 0 && (
@@ -652,13 +813,6 @@ export default function TransactionsPage() {
             </div>
           </div>
         )}
-
-        {/* Mobile-friendly alternative view for very small screens */}
-        <div className="block lg:hidden mt-4">
-          <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            Scroll horizontally to view all columns →
-          </div>
-        </div>
       </div>
 
       {/* Transaction Detail Modal */}

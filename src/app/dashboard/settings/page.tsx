@@ -15,7 +15,11 @@ import {
   FiEye,
   FiEyeOff,
   FiSave,
-  FiEdit
+  FiEdit,
+  FiTrash2,
+  FiPlus,
+  FiCheck,
+  FiX
 } from 'react-icons/fi';
 import { secureStorage } from '../../../lib/auth-context';
 
@@ -33,30 +37,65 @@ interface AgentInfo {
   lastLogin: string;
 }
 
+interface PaymentMethod {
+  id: string;
+  type: 'mobile_money' | 'bank_account' | 'card';
+  provider: string;
+  lastFour?: string;
+  phoneNumber?: string;
+  accountName?: string;
+  isDefault: boolean;
+}
+
+interface Language {
+  code: string;
+  name: string;
+  nativeName: string;
+}
+
 interface SettingsComponentProps {
   initialAgentInfo?: AgentInfo;
 }
 
-// Next.js app router expects page components to have a generic props signature.
-// Accept an optional props bag to avoid type incompatibilities between the
-// component props and the framework's inferred PageProps type.
 export default function SettingsComponent(props?: any) {
   const initialAgentInfo: AgentInfo | undefined = props?.initialAgentInfo;
   const [activeTab, setActiveTab] = useState('profile');
   const [darkMode, setDarkMode] = useState(true);
+  const [fontSize, setFontSize] = useState('medium');
+  const [language, setLanguage] = useState('en');
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
-    sms: true
+    sms: true,
+    transactionAlerts: true,
+    securityAlerts: true,
+    marketing: false
+  });
+  const [privacySettings, setPrivacySettings] = useState({
+    profileVisibility: 'private',
+    dataSharing: false,
+    activityStatus: true,
+    personalizedAds: false
   });
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isAddingPayment, setIsAddingPayment] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
+  });
+  const [newPaymentMethod, setNewPaymentMethod] = useState({
+    type: 'mobile_money' as 'mobile_money' | 'bank_account' | 'card',
+    provider: '',
+    phoneNumber: '',
+    accountName: '',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: ''
   });
   const [agentInfo, setAgentInfo] = useState<AgentInfo>({
     id: '',
@@ -78,15 +117,39 @@ export default function SettingsComponent(props?: any) {
     phoneNumber: ''
   });
 
-  // Load agent info from secureStorage on component mount
+  // Mock data for payment methods
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
+    {
+      id: '1',
+      type: 'mobile_money',
+      provider: 'MTN Mobile Money',
+      phoneNumber: '078****123',
+      isDefault: true
+    },
+    {
+      id: '2',
+      type: 'bank_account',
+      provider: 'Bank of Kigali',
+      accountName: 'John Doe',
+      lastFour: '7890',
+      isDefault: false
+    }
+  ]);
+
+  const languages: Language[] = [
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'fr', name: 'French', nativeName: 'Français' },
+    { code: 'rw', name: 'Kinyarwanda', nativeName: 'Kinyarwanda' },
+    { code: 'sw', name: 'Swahili', nativeName: 'Kiswahili' }
+  ];
+
+  // Load all settings from localStorage on component mount
   useEffect(() => {
-    const loadAgentInfo = () => {
+    const loadSettings = () => {
       try {
-        // Try to get agent info from secureStorage (from login response)
+        // Load agent info from secureStorage
         const userData = secureStorage.getUserData();
         if (userData) {
-          // userData comes from secureStorage and may have a single `name` field.
-          // Split name into first/last where possible and provide sensible defaults.
           const nameParts = (userData.name || '').split(' ');
           const firstName = nameParts.shift() || '';
           const lastName = nameParts.join(' ') || '';
@@ -105,7 +168,6 @@ export default function SettingsComponent(props?: any) {
             lastLogin: (userData as any).lastLogin || new Date().toISOString()
           });
 
-          // Initialize edit form with current data
           setEditForm({
             firstName,
             lastName,
@@ -113,7 +175,6 @@ export default function SettingsComponent(props?: any) {
             phoneNumber: userData.phoneNumber || ''
           });
         } else if (initialAgentInfo) {
-          // Fallback to initial props
           setAgentInfo(initialAgentInfo);
           setEditForm({
             firstName: initialAgentInfo.firstName,
@@ -123,24 +184,52 @@ export default function SettingsComponent(props?: any) {
           });
         }
 
-        // Load dark mode preference from localStorage
-        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-        setDarkMode(savedDarkMode);
-        if (savedDarkMode) {
-          document.documentElement.classList.add('dark');
+        // Load appearance settings
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode !== null) {
+          setDarkMode(savedDarkMode === 'true');
         }
 
-        // Load notification preferences from localStorage
+        const savedFontSize = localStorage.getItem('fontSize');
+        if (savedFontSize) {
+          setFontSize(savedFontSize);
+        }
+
+        // Load language preference
+        const savedLanguage = localStorage.getItem('language');
+        if (savedLanguage) {
+          setLanguage(savedLanguage);
+        }
+
+        // Load notification preferences
         const savedNotifications = localStorage.getItem('notificationPreferences');
         if (savedNotifications) {
           setNotifications(JSON.parse(savedNotifications));
+        }
+
+        // Load privacy settings
+        const savedPrivacy = localStorage.getItem('privacySettings');
+        if (savedPrivacy) {
+          setPrivacySettings(JSON.parse(savedPrivacy));
+        }
+
+        // Load 2FA setting
+        const saved2FA = localStorage.getItem('twoFactorEnabled');
+        if (saved2FA !== null) {
+          setTwoFactorEnabled(saved2FA === 'true');
+        }
+
+        // Load payment methods
+        const savedPayments = localStorage.getItem('paymentMethods');
+        if (savedPayments) {
+          setPaymentMethods(JSON.parse(savedPayments));
         }
       } catch (error) {
         console.error('Error loading settings:', error);
       }
     };
 
-    loadAgentInfo();
+    loadSettings();
   }, [initialAgentInfo]);
 
   // Apply dark mode to document
@@ -154,10 +243,34 @@ export default function SettingsComponent(props?: any) {
     }
   }, [darkMode]);
 
-  // Save notification preferences
+  // Apply font size
+  useEffect(() => {
+    document.documentElement.style.fontSize = 
+      fontSize === 'small' ? '14px' : 
+      fontSize === 'large' ? '18px' : '16px';
+    localStorage.setItem('fontSize', fontSize);
+  }, [fontSize]);
+
+  // Save settings to localStorage
   useEffect(() => {
     localStorage.setItem('notificationPreferences', JSON.stringify(notifications));
   }, [notifications]);
+
+  useEffect(() => {
+    localStorage.setItem('privacySettings', JSON.stringify(privacySettings));
+  }, [privacySettings]);
+
+  useEffect(() => {
+    localStorage.setItem('twoFactorEnabled', twoFactorEnabled.toString());
+  }, [twoFactorEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('language', language);
+  }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+  }, [paymentMethods]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -175,12 +288,19 @@ export default function SettingsComponent(props?: any) {
     }));
   };
 
+  const handlePaymentInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewPaymentMethod(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSaveProfile = async () => {
     try {
-      // Here you would typically make an API call to update the agent info
       const accessToken = secureStorage.getAccessToken();
       
-      const response = await fetch('http://localhost:4000/v1/agency/profile/update', {
+  const response = await fetch('https://core-api.ddin.rw/v1/agency/profile/update', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -192,16 +312,13 @@ export default function SettingsComponent(props?: any) {
       if (response.ok) {
         const updatedData = await response.json();
         if (updatedData.success) {
-          // Update local state with new data
           setAgentInfo(prev => ({
             ...prev,
             ...editForm
           }));
           setIsEditing(false);
           
-          // Update secureStorage with new data
           const currentUserData = secureStorage.getUserData();
-          // retrieve token data from sessionStorage if available
           let accessToken = '';
           let refreshToken = '';
           try {
@@ -215,7 +332,6 @@ export default function SettingsComponent(props?: any) {
             // ignore
           }
 
-          // Build a payload compatible with secureStorage.setUserData
           const payload = {
             id: (currentUserData as any)?.id,
             name: `${editForm.firstName} ${editForm.lastName}`,
@@ -227,7 +343,6 @@ export default function SettingsComponent(props?: any) {
           } as any;
 
           secureStorage.setUserData(payload);
-
           alert('Profile updated successfully!');
         }
       } else {
@@ -245,10 +360,15 @@ export default function SettingsComponent(props?: any) {
       return;
     }
 
+    if (passwordForm.newPassword.length < 6) {
+      alert('New password must be at least 6 characters long!');
+      return;
+    }
+
     try {
       const accessToken = secureStorage.getAccessToken();
       
-      const response = await fetch('http://localhost:4000/v1/agency/profile/change-password', {
+  const response = await fetch('https://core-api.ddin.rw/v1/agency/profile/change-password', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -288,6 +408,107 @@ export default function SettingsComponent(props?: any) {
     }));
   };
 
+  const handlePrivacyToggle = (type: keyof typeof privacySettings) => {
+    setPrivacySettings(prev => ({
+      ...prev,
+      [type]: !prev[type]
+    }));
+  };
+
+  const handleProfileVisibilityChange = (visibility: string) => {
+    setPrivacySettings(prev => ({
+      ...prev,
+      profileVisibility: visibility
+    }));
+  };
+
+  const handleAddPaymentMethod = () => {
+    if (!newPaymentMethod.provider) {
+      alert('Please select a provider');
+      return;
+    }
+
+    const newMethod: PaymentMethod = {
+      id: Date.now().toString(),
+      type: newPaymentMethod.type,
+      provider: newPaymentMethod.provider,
+      isDefault: paymentMethods.length === 0
+    };
+
+    if (newPaymentMethod.type === 'mobile_money') {
+      newMethod.phoneNumber = newPaymentMethod.phoneNumber;
+    } else if (newPaymentMethod.type === 'bank_account') {
+      newMethod.accountName = newPaymentMethod.accountName;
+      newMethod.lastFour = newPaymentMethod.accountName?.slice(-4);
+    } else if (newPaymentMethod.type === 'card') {
+      newMethod.lastFour = newPaymentMethod.cardNumber?.slice(-4);
+    }
+
+    setPaymentMethods(prev => [...prev, newMethod]);
+    setIsAddingPayment(false);
+    setNewPaymentMethod({
+      type: 'mobile_money',
+      provider: '',
+      phoneNumber: '',
+      accountName: '',
+      cardNumber: '',
+      expiryDate: '',
+      cvv: ''
+    });
+    alert('Payment method added successfully!');
+  };
+
+  const handleSetDefaultPayment = (id: string) => {
+    setPaymentMethods(prev => 
+      prev.map(method => ({
+        ...method,
+        isDefault: method.id === id
+      }))
+    );
+  };
+
+  const handleDeletePayment = (id: string) => {
+    if (paymentMethods.find(m => m.id === id)?.isDefault) {
+      alert('Cannot delete default payment method. Please set another method as default first.');
+      return;
+    }
+    
+    setPaymentMethods(prev => prev.filter(method => method.id !== id));
+    alert('Payment method deleted successfully!');
+  };
+
+  const handleTwoFactorToggle = async () => {
+    try {
+      const accessToken = secureStorage.getAccessToken();
+      
+  const response = await fetch('https://core-api.ddin.rw/v1/agency/profile/two-factor', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          enable: !twoFactorEnabled
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setTwoFactorEnabled(!twoFactorEnabled);
+          alert(`Two-factor authentication ${!twoFactorEnabled ? 'enabled' : 'disabled'} successfully!`);
+        } else {
+          alert(result.message || 'Failed to update two-factor authentication');
+        }
+      } else {
+        throw new Error('Failed to update two-factor authentication');
+      }
+    } catch (error) {
+      console.error('Error updating two-factor authentication:', error);
+      alert('Failed to update two-factor authentication. Please try again.');
+    }
+  };
+
   const tabs = [
     { id: 'profile', label: 'Profile', icon: <FiUser /> },
     { id: 'security', label: 'Security', icon: <FiLock /> },
@@ -315,7 +536,6 @@ export default function SettingsComponent(props?: any) {
               </button>
             </div>
 
-            {/* Read-only Information */}
             {!isEditing && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
@@ -396,7 +616,6 @@ export default function SettingsComponent(props?: any) {
               </div>
             )}
 
-            {/* Editable Form */}
             {isEditing && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -547,12 +766,25 @@ export default function SettingsComponent(props?: any) {
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Two-Factor Authentication</h2>
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">2FA is disabled</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Add an extra layer of security to your account</p>
+                  <h3 className="font-medium text-gray-900 dark:text-white">
+                    {twoFactorEnabled ? '2FA is enabled' : '2FA is disabled'}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {twoFactorEnabled 
+                      ? 'Your account is protected with two-factor authentication' 
+                      : 'Add an extra layer of security to your account'
+                    }
+                  </p>
                 </div>
-                <button className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-4 py-2 rounded-lg text-sm transition">
-                  Enable
-                </button>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={twoFactorEnabled}
+                    onChange={handleTwoFactorToggle}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#ff6600]"></div>
+                </label>
               </div>
             </div>
           </div>
@@ -587,10 +819,15 @@ export default function SettingsComponent(props?: any) {
             <div>
               <h3 className="font-medium text-gray-900 dark:text-white mb-3">Font Size</h3>
               <div className="grid grid-cols-3 gap-3">
-                {['Small', 'Medium', 'Large'].map((size) => (
+                {['small', 'medium', 'large'].map((size) => (
                   <button
                     key={size}
-                    className="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-center hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                    onClick={() => setFontSize(size)}
+                    className={`py-2 px-4 border rounded-lg text-center transition capitalize ${
+                      fontSize === size
+                        ? 'border-[#ff6600] bg-[#ff6600] text-white'
+                        : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    }`}
                   >
                     {size}
                   </button>
@@ -608,7 +845,9 @@ export default function SettingsComponent(props?: any) {
             {Object.entries(notifications).map(([key, value]) => (
               <div key={key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white capitalize">{key} Notifications</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-white capitalize">
+                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {value ? 'Enabled' : 'Disabled'}
                   </p>
@@ -627,8 +866,326 @@ export default function SettingsComponent(props?: any) {
           </div>
         );
       
-      // ... rest of the cases remain the same as your original code
-      // (privacy, payment, language, help)
+      case 'privacy':
+        return (
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Privacy Settings</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-medium text-gray-900 dark:text-white mb-3">Profile Visibility</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {['public', 'private', 'contacts'].map((visibility) => (
+                    <button
+                      key={visibility}
+                      onClick={() => handleProfileVisibilityChange(visibility)}
+                      className={`py-2 px-4 border rounded-lg text-center transition capitalize ${
+                        privacySettings.profileVisibility === visibility
+                          ? 'border-[#ff6600] bg-[#ff6600] text-white'
+                          : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      {visibility}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {Object.entries(privacySettings).filter(([key]) => key !== 'profileVisibility').map(([key, value]) => (
+                <div key={key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div>
+                    <h3 className="font-medium text-gray-900 dark:text-white capitalize">
+                      {key.replace(/([A-Z])/g, ' $1').trim()}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {value ? 'Enabled' : 'Disabled'}
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={value as boolean}
+                      onChange={() => handlePrivacyToggle(key as keyof typeof privacySettings)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#ff6600]"></div>
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      
+      case 'payment':
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Payment Methods</h2>
+              <button
+                onClick={() => setIsAddingPayment(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-[#ff6600] hover:bg-[#e65c00] text-white rounded-lg transition"
+              >
+                <FiPlus className="w-4 h-4" />
+                Add Payment Method
+              </button>
+            </div>
+
+            {isAddingPayment && (
+              <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg space-y-4">
+                <h3 className="font-medium text-gray-900 dark:text-white">Add New Payment Method</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Type
+                    </label>
+                    <select
+                      name="type"
+                      value={newPaymentMethod.type}
+                      onChange={handlePaymentInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    >
+                      <option value="mobile_money">Mobile Money</option>
+                      <option value="bank_account">Bank Account</option>
+                      <option value="card">Credit/Debit Card</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Provider
+                    </label>
+                    <input
+                      type="text"
+                      name="provider"
+                      value={newPaymentMethod.provider}
+                      onChange={handlePaymentInputChange}
+                      placeholder={newPaymentMethod.type === 'mobile_money' ? 'e.g., MTN, Airtel' : newPaymentMethod.type === 'bank_account' ? 'e.g., Bank of Kigali' : 'e.g., Visa, MasterCard'}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+
+                  {newPaymentMethod.type === 'mobile_money' && (
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        name="phoneNumber"
+                        value={newPaymentMethod.phoneNumber}
+                        onChange={handlePaymentInputChange}
+                        placeholder="0781234567"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                  )}
+
+                  {newPaymentMethod.type === 'bank_account' && (
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Account Name
+                      </label>
+                      <input
+                        type="text"
+                        name="accountName"
+                        value={newPaymentMethod.accountName}
+                        onChange={handlePaymentInputChange}
+                        placeholder="John Doe"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                  )}
+
+                  {newPaymentMethod.type === 'card' && (
+                    <>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Card Number
+                        </label>
+                        <input
+                          type="text"
+                          name="cardNumber"
+                          value={newPaymentMethod.cardNumber}
+                          onChange={handlePaymentInputChange}
+                          placeholder="1234 5678 9012 3456"
+                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          Expiry Date
+                        </label>
+                        <input
+                          type="text"
+                          name="expiryDate"
+                          value={newPaymentMethod.expiryDate}
+                          onChange={handlePaymentInputChange}
+                          placeholder="MM/YY"
+                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          CVV
+                        </label>
+                        <input
+                          type="text"
+                          name="cvv"
+                          value={newPaymentMethod.cvv}
+                          onChange={handlePaymentInputChange}
+                          placeholder="123"
+                          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button 
+                    onClick={handleAddPaymentMethod}
+                    className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-6 py-2 rounded-lg transition"
+                  >
+                    Add Method
+                  </button>
+                  <button 
+                    onClick={() => setIsAddingPayment(false)}
+                    className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {paymentMethods.map((method) => (
+                <div key={method.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-[#ff6600] rounded-lg flex items-center justify-center">
+                      <FiCreditCard className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900 dark:text-white capitalize">
+                        {method.type.replace('_', ' ')} - {method.provider}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {method.type === 'mobile_money' && method.phoneNumber && `Phone: ${method.phoneNumber}`}
+                        {method.type === 'bank_account' && method.accountName && `Account: ${method.accountName}`}
+                        {method.type === 'card' && method.lastFour && `Card: **** ${method.lastFour}`}
+                      </p>
+                      {method.isDefault && (
+                        <span className="inline-block mt-1 px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs rounded">
+                          Default
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    {!method.isDefault && (
+                      <>
+                        <button
+                          onClick={() => handleSetDefaultPayment(method.id)}
+                          className="p-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                          title="Set as default"
+                        >
+                          <FiCheck className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeletePayment(method.id)}
+                          className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                          title="Delete"
+                        >
+                          <FiTrash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      
+      case 'language':
+        return (
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Language Preferences</h2>
+            
+            <div className="space-y-4">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code)}
+                  className={`w-full flex items-center justify-between p-4 rounded-lg transition ${
+                    language === lang.code
+                      ? 'bg-[#ff6600] text-white'
+                      : 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <div className="text-left">
+                    <h3 className="font-medium">{lang.name}</h3>
+                    <p className="text-sm opacity-75">{lang.nativeName}</p>
+                  </div>
+                  {language === lang.code && (
+                    <FiCheck className="w-5 h-5" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      
+      case 'help':
+        return (
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Help & Support</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+                <h3 className="font-medium text-gray-900 dark:text-white mb-3">Contact Support</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Get help from our support team
+                </p>
+                <div className="space-y-2 text-sm">
+                  <p>📞 <strong>Phone:</strong> +250 788 123 456</p>
+                  <p>✉️ <strong>Email:</strong> support@xpay.com</p>
+                  <p>💬 <strong>Live Chat:</strong> Available 24/7</p>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
+                <h3 className="font-medium text-gray-900 dark:text-white mb-3">FAQ</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Frequently asked questions
+                </p>
+                <div className="space-y-2 text-sm">
+                  <p>• How to reset password?</p>
+                  <p>• How to update profile?</p>
+                  <p>• Transaction issues?</p>
+                  <p>• Commission queries?</p>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg md:col-span-2">
+                <h3 className="font-medium text-gray-900 dark:text-white mb-3">Documentation</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  User guides and documentation
+                </p>
+                <div className="flex gap-3">
+                  <button className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-4 py-2 rounded-lg text-sm transition">
+                    User Guide
+                  </button>
+                  <button className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition">
+                    API Documentation
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
       
       default:
         return <div>Select a settings category</div>;
