@@ -1,11 +1,11 @@
 {
   "version": 1,
   "functions": {
-    "/": {},
     "/forgot-password": {},
-    "/registration": {},
+    "/": {},
     "/login": {},
-    "/dashboard/balance": {},
-    "/dashboard/commission": {}
+    "/registration": {},
+    "/dashboard/commission": {},
+    "/dashboard/balance": {}
   }
 }

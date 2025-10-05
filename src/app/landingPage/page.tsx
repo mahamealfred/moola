@@ -174,7 +174,7 @@ export default function LandingPage() {
         <div className="flex items-center gap-3">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             <span className="text-[#ff6600]">X</span>
-            <span className="text-[#13294b] dark:text-white">-Pay</span>
+            <span className="text-[#13294b] dark:text-white">-Payy</span>
           </h1>
         </div>
         <div className="flex items-center gap-4">
