@@ -1,8 +1,8 @@
 {
   "version": 1,
   "functions": {
-    "/": {},
     "/forgot-password": {},
+    "/": {},
     "/login": {},
     "/registration": {},
     "/dashboard/commission": {},
