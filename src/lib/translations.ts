@@ -1184,6 +1184,20 @@ export const translations = {
       multiCurrency: 'Multi-devises',
       offlineMode: 'Mode hors ligne',
       analytics: 'Analytique',
+      
+      all: 'Tout',
+      utilities: 'Services publics',
+      government: 'Gouvernement',
+      telecom: 'Télécommunications',
+      entertainment: 'Divertissement',
+      communication: 'Communication',
+      education: 'Éducation',
+      business: 'Entreprise',
+      finance: 'Finance',
+      housing: 'Logement',
+      transport: 'Transport',
+      insurance: 'Assurance',
+      shopping: 'Shopping',
     },
 
     errors: {
@@ -1863,6 +1877,20 @@ export const translations = {
       multiCurrency: 'Amafaranga Menshi',
       offlineMode: 'Uburyo bwo Hanze',
       analytics: 'Isesengura',
+      
+      all: 'Byose',
+      utilities: 'Serivisi Rusange',
+      government: 'Guverinoma',
+      telecom: 'Itumanaho',
+      entertainment: 'Imyidagaduro',
+      communication: 'Itumanaho',
+      education: 'Uburezi',
+      business: 'Ubucuruzi',
+      finance: 'Amafaranga',
+      housing: 'Amazu',
+      transport: 'Ubwikorezi',
+      insurance: 'Ubwishingizi',
+      shopping: 'Kugura',
     },
 
     landing: {
@@ -2023,6 +2051,20 @@ export const translations = {
       multiCurrency: 'Multi-Currency',
       offlineMode: 'Offline Mode',
       analytics: 'Analytics',
+      
+      all: 'All',
+      utilities: 'Utilities',
+      government: 'Government',
+      telecom: 'Telecom',
+      entertainment: 'Entertainment',
+      communication: 'Communication',
+      education: 'Education',
+      business: 'Business',
+      finance: 'Finance',
+      housing: 'Housing',
+      transport: 'Transport',
+      insurance: 'Insurance',
+      shopping: 'Shopping',
     },
 
     errors: {
