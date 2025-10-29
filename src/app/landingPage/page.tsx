@@ -46,6 +46,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from '@/lib/i18n-context';
 
 // Testimonials Data
 const testimonials = [
@@ -273,6 +274,7 @@ const slideIn: Variants = {
 // ...existing code...
 
 export default function LandingPage() {
+  const { t } = useTranslation();
   const [isDark, setIsDark] = useState(true);
   const [newService, setNewService] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -286,12 +288,167 @@ export default function LandingPage() {
 
   const itemsPerView = 3;
 
+  const testimonials = [
+    {
+      id: 1,
+      name: t('landing.testimonial1Name'),
+      role: t('landing.testimonial1Role'),
+      content: t('landing.testimonial1Content'),
+      rating: 5,
+      avatar: "AU"
+    },
+    {
+      id: 2,
+      name: t('landing.testimonial2Name'),
+      role: t('landing.testimonial2Role'),
+      content: t('landing.testimonial2Content'),
+      rating: 5,
+      avatar: "DM"
+    },
+    {
+      id: 3,
+      name: t('landing.testimonial3Name'),
+      role: t('landing.testimonial3Role'),
+      content: t('landing.testimonial3Content'),
+      rating: 4,
+      avatar: "GN"
+    },
+    {
+      id: 4,
+      name: t('landing.testimonial4Name'),
+      role: t('landing.testimonial4Role'),
+      content: t('landing.testimonial4Content'),
+      rating: 5,
+      avatar: "EH"
+    }
+  ];
+
+  const allServicesTranslated = [
+    { name: t('landing.electricityPayment'), icon: Zap, category: 'Utilities', description: t('landing.electricityPaymentDesc'), color: 'text-yellow-500' },
+    { name: t('landing.rraTaxPayment'), icon: FileText, category: 'Government', description: t('landing.rraTaxPaymentDesc'), color: 'text-red-500' },
+    { name: t('landing.buyAirtime'), icon: Phone, category: 'Telecom', description: t('landing.buyAirtimeDesc'), color: 'text-green-500' },
+    { name: t('landing.startimesTV'), icon: Tv, category: 'Entertainment', description: t('landing.startimesTVDesc'), color: 'text-purple-500' },
+    { name: t('landing.bulkSMS'), icon: MessageSquare, category: 'Communication', description: t('landing.bulkSMSDesc'), color: 'text-blue-500' },
+    { name: t('landing.iremboServices'), icon: Globe, category: 'Government', description: t('landing.iremboServicesDesc'), color: 'text-indigo-500' },
+    { name: t('landing.wasacWater'), icon: Droplet, category: 'Utilities', description: t('landing.wasacWaterDesc'), color: 'text-cyan-500' },
+    { name: t('landing.schoolFees'), icon: BookOpen, category: 'Education', description: t('landing.schoolFeesDesc'), color: 'text-orange-500' },
+    { name: t('landing.bulkSalary'), icon: Users, category: 'Business', description: t('landing.bulkSalaryDesc'), color: 'text-teal-500' },
+    { name: t('landing.invoicePayments'), icon: CreditCard, category: 'Business', description: t('landing.invoicePaymentsDesc'), color: 'text-pink-500' },
+    { name: t('landing.taxCalculation'), icon: Calculator, category: 'Business', description: t('landing.taxCalculationDesc'), color: 'text-gray-600' },
+    { name: t('landing.expenseManagement'), icon: FileSpreadsheet, category: 'Business', description: t('landing.expenseManagementDesc'), color: 'text-amber-600' },
+    { name: t('landing.mobileMoney'), icon: Smartphone, category: 'Finance', description: t('landing.mobileMoneyDesc'), color: 'text-green-600' },
+    { name: t('landing.internetBills'), icon: Wifi, category: 'Utilities', description: t('landing.internetBillsDesc'), color: 'text-blue-600' },
+    { name: t('landing.rentPayment'), icon: Home, category: 'Housing', description: t('landing.rentPaymentDesc'), color: 'text-brown-500' },
+    { name: t('landing.transport'), icon: Car, category: 'Transport', description: t('landing.transportDesc'), color: 'text-gray-500' },
+    { name: t('landing.healthInsurance'), icon: Heart, category: 'Insurance', description: t('landing.healthInsuranceDesc'), color: 'text-red-400' },
+    { name: t('landing.onlineShopping'), icon: ShoppingCart, category: 'Shopping', description: t('landing.onlineShoppingDesc'), color: 'text-purple-600' },
+  ];
+
+  const paymentFeaturesTranslated = [
+    {
+      title: t('landing.qrCodePayments'),
+      description: t('landing.qrCodePaymentsDesc'),
+      icon: QrCode,
+      color: 'text-green-500'
+    },
+    {
+      title: t('landing.moneyTransferFeature'),
+      description: t('landing.moneyTransferFeatureDesc'),
+      icon: Send,
+      color: 'text-blue-500'
+    },
+    {
+      title: t('landing.billSplitting'),
+      description: t('landing.billSplittingDesc'),
+      icon: Receipt,
+      color: 'text-purple-500'
+    },
+    {
+      title: t('landing.scheduledPayments'),
+      description: t('landing.scheduledPaymentsDesc'),
+      icon: Calendar,
+      color: 'text-orange-500'
+    }
+  ];
+
+  const securityFeaturesTranslated = [
+    {
+      title: t('landing.biometricAuth'),
+      description: t('landing.biometricAuthDesc'),
+      icon: Lock,
+      color: 'text-red-500'
+    },
+    {
+      title: t('landing.realtimeMonitoring'),
+      description: t('landing.realtimeMonitoringDesc'),
+      icon: Eye,
+      color: 'text-blue-500'
+    },
+    {
+      title: t('landing.instantNotifications'),
+      description: t('landing.instantNotificationsDesc'),
+      icon: Bell,
+      color: 'text-green-500'
+    },
+    {
+      title: t('landing.twoFactorAuth'),
+      description: t('landing.twoFactorAuthDesc'),
+      icon: ShieldCheck,
+      color: 'text-purple-500'
+    }
+  ];
+
+  const banksTranslated = [
+    { name: t('landing.equityBank'), icon: Building, color: 'text-blue-600' },
+    { name: t('landing.bankOfKigali'), icon: Building, color: 'text-green-600' },
+    { name: t('landing.ecobank'), icon: Building, color: 'text-orange-600' },
+    { name: t('landing.gtBank'), icon: Building, color: 'text-red-600' },
+    { name: t('landing.imBank'), icon: Building, color: 'text-purple-600' },
+    { name: t('landing.cogebank'), icon: Building, color: 'text-teal-600' },
+  ];
+
+  const benefitsTranslated = [
+    { 
+      title: t('landing.secureTransactions'), 
+      description: t('landing.secureTransactionsDesc'), 
+      icon: Shield,
+      color: 'text-green-500'
+    },
+    { 
+      title: t('landing.availability247'), 
+      description: t('landing.availability247Desc'), 
+      icon: Users,
+      color: 'text-blue-500'
+    },
+    { 
+      title: t('landing.instantProcessing'), 
+      description: t('landing.instantProcessingDesc'), 
+      icon: CheckCircle,
+      color: 'text-purple-500'
+    },
+    {
+      title: t('landing.lowFees'),
+      description: t('landing.lowFeesDesc'),
+      icon: Banknote,
+      color: 'text-green-600'
+    }
+  ];
+
+  const appFeaturesTranslated = [
+    { title: t('landing.faceID'), icon: Fingerprint, color: 'text-blue-500' },
+    { title: t('landing.instantTransfers'), icon: Zap, color: 'text-yellow-500' },
+    { title: t('landing.billReminders'), icon: Bell, color: 'text-red-500' },
+    { title: t('landing.multiCurrency'), icon: DollarSign, color: 'text-green-500' },
+    { title: t('landing.offlineMode'), icon: Wifi, color: 'text-purple-500' },
+    { title: t('landing.analytics'), icon: TrendingUp, color: 'text-orange-500' }
+  ];
+
   // Get unique categories
-  const categories = ['All', ...new Set(allServices.map(service => service.category))];
+  const categories = ['All', ...new Set(allServicesTranslated.map(service => service.category))];
 
   // Filter services
   const filteredServices = useMemo(() => {
-    let filtered = allServices;
+    let filtered = allServicesTranslated;
 
     if (searchTerm) {
       filtered = filtered.filter(service =>
@@ -305,10 +462,10 @@ export default function LandingPage() {
     }
 
     return filtered;
-  }, [searchTerm, activeCategory]);
+  }, [searchTerm, activeCategory, allServicesTranslated]);
 
   // Update carousel to use filtered services
-  const displayServices = filteredServices.length > 0 ? filteredServices : allServices;
+  const displayServices = filteredServices.length > 0 ? filteredServices : allServicesTranslated;
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -333,11 +490,11 @@ export default function LandingPage() {
   // Auto-rotate features
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveFeature((prev) => (prev + 1) % paymentFeatures.length);
+      setActiveFeature((prev) => (prev + 1) % paymentFeaturesTranslated.length);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [paymentFeaturesTranslated.length]);
 
   const toggleTheme = () => {
     const nextTheme = !isDark;
@@ -438,7 +595,7 @@ export default function LandingPage() {
               href="/login"
               className="text-[#13294b] dark:text-white font-medium hover:text-[#ff6600] dark:hover:text-[#ff6600] transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              Login
+              {t('landing.login')}
             </Link>
           </motion.div>
           <motion.button
@@ -472,7 +629,7 @@ export default function LandingPage() {
           className="inline-flex items-center bg-gradient-to-r from-[#ff6600]/10 to-[#13294b]/10 dark:from-[#ff6600]/20 dark:to-[#13294b]/20 text-[#ff6600] dark:text-[#ffcc99] px-6 py-3 rounded-full text-sm font-medium mb-8 border border-[#ff6600]/20"
         >
           <Sparkles className="w-4 h-4 mr-2" />
-          Rwanda's Leading Payment Platform
+          {t('landing.leadingPlatform')}
         </motion.div>
         
         <motion.h2
@@ -481,14 +638,14 @@ export default function LandingPage() {
           transition={{ delay: 0.4 }}
           className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#13294b] dark:text-white mb-8 leading-tight"
         >
-          Your All-in-One
+          {t('landing.heroTitle')}
           <motion.span
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.8, type: "spring", stiffness: 100 }}
             className="block bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent"
           >
-            Payment Solution
+            {t('landing.paymentSolution')}
           </motion.span>
         </motion.h2>
         
@@ -498,7 +655,7 @@ export default function LandingPage() {
           transition={{ delay: 0.6 }}
           className="text-xl sm:text-2xl max-w-4xl mx-auto text-gray-700 dark:text-gray-300 mb-12 leading-relaxed"
         >
-          Send money, pay bills, manage expenses, and grow your business with Rwanda's most comprehensive digital payment platform.
+          {t('landing.heroDescription')}
         </motion.p>
         
         <motion.div
@@ -512,7 +669,7 @@ export default function LandingPage() {
               href="/registration"
               className="px-10 py-4 bg-gradient-to-r from-[#ff6600] to-[#ff8c00] text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 shadow-lg hover:shadow-[#ff6600]/25 flex items-center justify-center gap-3 text-lg"
             >
-              Get Started <ArrowRight className="w-5 h-5" />
+              {t('landing.getStarted')} <ArrowRight className="w-5 h-5" />
             </Link>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -520,7 +677,7 @@ export default function LandingPage() {
               href="/login"
               className="px-10 py-4 border-2 border-[#13294b] text-[#13294b] dark:border-gray-400 dark:text-gray-300 rounded-2xl font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
             >
-              Sign In
+              {t('landing.signIn')}
             </Link>
           </motion.div>
         </motion.div>
@@ -533,9 +690,9 @@ export default function LandingPage() {
           className="grid grid-cols-3 gap-8 max-w-2xl mx-auto mt-16 pt-8 border-t border-gray-200 dark:border-gray-800"
         >
           {[
-            { number: '50K+', label: 'Happy Users' },
-            { number: '1M+', label: 'Transactions' },
-            { number: '99.9%', label: 'Uptime' }
+            { number: '50K+', label: t('landing.happyUsers') },
+            { number: '1M+', label: t('landing.transactions') },
+            { number: '99.9%', label: t('landing.uptime') }
           ].map((stat, index) => (
             <motion.div
               key={index}
@@ -560,10 +717,10 @@ export default function LandingPage() {
           className="text-center mb-16"
         >
           <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
-            Smart <span className="text-[#ff6600]">Payment Features</span>
+            {t('landing.smartPayment')} <span className="text-[#ff6600]">{t('landing.paymentFeatures')}</span>
           </h3>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Everything you need to manage your money efficiently and securely
+            {t('landing.paymentFeaturesDesc')}
           </p>
         </motion.div>
 
@@ -601,7 +758,7 @@ export default function LandingPage() {
               </AnimatePresence>
               
               <div className="flex justify-center gap-2 mt-8">
-                {paymentFeatures.map((_, idx) => (
+                {paymentFeaturesTranslated.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveFeature(idx)}
@@ -623,7 +780,7 @@ export default function LandingPage() {
             transition={{ duration: 0.7 }}
             className="grid grid-cols-1 sm:grid-cols-2 gap-6"
           >
-            {paymentFeatures.map((feature, idx) => (
+            {paymentFeaturesTranslated.map((feature, idx) => (
               <motion.div
                 key={idx}
                 whileHover={{ scale: 1.05, y: -5 }}
@@ -665,10 +822,10 @@ export default function LandingPage() {
           className="text-center mb-16"
         >
           <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
-            Why Choose <span className="text-[#ff6600]">X-Pay</span>?
+            {t('landing.whyChoose')} <span className="text-[#ff6600]">X-Pay</span>?
           </h3>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Experience the future of digital payments with our cutting-edge platform
+            {t('landing.whyChooseDesc')}
           </p>
         </motion.div>
         
@@ -678,7 +835,7 @@ export default function LandingPage() {
           animate="visible"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
         >
-          {benefits.map(({ title, description, icon: Icon, color }, idx) => (
+          {benefitsTranslated.map(({ title, description, icon: Icon, color }, idx) => (
             <motion.div
               key={idx}
               variants={scaleIn}
@@ -715,10 +872,10 @@ export default function LandingPage() {
           className="text-center mb-16"
         >
           <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
-            Bank-Level <span className="text-[#ff6600]">Security</span>
+            {t('landing.bankLevel')} <span className="text-[#ff6600]">{t('landing.security')}</span>
           </h3>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Your security is our top priority. We use enterprise-grade encryption to protect your data.
+            {t('landing.securityDesc')}
           </p>
         </motion.div>
 
@@ -728,7 +885,7 @@ export default function LandingPage() {
           animate="visible"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
         >
-          {securityFeatures.map(({ title, description, icon: Icon, color }, idx) => (
+          {securityFeaturesTranslated.map(({ title, description, icon: Icon, color }, idx) => (
             <motion.div
               key={idx}
               variants={scaleIn}
@@ -758,10 +915,10 @@ export default function LandingPage() {
           className="text-center mb-16"
         >
           <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
-            Our <span className="text-[#ff6600]">Services</span>
+            {t('landing.ourServices')} <span className="text-[#ff6600]">{t('landing.services')}</span>
           </h3>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Access a comprehensive range of financial and utility services through our secure platform
+            {t('landing.servicesDesc')}
           </p>
         </motion.div>
 
@@ -777,7 +934,7 @@ export default function LandingPage() {
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Search services..."
+                  placeholder={t('landing.searchServices')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all text-lg"
@@ -810,10 +967,10 @@ export default function LandingPage() {
               animate={{ opacity: 1, height: 'auto' }}
               className="mt-6 flex flex-wrap gap-3 items-center"
             >
-              <span className="text-gray-600 dark:text-gray-400 font-medium">Active filters:</span>
+              <span className="text-gray-600 dark:text-gray-400 font-medium">{t('landing.activeFilters')}:</span>
               {searchTerm && (
                 <span className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm px-4 py-2 rounded-full">
-                  Search: "{searchTerm}"
+                  {t('landing.search')}: "{searchTerm}"
                   <button onClick={() => setSearchTerm('')} className="hover:text-blue-600 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
@@ -821,7 +978,7 @@ export default function LandingPage() {
               )}
               {activeCategory !== 'All' && (
                 <span className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm px-4 py-2 rounded-full">
-                  Category: {activeCategory}
+                  {t('landing.category')}: {activeCategory}
                   <button onClick={() => setActiveCategory('All')} className="hover:text-green-600 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
@@ -831,7 +988,7 @@ export default function LandingPage() {
                 onClick={clearFilters}
                 className="text-sm text-[#ff6600] hover:text-[#e65c00] font-medium transition-colors"
               >
-                Clear all
+                {t('landing.clearAll')}
               </button>
             </motion.div>
           )}
@@ -887,7 +1044,7 @@ export default function LandingPage() {
               onClick={goToLogin}
               className="px-8 py-3 border-2 border-[#13294b] text-[#13294b] dark:border-gray-400 dark:text-gray-300 rounded-xl font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition-all duration-300"
             >
-              View All {displayServices.length} Services
+              {t('landing.viewAll')} {displayServices.length} {t('landing.services')}
             </motion.button>
           </motion.div>
         )}
@@ -900,7 +1057,7 @@ export default function LandingPage() {
             className="text-center py-16"
           >
             <div className="text-gray-400 dark:text-gray-500 text-2xl mb-6">
-              No services found matching your criteria
+              {t('landing.noServicesFound')}
             </div>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -908,7 +1065,7 @@ export default function LandingPage() {
               onClick={clearFilters}
               className="px-8 py-3 bg-[#ff6600] text-white rounded-xl font-semibold hover:bg-[#e65c00] transition shadow-lg"
             >
-              Show all services
+              {t('landing.showAllServices')}
             </motion.button>
           </motion.div>
         )}
@@ -923,14 +1080,14 @@ export default function LandingPage() {
             transition={{ duration: 0.7 }}
           >
             <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
-              Take X-Pay <span className="text-[#ff6600]">Everywhere</span>
+              {t('landing.takeXPay')} <span className="text-[#ff6600]">{t('landing.everywhere')}</span>
             </h3>
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-              Download our mobile app and manage your payments on the go. Available on iOS and Android.
+              {t('landing.mobileAppDesc')}
             </p>
             
             <div className="grid grid-cols-2 gap-6 mb-8">
-              {appFeatures.map((feature, idx) => (
+              {appFeaturesTranslated.map((feature, idx) => (
                 <motion.div
                   key={idx}
                   initial={{ opacity: 0, y: 20 }}
@@ -956,7 +1113,7 @@ export default function LandingPage() {
                 className="px-6 py-3 bg-gray-800 text-white rounded-xl font-semibold hover:bg-gray-900 transition shadow-lg flex items-center gap-2"
               >
                 <Smartphone className="w-5 h-5" />
-                App Store
+                {t('landing.appStore')}
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -964,7 +1121,7 @@ export default function LandingPage() {
                 className="px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition shadow-lg flex items-center gap-2"
               >
                 <Smartphone className="w-5 h-5" />
-                Play Store
+                {t('landing.playStore')}
               </motion.button>
             </div>
           </motion.div>
@@ -982,8 +1139,8 @@ export default function LandingPage() {
                     <span className="text-white font-bold">X</span>
                   </div>
                   <div>
-                    <div className="font-bold text-gray-800 dark:text-white">X-Pay Wallet</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Ready to use</div>
+                    <div className="font-bold text-gray-800 dark:text-white">{t('landing.xpayWallet')}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{t('landing.readyToUse')}</div>
                   </div>
                 </div>
                 
@@ -1024,10 +1181,10 @@ export default function LandingPage() {
           className="text-center mb-16"
         >
           <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
-            What Our <span className="text-[#ff6600]">Users Say</span>
+            {t('landing.whatOurUsers')} <span className="text-[#ff6600]">{t('landing.usersSay')}</span>
           </h3>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Discover why thousands of users trust X-Pay for their payment needs
+            {t('landing.testimonialsDesc')}
           </p>
         </motion.div>
 
@@ -1138,10 +1295,10 @@ export default function LandingPage() {
           className="text-center mb-16"
         >
           <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
-            Trusted <span className="text-[#ff6600]">Banking Partners</span>
+            {t('landing.trusted')} <span className="text-[#ff6600]">{t('landing.bankingPartners')}</span>
           </h3>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            We partner with leading financial institutions to bring you seamless banking services
+            {t('landing.bankingPartnersDesc')}
           </p>
         </motion.div>
 
@@ -1151,7 +1308,7 @@ export default function LandingPage() {
           variants={staggerContainer}
           className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 max-w-6xl mx-auto"
         >
-          {banks.map(({ name, icon: Icon, color }, idx) => (
+          {banksTranslated.map(({ name, icon: Icon, color }, idx) => (
             <motion.div
               key={idx}
               variants={scaleIn}
@@ -1181,10 +1338,10 @@ export default function LandingPage() {
           className="grid grid-cols-2 lg:grid-cols-4 gap-8"
         >
           {[
-            { number: allServices.length + '+', label: 'Services', delay: 0 },
-            { number: banks.length, label: 'Bank Partners', delay: 0.1 },
-            { number: '24/7', label: 'Available', delay: 0.2 },
-            { number: '100%', label: 'Secure', delay: 0.3 }
+            { number: allServicesTranslated.length + '+', label: t('landing.services'), delay: 0 },
+            { number: banksTranslated.length, label: t('landing.bankPartners'), delay: 0.1 },
+            { number: '24/7', label: t('landing.available'), delay: 0.2 },
+            { number: '100%', label: t('landing.secure'), delay: 0.3 }
           ].map((stat, index) => (
             <motion.div
               key={index}
@@ -1217,10 +1374,10 @@ export default function LandingPage() {
           className="text-center mb-16"
         >
           <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
-            Can't Find Your <span className="text-[#ff6600]">Service</span>?
+            {t('landing.cantFindService')} <span className="text-[#ff6600]">{t('landing.service')}</span>?
           </h3>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Let us know what service you need, and we'll consider adding it to our platform.
+            {t('landing.serviceRequestDesc')}
           </p>
         </motion.div>
 
@@ -1236,12 +1393,12 @@ export default function LandingPage() {
               htmlFor="newService"
               className="block text-gray-800 dark:text-gray-200 font-semibold text-lg mb-3"
             >
-              Service Name
+              {t('landing.serviceName')}
             </label>
             <input
               id="newService"
               type="text"
-              placeholder="Enter service name (e.g., Water Bill)"
+              placeholder={t('landing.serviceNamePlaceholder')}
               className="w-full rounded-xl border border-gray-300 dark:border-gray-600 px-6 py-4 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ff6600] transition text-lg bg-white dark:bg-gray-800"
               value={newService}
               onChange={(e) => setNewService(e.target.value)}
@@ -1255,7 +1412,7 @@ export default function LandingPage() {
             whileTap={{ scale: 0.98 }}
             className="w-full bg-gradient-to-r from-[#ff6600] to-[#ff8c00] hover:from-[#e65c00] hover:to-[#e65c00] text-white rounded-xl py-4 font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl"
           >
-            Submit Request
+            {t('landing.submitRequest')}
           </motion.button>
           <AnimatePresence>
             {submitted && (
@@ -1266,7 +1423,7 @@ export default function LandingPage() {
                 role="alert"
                 className="mt-6 text-center text-green-600 dark:text-green-400 font-semibold text-lg bg-green-50 dark:bg-green-900/20 py-3 rounded-xl"
               >
-                ✅ Thank you! Your request has been submitted.
+                ✅ {t('landing.requestSubmitted')}
               </motion.p>
             )}
           </AnimatePresence>
@@ -1293,14 +1450,14 @@ export default function LandingPage() {
                 </h1>
               </div>
               <p className="text-gray-300 text-lg">
-                Simplifying digital payments in Rwanda with cutting-edge technology and unparalleled security.
+                {t('landing.footerTagline')}
               </p>
             </div>
             
             <div>
-              <h4 className="text-lg font-semibold mb-4">Services</h4>
+              <h4 className="text-lg font-semibold mb-4">{t('landing.services')}</h4>
               <div className="space-y-2">
-                {['Bill Payments', 'Money Transfer', 'Mobile Top-up', 'Banking Services'].map((item) => (
+                {[t('landing.billPayments'), t('landing.moneyTransfer'), t('landing.mobileTopup'), t('landing.bankingServices')].map((item) => (
                   <div key={item} className="text-gray-300 hover:text-white transition-colors cursor-pointer">
                     {item}
                   </div>
@@ -1309,9 +1466,9 @@ export default function LandingPage() {
             </div>
             
             <div>
-              <h4 className="text-lg font-semibold mb-4">Support</h4>
+              <h4 className="text-lg font-semibold mb-4">{t('landing.support')}</h4>
               <div className="space-y-2">
-                {['Help Center', 'Contact Us', 'Privacy Policy', 'Terms of Service'].map((item) => (
+                {[t('landing.helpCenter'), t('landing.contactUs'), t('landing.privacyPolicy'), t('landing.termsOfService')].map((item) => (
                   <div key={item} className="text-gray-300 hover:text-white transition-colors cursor-pointer">
                     {item}
                   </div>
@@ -1320,13 +1477,13 @@ export default function LandingPage() {
             </div>
             
             <div>
-              <h4 className="text-lg font-semibold mb-4">Download App</h4>
+              <h4 className="text-lg font-semibold mb-4">{t('landing.downloadApp')}</h4>
               <div className="space-y-3">
                 <button className="w-full bg-black text-white py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-                  App Store
+                  {t('landing.appStore')}
                 </button>
                 <button className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 transition-colors">
-                  Google Play
+                  {t('landing.googlePlay')}
                 </button>
               </div>
             </div>
@@ -1339,7 +1496,7 @@ export default function LandingPage() {
             className="border-t border-gray-700 pt-8 text-center"
           >
             <p className="text-gray-400 text-lg">
-              © {new Date().getFullYear()} X-Pay. All rights reserved. Made with ❤️ for Rwanda
+              © {new Date().getFullYear()} X-Pay. {t('landing.allRightsReserved')}. {t('landing.madeWithLove')}
             </p>
           </motion.div>
         </div>

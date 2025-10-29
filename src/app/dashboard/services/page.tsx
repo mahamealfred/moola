@@ -45,6 +45,7 @@ import IremboPayment from './payment-services/irembopay/page';
 import RNITPayment from './payment-services/rnit/page';
 import BulkAirtimeForm from './payment-services/bulk-airtime/page';
 import { useAuth } from '@/lib/auth-context';
+import { useTranslation } from '@/lib/i18n-context';
 
 type PaymentService = {
   name: string;
@@ -121,6 +122,7 @@ const statsVariants = {
 };
 
 export default function DashboardHome() {
+  const { t } = useTranslation();
   const [selectedService, setSelectedService] = useState<PaymentService | BusinessService | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
@@ -258,17 +260,17 @@ export default function DashboardHome() {
         <div className="absolute top-3 right-3 flex gap-1">
           {service.isNew && (
             <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
-              New
+              {t('services.new')}
             </span>
           )}
           {service.isFeatured && (
             <span className="bg-[#ff6600] text-white text-xs px-2 py-1 rounded-full font-medium">
-              Featured
+              {t('services.featured')}
             </span>
           )}
           {service.status === 'coming-soon' && (
             <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full font-medium">
-              Coming Soon
+              {t('services.comingSoon')}
             </span>
           )}
         </div>
@@ -282,9 +284,9 @@ export default function DashboardHome() {
               {service.name} 
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
-              {sectionType === 'payment' && 'Quick payment service'}
-              {sectionType === 'agency' && 'Banking services'}
-              {sectionType === 'business' && 'Business solutions'}
+              {sectionType === 'payment' && t('services.quickPaymentService')}
+              {sectionType === 'agency' && t('services.bankingServices')}
+              {sectionType === 'business' && t('services.businessSolutions')}
             </p>
           </div>
           <ChevronRight className={`w-4 h-4 text-gray-400 group-hover:text-[#ff6600] transition-colors flex-shrink-0 ${
@@ -331,12 +333,12 @@ export default function DashboardHome() {
         <div className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full px-4 py-2 mb-4 border border-gray-200 dark:border-gray-600">
           <Sparkles className="w-4 h-4 text-[#ff6600]" />
           <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-            Welcome back, {user?.name || 'User'}
+            {t('services.welcomeBack', { name: user?.name || t('services.user') })}
           </span>
         </div>
         
         <p className="text-gray-500 dark:text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">
-          {isAgent ? 'Comprehensive Agency Services Platform' : 'Advanced Business Services Platform'}
+          {isAgent ? t('services.comprehensiveAgencyPlatform') : t('services.advancedBusinessPlatform')}
         </p>
       </motion.div>
 
@@ -402,7 +404,7 @@ export default function DashboardHome() {
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {paymentServices.length}
               </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Total Services</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">{t('services.totalServices')}</div>
             </div>
           </div>
         </div>
@@ -416,7 +418,7 @@ export default function DashboardHome() {
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {paymentServices.filter(s => s.isFeatured).length}
               </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Featured</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">{t('services.featured')}</div>
             </div>
           </div>
         </div>
@@ -430,7 +432,7 @@ export default function DashboardHome() {
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 24/7
               </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Available</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">{t('services.available')}</div>
             </div>
           </div>
         </div>
@@ -444,7 +446,7 @@ export default function DashboardHome() {
               <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 100%
               </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Secure</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">{t('services.secure')}</div>
             </div>
           </div>
         </div>
@@ -462,10 +464,10 @@ export default function DashboardHome() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white">
-                Payment Services
+                {t('services.paymentServices')}
               </h2>
               <p className="text-gray-500 dark:text-gray-400 mt-2">
-                Quick and secure payment solutions for all your needs
+                {t('services.paymentServicesDesc')}
               </p>
             </div>
             <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-[#ff6600] to-orange-400 rounded-full lg:hidden"></div>
@@ -485,7 +487,7 @@ export default function DashboardHome() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
                     type="text"
-                    placeholder="Search services..."
+                    placeholder={t('services.searchServices')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all"
@@ -518,9 +520,9 @@ export default function DashboardHome() {
                   onChange={(e) => setSortBy(e.target.value as any)}
                   className="bg-gray-100 dark:bg-gray-800 border-0 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff6600] transition-all"
                 >
-                  <option value="popularity">Most Popular</option>
-                  <option value="name">Alphabetical</option>
-                  <option value="new">New First</option>
+                  <option value="popularity">{t('services.mostPopular')}</option>
+                  <option value="name">{t('services.alphabetical')}</option>
+                  <option value="new">{t('services.newFirst')}</option>
                 </select>
               </div>
             </div>
@@ -534,7 +536,7 @@ export default function DashboardHome() {
               >
                 {searchTerm && (
                   <span className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-sm px-3 py-1 rounded-full">
-                    Search: "{searchTerm}"
+                    {t('services.search')}: "{searchTerm}"
                     <button onClick={() => setSearchTerm('')} className="hover:text-blue-600">
                       <X className="w-3 h-3" />
                     </button>
@@ -542,7 +544,7 @@ export default function DashboardHome() {
                 )}
                 {activeCategory !== 'All' && (
                   <span className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 text-sm px-3 py-1 rounded-full">
-                    Category: {activeCategory}
+                    {t('services.category')}: {activeCategory}
                     <button onClick={() => setActiveCategory('All')} className="hover:text-green-600">
                       <X className="w-3 h-3" />
                     </button>
@@ -568,7 +570,7 @@ export default function DashboardHome() {
               className="text-center py-12"
             >
               <div className="text-gray-400 dark:text-gray-500 text-lg">
-                No services found matching your criteria
+                {t('services.noServicesFound')}
               </div>
               <button
                 onClick={() => {
@@ -577,7 +579,7 @@ export default function DashboardHome() {
                 }}
                 className="mt-4 text-[#ff6600] hover:text-[#e65c00] font-medium"
               >
-                Clear all filters
+                {t('services.clearAllFilters')}
               </button>
             </motion.div>
           )}
@@ -594,10 +596,10 @@ export default function DashboardHome() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white">
-                  Agency Banking
+                  {t('services.agencyBanking')}
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  Partner banking services and financial solutions
+                  {t('services.agencyBankingDesc')}
                 </p>
               </div>
               <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-[#ff6600] to-orange-400 rounded-full"></div>
@@ -619,10 +621,10 @@ export default function DashboardHome() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white">
-                  Business Services
+                  {t('services.businessServices')}
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  Advanced tools for business management and operations
+                  {t('services.businessServicesDesc')}
                 </p>
               </div>
               <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-[#ff6600] to-orange-400 rounded-full"></div>
@@ -645,10 +647,10 @@ export default function DashboardHome() {
           <div className={`w-3 h-3 rounded-full ${isAgent ? 'bg-blue-500' : 'bg-green-500'} animate-pulse`}></div>
           <div>
             <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              {userRole} Mode
+              {userRole} {t('services.mode')}
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400">
-              {isAgent ? 'Agency Services' : 'Business Tools'}
+              {isAgent ? t('services.agencyServices') : t('services.businessTools')}
             </div>
           </div>
         </div>

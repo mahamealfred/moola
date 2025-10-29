@@ -22,6 +22,7 @@ import {
   FiX
 } from 'react-icons/fi';
 import { secureStorage } from '../../../lib/auth-context';
+import { useTranslation } from '@/lib/i18n-context';
 
 interface AgentInfo {
   id: number | string;
@@ -58,6 +59,7 @@ interface SettingsComponentProps {
 }
 
 export default function SettingsComponent(props?: any) {
+  const { t } = useTranslation();
   const initialAgentInfo: AgentInfo | undefined = props?.initialAgentInfo;
   const [activeTab, setActiveTab] = useState('profile');
   const [darkMode, setDarkMode] = useState(true);
@@ -343,25 +345,25 @@ export default function SettingsComponent(props?: any) {
           } as any;
 
           secureStorage.setUserData(payload);
-          alert('Profile updated successfully!');
+          alert(t('settings.profileUpdatedSuccess'));
         }
       } else {
-        throw new Error('Failed to update profile');
+        throw new Error(t('settings.profileUpdateFailed'));
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Failed to update profile. Please try again.');
+      alert(t('settings.profileUpdateError'));
     }
   };
 
   const handlePasswordUpdate = async () => {
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert('New passwords do not match!');
+      alert(t('settings.passwordsDoNotMatch'));
       return;
     }
 
     if (passwordForm.newPassword.length < 6) {
-      alert('New password must be at least 6 characters long!');
+      alert(t('settings.passwordTooShort'));
       return;
     }
 
@@ -383,21 +385,21 @@ export default function SettingsComponent(props?: any) {
       if (response.ok) {
         const result = await response.json();
         if (result.success) {
-          alert('Password updated successfully!');
+          alert(t('settings.passwordUpdatedSuccess'));
           setPasswordForm({
             currentPassword: '',
             newPassword: '',
             confirmPassword: ''
           });
         } else {
-          alert(result.message || 'Failed to update password');
+          alert(result.message || t('settings.passwordUpdateFailed'));
         }
       } else {
-        throw new Error('Failed to update password');
+        throw new Error(t('settings.passwordUpdateFailed'));
       }
     } catch (error) {
       console.error('Error updating password:', error);
-      alert('Failed to update password. Please try again.');
+      alert(t('settings.passwordUpdateError'));
     }
   };
 
@@ -424,7 +426,7 @@ export default function SettingsComponent(props?: any) {
 
   const handleAddPaymentMethod = () => {
     if (!newPaymentMethod.provider) {
-      alert('Please select a provider');
+      alert(t('settings.selectProvider'));
       return;
     }
 
@@ -455,7 +457,7 @@ export default function SettingsComponent(props?: any) {
       expiryDate: '',
       cvv: ''
     });
-    alert('Payment method added successfully!');
+    alert(t('settings.paymentMethodAdded'));
   };
 
   const handleSetDefaultPayment = (id: string) => {
@@ -469,12 +471,12 @@ export default function SettingsComponent(props?: any) {
 
   const handleDeletePayment = (id: string) => {
     if (paymentMethods.find(m => m.id === id)?.isDefault) {
-      alert('Cannot delete default payment method. Please set another method as default first.');
+      alert(t('settings.cannotDeleteDefault'));
       return;
     }
     
     setPaymentMethods(prev => prev.filter(method => method.id !== id));
-    alert('Payment method deleted successfully!');
+    alert(t('settings.paymentMethodDeleted'));
   };
 
   const handleTwoFactorToggle = async () => {
@@ -496,28 +498,28 @@ export default function SettingsComponent(props?: any) {
         const result = await response.json();
         if (result.success) {
           setTwoFactorEnabled(!twoFactorEnabled);
-          alert(`Two-factor authentication ${!twoFactorEnabled ? 'enabled' : 'disabled'} successfully!`);
+          alert(t('settings.twoFactorToggled', { status: !twoFactorEnabled ? t('settings.enabled') : t('settings.disabled') }));
         } else {
-          alert(result.message || 'Failed to update two-factor authentication');
+          alert(result.message || t('settings.twoFactorUpdateFailed'));
         }
       } else {
-        throw new Error('Failed to update two-factor authentication');
+        throw new Error(t('settings.twoFactorUpdateFailed'));
       }
     } catch (error) {
       console.error('Error updating two-factor authentication:', error);
-      alert('Failed to update two-factor authentication. Please try again.');
+      alert(t('settings.twoFactorUpdateError'));
     }
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: <FiUser /> },
-    { id: 'security', label: 'Security', icon: <FiLock /> },
-    { id: 'appearance', label: 'Appearance', icon: <FiMoon /> },
-    { id: 'notifications', label: 'Notifications', icon: <FiBell /> },
-    { id: 'privacy', label: 'Privacy', icon: <FiShield /> },
-    { id: 'payment', label: 'Payment Methods', icon: <FiCreditCard /> },
-    { id: 'language', label: 'Language', icon: <FiGlobe /> },
-    { id: 'help', label: 'Help & Support', icon: <FiHelpCircle /> },
+    { id: 'profile', label: t('settings.tabs.profile'), icon: <FiUser /> },
+    { id: 'security', label: t('settings.tabs.security'), icon: <FiLock /> },
+    { id: 'appearance', label: t('settings.tabs.appearance'), icon: <FiMoon /> },
+    { id: 'notifications', label: t('settings.tabs.notifications'), icon: <FiBell /> },
+    { id: 'privacy', label: t('settings.tabs.privacy'), icon: <FiShield /> },
+    { id: 'payment', label: t('settings.tabs.payment'), icon: <FiCreditCard /> },
+    { id: 'language', label: t('settings.tabs.language'), icon: <FiGlobe /> },
+    { id: 'help', label: t('settings.tabs.help'), icon: <FiHelpCircle /> },
   ];
 
   const renderContent = () => {
@@ -526,13 +528,13 @@ export default function SettingsComponent(props?: any) {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Profile Information</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.profileInformation')}</h2>
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 className="flex items-center gap-2 px-4 py-2 bg-[#ff6600] hover:bg-[#e65c00] text-white rounded-lg transition"
               >
                 {isEditing ? <FiSave className="w-4 h-4" /> : <FiEdit className="w-4 h-4" />}
-                {isEditing ? 'Save Changes' : 'Edit Profile'}
+                {isEditing ? t('settings.saveChanges') : t('settings.editProfile')}
               </button>
             </div>
 
@@ -541,7 +543,7 @@ export default function SettingsComponent(props?: any) {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      First Name
+                      {t('settings.firstName')}
                     </label>
                     <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
                       {agentInfo.firstName}
@@ -549,7 +551,7 @@ export default function SettingsComponent(props?: any) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Last Name
+                      {t('settings.lastName')}
                     </label>
                     <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
                       {agentInfo.lastName}
@@ -557,7 +559,7 @@ export default function SettingsComponent(props?: any) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Email
+                      {t('settings.email')}
                     </label>
                     <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
                       {agentInfo.email}
@@ -565,7 +567,7 @@ export default function SettingsComponent(props?: any) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Phone Number
+                      {t('settings.phoneNumber')}
                     </label>
                     <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
                       {agentInfo.phoneNumber}
@@ -576,7 +578,7 @@ export default function SettingsComponent(props?: any) {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Agency Name
+                      {t('settings.agencyName')}
                     </label>
                     <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
                       {agentInfo.agencyName}
@@ -584,7 +586,7 @@ export default function SettingsComponent(props?: any) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Agency Code
+                      {t('settings.agencyCode')}
                     </label>
                     <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
                       {agentInfo.agencyCode}
@@ -592,7 +594,7 @@ export default function SettingsComponent(props?: any) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Status
+                      {t('settings.status')}
                     </label>
                     <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
@@ -606,7 +608,7 @@ export default function SettingsComponent(props?: any) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Role
+                      {t('settings.role')}
                     </label>
                     <div className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white capitalize">
                       {agentInfo.role}
@@ -620,7 +622,7 @@ export default function SettingsComponent(props?: any) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    First Name
+                    {t('settings.firstName')}
                   </label>
                   <input
                     type="text"
@@ -632,7 +634,7 @@ export default function SettingsComponent(props?: any) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Last Name
+                    {t('settings.lastName')}
                   </label>
                   <input
                     type="text"
@@ -644,7 +646,7 @@ export default function SettingsComponent(props?: any) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email
+                    {t('settings.email')}
                   </label>
                   <input
                     type="email"
@@ -656,7 +658,7 @@ export default function SettingsComponent(props?: any) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Phone Number
+                    {t('settings.phoneNumber')}
                   </label>
                   <input
                     type="tel"
@@ -672,13 +674,13 @@ export default function SettingsComponent(props?: any) {
                     onClick={handleSaveProfile}
                     className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-6 py-2 rounded-lg transition"
                   >
-                    Save Changes
+                    {t('settings.saveChanges')}
                   </button>
                   <button 
                     onClick={() => setIsEditing(false)}
                     className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition"
                   >
-                    Cancel
+                    {t('settings.cancel')}
                   </button>
                 </div>
               </div>
@@ -689,11 +691,11 @@ export default function SettingsComponent(props?: any) {
       case 'security':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Change Password</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.changePassword')}</h2>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Current Password
+                  {t('settings.currentPassword')}
                 </label>
                 <div className="relative">
                   <input
@@ -714,7 +716,7 @@ export default function SettingsComponent(props?: any) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  New Password
+                  {t('settings.newPassword')}
                 </label>
                 <div className="relative">
                   <input
@@ -735,7 +737,7 @@ export default function SettingsComponent(props?: any) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Confirm New Password
+                  {t('settings.confirmNewPassword')}
                 </label>
                 <div className="relative">
                   <input
@@ -759,20 +761,20 @@ export default function SettingsComponent(props?: any) {
               onClick={handlePasswordUpdate}
               className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-6 py-2 rounded-lg transition"
             >
-              Update Password
+              {t('settings.updatePassword')}
             </button>
 
             <div className="pt-6 mt-6 border-t border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Two-Factor Authentication</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t('settings.twoFactorAuth')}</h2>
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div>
                   <h3 className="font-medium text-gray-900 dark:text-white">
-                    {twoFactorEnabled ? '2FA is enabled' : '2FA is disabled'}
+                    {twoFactorEnabled ? t('settings.twoFactorEnabled') : t('settings.twoFactorDisabled')}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {twoFactorEnabled 
-                      ? 'Your account is protected with two-factor authentication' 
-                      : 'Add an extra layer of security to your account'
+                      ? t('settings.twoFactorProtected')
+                      : t('settings.twoFactorAdd')
                     }
                   </p>
                 </div>
@@ -793,15 +795,15 @@ export default function SettingsComponent(props?: any) {
       case 'appearance':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Appearance</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.appearance')}</h2>
             
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
               <div className="flex items-center space-x-3">
                 {darkMode ? <FiMoon className="text-[#ff6600]" /> : <FiSun className="text-[#ff6600]" />}
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">Dark Mode</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-white">{t('settings.darkMode')}</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {darkMode ? 'Dark theme is enabled' : 'Light theme is enabled'}
+                    {darkMode ? t('settings.darkThemeEnabled') : t('settings.lightThemeEnabled')}
                   </p>
                 </div>
               </div>
@@ -817,7 +819,7 @@ export default function SettingsComponent(props?: any) {
             </div>
 
             <div>
-              <h3 className="font-medium text-gray-900 dark:text-white mb-3">Font Size</h3>
+              <h3 className="font-medium text-gray-900 dark:text-white mb-3">{t('settings.fontSize')}</h3>
               <div className="grid grid-cols-3 gap-3">
                 {['small', 'medium', 'large'].map((size) => (
                   <button
@@ -829,7 +831,7 @@ export default function SettingsComponent(props?: any) {
                         : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
-                    {size}
+                    {t(`settings.${size}`)}
                   </button>
                 ))}
               </div>
@@ -840,16 +842,16 @@ export default function SettingsComponent(props?: any) {
       case 'notifications':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Notification Preferences</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.notificationPreferences')}</h2>
             
             {Object.entries(notifications).map(([key, value]) => (
               <div key={key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div>
                   <h3 className="font-medium text-gray-900 dark:text-white capitalize">
-                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                    {t(`settings.notifications.${key}`)}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {value ? 'Enabled' : 'Disabled'}
+                    {value ? t('settings.enabled') : t('settings.disabled')}
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -869,11 +871,11 @@ export default function SettingsComponent(props?: any) {
       case 'privacy':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Privacy Settings</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.privacySettings')}</h2>
             
             <div className="space-y-4">
               <div>
-                <h3 className="font-medium text-gray-900 dark:text-white mb-3">Profile Visibility</h3>
+                <h3 className="font-medium text-gray-900 dark:text-white mb-3">{t('settings.profileVisibility')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {['public', 'private', 'contacts'].map((visibility) => (
                     <button
@@ -885,7 +887,7 @@ export default function SettingsComponent(props?: any) {
                           : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
                       }`}
                     >
-                      {visibility}
+                      {t(`settings.${visibility}`)}
                     </button>
                   ))}
                 </div>
@@ -895,10 +897,10 @@ export default function SettingsComponent(props?: any) {
                 <div key={key} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div>
                     <h3 className="font-medium text-gray-900 dark:text-white capitalize">
-                      {key.replace(/([A-Z])/g, ' $1').trim()}
+                      {t(`settings.privacy.${key}`)}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {value ? 'Enabled' : 'Disabled'}
+                      {value ? t('settings.enabled') : t('settings.disabled')}
                     </p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -920,24 +922,24 @@ export default function SettingsComponent(props?: any) {
         return (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Payment Methods</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.paymentMethods')}</h2>
               <button
                 onClick={() => setIsAddingPayment(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-[#ff6600] hover:bg-[#e65c00] text-white rounded-lg transition"
               >
                 <FiPlus className="w-4 h-4" />
-                Add Payment Method
+                {t('settings.addPaymentMethod')}
               </button>
             </div>
 
             {isAddingPayment && (
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg space-y-4">
-                <h3 className="font-medium text-gray-900 dark:text-white">Add New Payment Method</h3>
+                <h3 className="font-medium text-gray-900 dark:text-white">{t('settings.addNewPaymentMethod')}</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Type
+                      {t('settings.type')}
                     </label>
                     <select
                       name="type"
@@ -945,15 +947,15 @@ export default function SettingsComponent(props?: any) {
                       onChange={handlePaymentInputChange}
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#ff6600] focus:border-transparent dark:bg-gray-700 dark:text-white"
                     >
-                      <option value="mobile_money">Mobile Money</option>
-                      <option value="bank_account">Bank Account</option>
-                      <option value="card">Credit/Debit Card</option>
+                      <option value="mobile_money">{t('settings.mobileMoney')}</option>
+                      <option value="bank_account">{t('settings.bankAccount')}</option>
+                      <option value="card">{t('settings.creditDebitCard')}</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Provider
+                      {t('settings.provider')}
                     </label>
                     <input
                       type="text"
@@ -968,7 +970,7 @@ export default function SettingsComponent(props?: any) {
                   {newPaymentMethod.type === 'mobile_money' && (
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Phone Number
+                        {t('settings.phoneNumber')}
                       </label>
                       <input
                         type="tel"
@@ -984,7 +986,7 @@ export default function SettingsComponent(props?: any) {
                   {newPaymentMethod.type === 'bank_account' && (
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Account Name
+                        {t('settings.accountName')}
                       </label>
                       <input
                         type="text"
@@ -1001,7 +1003,7 @@ export default function SettingsComponent(props?: any) {
                     <>
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Card Number
+                          {t('settings.cardNumber')}
                         </label>
                         <input
                           type="text"
@@ -1014,7 +1016,7 @@ export default function SettingsComponent(props?: any) {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Expiry Date
+                          {t('settings.expiryDate')}
                         </label>
                         <input
                           type="text"
@@ -1027,7 +1029,7 @@ export default function SettingsComponent(props?: any) {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          CVV
+                          {t('settings.cvv')}
                         </label>
                         <input
                           type="text"
@@ -1047,13 +1049,13 @@ export default function SettingsComponent(props?: any) {
                     onClick={handleAddPaymentMethod}
                     className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-6 py-2 rounded-lg transition"
                   >
-                    Add Method
+                    {t('settings.addMethod')}
                   </button>
                   <button 
                     onClick={() => setIsAddingPayment(false)}
                     className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition"
                   >
-                    Cancel
+                    {t('settings.cancel')}
                   </button>
                 </div>
               </div>
@@ -1068,16 +1070,16 @@ export default function SettingsComponent(props?: any) {
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900 dark:text-white capitalize">
-                        {method.type.replace('_', ' ')} - {method.provider}
+                        {t(`settings.${method.type.replace('_', '')}`)} - {method.provider}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {method.type === 'mobile_money' && method.phoneNumber && `Phone: ${method.phoneNumber}`}
-                        {method.type === 'bank_account' && method.accountName && `Account: ${method.accountName}`}
-                        {method.type === 'card' && method.lastFour && `Card: **** ${method.lastFour}`}
+                        {method.type === 'mobile_money' && method.phoneNumber && `${t('settings.phone')}: ${method.phoneNumber}`}
+                        {method.type === 'bank_account' && method.accountName && `${t('settings.account')}: ${method.accountName}`}
+                        {method.type === 'card' && method.lastFour && `${t('settings.card')}: **** ${method.lastFour}`}
                       </p>
                       {method.isDefault && (
                         <span className="inline-block mt-1 px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs rounded">
-                          Default
+                          {t('settings.default')}
                         </span>
                       )}
                     </div>
@@ -1112,7 +1114,7 @@ export default function SettingsComponent(props?: any) {
       case 'language':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Language Preferences</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.languagePreferences')}</h2>
             
             <div className="space-y-4">
               {languages.map((lang) => (
@@ -1141,45 +1143,45 @@ export default function SettingsComponent(props?: any) {
       case 'help':
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Help & Support</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.helpSupport')}</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-                <h3 className="font-medium text-gray-900 dark:text-white mb-3">Contact Support</h3>
+                <h3 className="font-medium text-gray-900 dark:text-white mb-3">{t('settings.contactSupport')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Get help from our support team
+                  {t('settings.getSupportHelp')}
                 </p>
                 <div className="space-y-2 text-sm">
-                  <p>📞 <strong>Phone:</strong> +250 788 123 456</p>
-                  <p>✉️ <strong>Email:</strong> support@xpay.com</p>
-                  <p>💬 <strong>Live Chat:</strong> Available 24/7</p>
+                  <p>📞 <strong>{t('settings.phone')}:</strong> +250 788 123 456</p>
+                  <p>✉️ <strong>{t('settings.email')}:</strong> support@xpay.com</p>
+                  <p>💬 <strong>{t('settings.liveChat')}:</strong> {t('settings.available247')}</p>
                 </div>
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-                <h3 className="font-medium text-gray-900 dark:text-white mb-3">FAQ</h3>
+                <h3 className="font-medium text-gray-900 dark:text-white mb-3">{t('settings.faq')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Frequently asked questions
+                  {t('settings.frequentlyAskedQuestions')}
                 </p>
                 <div className="space-y-2 text-sm">
-                  <p>• How to reset password?</p>
-                  <p>• How to update profile?</p>
-                  <p>• Transaction issues?</p>
-                  <p>• Commission queries?</p>
+                  <p>• {t('settings.howToResetPassword')}</p>
+                  <p>• {t('settings.howToUpdateProfile')}</p>
+                  <p>• {t('settings.transactionIssues')}</p>
+                  <p>• {t('settings.commissionQueries')}</p>
                 </div>
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg md:col-span-2">
-                <h3 className="font-medium text-gray-900 dark:text-white mb-3">Documentation</h3>
+                <h3 className="font-medium text-gray-900 dark:text-white mb-3">{t('settings.documentation')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  User guides and documentation
+                  {t('settings.userGuidesAndDocs')}
                 </p>
                 <div className="flex gap-3">
                   <button className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-4 py-2 rounded-lg text-sm transition">
-                    User Guide
+                    {t('settings.userGuide')}
                   </button>
                   <button className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition">
-                    API Documentation
+                    {t('settings.apiDocumentation')}
                   </button>
                 </div>
               </div>
@@ -1188,7 +1190,7 @@ export default function SettingsComponent(props?: any) {
         );
       
       default:
-        return <div>Select a settings category</div>;
+        return <div>{t('settings.selectCategory')}</div>;
     }
   };
 
@@ -1199,8 +1201,8 @@ export default function SettingsComponent(props?: any) {
           {/* Sidebar */}
           <div className="md:w-64 md:border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
             <div className="p-6">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">Manage your account preferences</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('settings.settings')}</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">{t('settings.managePreferences')}</p>
             </div>
             <nav className="p-4">
               <ul className="space-y-2">

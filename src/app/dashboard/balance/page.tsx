@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Banknote, Coins, PlusCircle, RefreshCw, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../../lib/auth-context';
 import { secureStorage } from '../../../lib/auth-context';
+import { useTranslation } from '@/lib/i18n-context';
 
 interface Account {
   accountId: number;
@@ -34,6 +35,7 @@ export default function BalancePage() {
   const [refreshing, setRefreshing] = useState(false);
   const [showAmounts, setShowAmounts] = useState(false);
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   // Extract specific accounts
   const floatAccount = accounts.find(acc => acc.accountName === 'Agent Float A/C');
@@ -52,7 +54,7 @@ export default function BalancePage() {
       const accessToken = secureStorage.getAccessToken();
       
       if (!accessToken) {
-        throw new Error('Authentication required. Please login again.');
+        throw new Error(t('balance.authRequired'));
       }
 
   const response = await fetch('https://core-api.ddin.rw/v1/agency/accounts/all/accounts/info/balance', {
@@ -65,7 +67,7 @@ export default function BalancePage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error('Session expired. Please login again.');
+          throw new Error(t('balance.sessionExpired'));
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -73,12 +75,12 @@ export default function BalancePage() {
       const data: AccountsResponse = await response.json();
 
       if (!data.success) {
-        throw new Error('Failed to fetch account information');
+        throw new Error(t('balance.fetchFailed'));
       }
 
       setAccounts(data.accounts || []);
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch account balances');
+      setError(err.message || t('balance.fetchFailed'));
       console.error('Error fetching account balances:', err);
     } finally {
       setIsLoading(false);
@@ -112,7 +114,7 @@ export default function BalancePage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="text-center">
           <RefreshCw className="w-8 h-8 animate-spin text-[#ff6600] mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading account balances...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('balance.loading')}</p>
         </div>
       </div>
     );
@@ -125,13 +127,13 @@ export default function BalancePage() {
           <div className="flex items-center gap-3">
             <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">Error</h3>
+              <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">{t('balance.error')}</h3>
               <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
               <button
                 onClick={() => fetchAccountBalance()}
                 className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
               >
-                Try Again
+                {t('balance.tryAgain')}
               </button>
             </div>
           </div>
@@ -147,7 +149,7 @@ export default function BalancePage() {
         {/* Header with Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white text-center sm:text-left">
-            Wallet Overview
+            {t('balance.title')}
           </h2>
           
           <div className="flex items-center gap-3">
@@ -159,12 +161,12 @@ export default function BalancePage() {
               {showAmounts ? (
                 <>
                   <EyeOff className="w-4 h-4" />
-                  <span className="hidden sm:inline">Hide Amounts</span>
+                  <span className="hidden sm:inline">{t('balance.hideAmounts')}</span>
                 </>
               ) : (
                 <>
                   <Eye className="w-4 h-4" />
-                  <span className="hidden sm:inline">Show Amounts</span>
+                  <span className="hidden sm:inline">{t('balance.showAmounts')}</span>
                 </>
               )}
             </button>
@@ -177,7 +179,7 @@ export default function BalancePage() {
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">
-                {refreshing ? 'Refreshing...' : 'Refresh'}
+                {refreshing ? t('balance.refreshing') : t('balance.refresh')}
               </span>
             </button>
           </div>
@@ -191,9 +193,9 @@ export default function BalancePage() {
             transition={{ duration: 0.3 }}
             className="bg-gradient-to-r from-[#13294b] to-[#ff6600] p-4 sm:p-6 rounded-2xl text-white text-center mb-6 sm:mb-8"
           >
-            <p className="text-base sm:text-lg font-semibold">Welcome, {user.name}!</p>
-            <p className="text-xs sm:text-sm opacity-90 mt-1">Agent Category: {user.category} • Phone: {user.phoneNumber}</p>
-            <p className="text-xs opacity-75 mt-2">Last updated: {new Date().toLocaleString()}</p>
+            <p className="text-base sm:text-lg font-semibold">{t('balance.welcome', { name: user.name })}</p>
+            <p className="text-xs sm:text-sm opacity-90 mt-1">{t('balance.agentCategory')}: {user.category} • {t('balance.phone')}: {user.phoneNumber}</p>
+            <p className="text-xs opacity-75 mt-2">{t('balance.lastUpdated')}: {new Date().toLocaleString()}</p>
           </motion.div>
         )}
 
@@ -212,7 +214,7 @@ export default function BalancePage() {
                 <Banknote className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Float Balance</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('balance.floatBalance')}</p>
                 <p className="text-xl sm:text-2xl font-bold text-[#ff6600] truncate">
                   {showAmounts 
                     ? (floatAccount ? floatAccount.formattedBalance : 'RWF 0.00')
@@ -220,21 +222,21 @@ export default function BalancePage() {
                   }
                 </p>
                 <p className="text-xs text-gray-400 mt-1 truncate">
-                  Available: {showAmounts 
+                  {t('balance.available')}: {showAmounts 
                     ? (floatAccount ? floatAccount.formattedAvailableBalance : 'RWF 0.00')
                     : (floatAccount ? formatHiddenAmount(floatAccount.formattedAvailableBalance) : '••••••')
                   }
                 </p>
                 {floatAccount && floatAccount.reservedAmount > 0 && (
                   <p className="text-xs text-orange-500 mt-1 truncate">
-                    Reserved: {showAmounts 
+                    {t('balance.reserved')}: {showAmounts 
                       ? floatAccount.formattedReservedAmount
                       : formatHiddenAmount(floatAccount.formattedReservedAmount)
                     }
                   </p>
                 )}
                 <p className="text-xs text-gray-500 mt-2 italic">
-                  Click to {showAmounts ? 'hide' : 'show'} amount
+                  {t('balance.clickTo')} {showAmounts ? t('balance.hide') : t('balance.show')} {t('balance.amount')}
                 </p>
               </div>
             </div>
@@ -253,16 +255,16 @@ export default function BalancePage() {
                 <Coins className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Instant Commission</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('balance.instantCommission')}</p>
                 <p className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400 truncate">
                   {showAmounts 
                     ? (instantCommissionAccount ? instantCommissionAccount.formattedBalance : 'RWF 0.00')
                     : (instantCommissionAccount ? formatHiddenAmount(instantCommissionAccount.formattedBalance) : '••••••')
                   }
                 </p>
-                <p className="text-xs text-gray-400 mt-1">Available for withdrawal</p>
+                <p className="text-xs text-gray-400 mt-1">{t('balance.availableForWithdrawal')}</p>
                 <p className="text-xs text-gray-500 mt-2 italic">
-                  Click to {showAmounts ? 'hide' : 'show'} amount
+                  {t('balance.clickTo')} {showAmounts ? t('balance.hide') : t('balance.show')} {t('balance.amount')}
                 </p>
               </div>
             </div>
@@ -281,16 +283,16 @@ export default function BalancePage() {
                 <Coins className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Delayed Commission</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('balance.delayedCommission')}</p>
                 <p className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 truncate">
                   {showAmounts 
                     ? (delayedCommissionAccount ? delayedCommissionAccount.formattedBalance : 'RWF 0.00')
                     : (delayedCommissionAccount ? formatHiddenAmount(delayedCommissionAccount.formattedBalance) : '••••••')
                   }
                 </p>
-                <p className="text-xs text-gray-400 mt-1">Pending clearance</p>
+                <p className="text-xs text-gray-400 mt-1">{t('balance.pendingClearance')}</p>
                 <p className="text-xs text-gray-500 mt-2 italic">
-                  Click to {showAmounts ? 'hide' : 'show'} amount
+                  {t('balance.clickTo')} {showAmounts ? t('balance.hide') : t('balance.show')} {t('balance.amount')}
                 </p>
               </div>
             </div>
@@ -305,13 +307,13 @@ export default function BalancePage() {
           className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all mb-6 sm:mb-8"
         >
           <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 text-center sm:text-left">
-            Top-Up Float
+            {t('balance.topUpFloat')}
           </h3>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-end">
             <div className="flex-1 min-w-0">
               <input
                 type="number"
-                placeholder="Enter amount (RWF)"
+                placeholder={t('balance.enterAmount')}
                 value={topupAmount}
                 onChange={(e) => setTopupAmount(e.target.value)}
                 className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#ff6600] text-sm sm:text-base"
@@ -323,7 +325,7 @@ export default function BalancePage() {
               className="inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-3 rounded-xl bg-[#ff6600] text-white hover:bg-[#e65c00] transition disabled:opacity-50 font-semibold text-sm sm:text-base whitespace-nowrap"
             >
               <PlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-              Top-Up Now
+              {t('balance.topUpNow')}
             </button>
           </div>
         </motion.div>
@@ -338,14 +340,14 @@ export default function BalancePage() {
           >
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3 sm:mb-4">
               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-                All Accounts Summary
+                {t('balance.allAccountsSummary')}
               </h3>
               <button
                 onClick={toggleAmountsVisibility}
                 className="flex items-center gap-2 px-3 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               >
                 {showAmounts ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                {showAmounts ? 'Hide amounts' : 'Show amounts'}
+                {showAmounts ? t('balance.hideAmounts') : t('balance.showAmounts')}
               </button>
             </div>
             
@@ -354,10 +356,10 @@ export default function BalancePage() {
                 <table className="w-full text-xs sm:text-sm">
                   <thead>
                     <tr className="border-b border-gray-200 dark:border-gray-700">
-                      <th className="text-left py-2 sm:py-3 font-medium text-gray-500 dark:text-gray-400 px-2 sm:px-3">Account Name</th>
-                      <th className="text-right py-2 sm:py-3 font-medium text-gray-500 dark:text-gray-400 px-2 sm:px-3">Balance</th>
-                      <th className="text-right py-2 sm:py-3 font-medium text-gray-500 dark:text-gray-400 px-2 sm:px-3 hidden sm:table-cell">Available</th>
-                      <th className="text-right py-2 sm:py-3 font-medium text-gray-500 dark:text-gray-400 px-2 sm:px-3 hidden md:table-cell">Reserved</th>
+                      <th className="text-left py-2 sm:py-3 font-medium text-gray-500 dark:text-gray-400 px-2 sm:px-3">{t('balance.accountName')}</th>
+                      <th className="text-right py-2 sm:py-3 font-medium text-gray-500 dark:text-gray-400 px-2 sm:px-3">{t('balance.balance')}</th>
+                      <th className="text-right py-2 sm:py-3 font-medium text-gray-500 dark:text-gray-400 px-2 sm:px-3 hidden sm:table-cell">{t('balance.available')}</th>
+                      <th className="text-right py-2 sm:py-3 font-medium text-gray-500 dark:text-gray-400 px-2 sm:px-3 hidden md:table-cell">{t('balance.reserved')}</th>
                     </tr>
                   </thead>
                   <tbody>

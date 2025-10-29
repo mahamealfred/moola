@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { Sun, Moon, Eye, EyeOff, AlertCircle, Loader2, Shield } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
+import { useTranslation } from '@/lib/i18n-context';
+import LanguageSelector from '@/components/LanguageSelector';
 
 export const runtime = "edge";
 
@@ -20,6 +22,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/dashboard';
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { t } = useTranslation();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -47,7 +50,7 @@ export default function LoginPage() {
     setError('');
     
     if (!username.trim() || !password.trim()) {
-      setError('Please enter both username and password');
+      setError(t('login.errorBothFields'));
       return;
     }
 
@@ -72,7 +75,7 @@ export default function LoginPage() {
       // The AuthProvider will handle the redirect automatically
       
     } catch (err: any) {
-      setError(err.message || 'Something went wrong.');
+      setError(err.message || t('login.errorGeneral'));
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +89,7 @@ export default function LoginPage() {
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#ff6600] mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Checking authentication...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('common.checkingAuth')}</p>
         </div>
       </div>
     );
@@ -110,7 +113,7 @@ export default function LoginPage() {
         {/* Security Indicator */}
         <div className="absolute top-4 right-4 flex items-center gap-2 text-green-600 dark:text-green-400 text-xs">
           <Shield className="w-3 h-3" />
-          Secure
+          {t('common.secure')}
         </div>
 
         {/* Left: Login Form */}
@@ -124,16 +127,19 @@ export default function LoginPage() {
             <h1 className="text-2xl font-extrabold text-[#13294b] dark:text-white">
               <span className="text-[#ff6600]">X</span>-Pay
             </h1>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Toggle dark mode"
-            >
-              {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
-            </button>
+            <div className="flex items-center gap-2">
+              <LanguageSelector />
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label="Toggle dark mode"
+              >
+                {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
+              </button>
+            </div>
           </header>
 
-          <h2 className="text-xl font-semibold text-[#13294b] dark:text-white">Sign in to your account</h2>
+          <h2 className="text-xl font-semibold text-[#13294b] dark:text-white">{t('login.title')}</h2>
 
           {/* Error Message */}
           {error && (
@@ -157,7 +163,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Username
+                {t('login.username')}
               </label>
               <input
                 id="username"
@@ -167,7 +173,7 @@ export default function LoginPage() {
                   setUsername(e.target.value);
                   clearError();
                 }}
-                placeholder="Enter your username"
+                placeholder={t('login.enterUsername')}
                 className="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all"
                 required
                 disabled={isLoading}
@@ -177,7 +183,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Password
+                {t('login.password')}
               </label>
               <div className="relative">
                 <input
@@ -188,7 +194,7 @@ export default function LoginPage() {
                     setPassword(e.target.value);
                     clearError();
                   }}
-                  placeholder="Enter your password"
+                  placeholder={t('login.enterPassword')}
                   className="w-full px-4 py-3 pr-12 rounded-2xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all"
                   required
                   disabled={isLoading}
@@ -199,7 +205,7 @@ export default function LoginPage() {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                   onClick={() => setShowPassword(prev => !prev)}
                   disabled={isLoading}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -213,13 +219,13 @@ export default function LoginPage() {
                   className="accent-[#ff6600] cursor-pointer" 
                   disabled={isLoading}
                 />
-                Remember me
+                {t('login.rememberMe')}
               </label>
               <Link 
                 href="/forgot-password" 
                 className="text-[#13294b] dark:text-[#ff6600] hover:underline transition-colors"
               >
-                Forgot password?
+                {t('login.forgotPassword')}
               </Link>
             </div>
 
@@ -231,20 +237,20 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Signing In...
+                  {t('login.signingIn')}
                 </>
               ) : (
-                'Sign In'
+                t('login.signIn')
               )}
             </button>
 
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-              Do you want to become an Agent?{' '}
+              {t('login.becomeAgent')}{' '}
               <Link 
                 href="/registration" 
                 className="text-[#13294b] dark:text-[#ff6600] font-medium hover:underline transition-colors"
               >
-                Register
+                {t('login.register')}
               </Link>
             </p>
           </form>
@@ -263,7 +269,7 @@ export default function LoginPage() {
             transition={{ delay: 0.5, duration: 0.6, type: 'spring', stiffness: 60 }}
             className="text-4xl font-extrabold mb-4"
           >
-            Welcome to X-pay
+            {t('login.welcomeTitle')}
           </motion.h2>
           <motion.p
             initial={{ y: 20, opacity: 0 }}
@@ -271,7 +277,7 @@ export default function LoginPage() {
             transition={{ delay: 0.8, duration: 0.6, type: 'spring', stiffness: 60 }}
             className="text-lg font-medium max-w-md"
           >
-            A network of the best – empowering agents and individuals to access and offer essential financial services easily and securely.
+            {t('login.welcomeDescription')}
           </motion.p>
         </motion.div>
       </div>
