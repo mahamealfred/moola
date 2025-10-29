@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Timer, Coins, Download, RefreshCw, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { secureStorage } from '../../../lib/auth-context';
+import { useTranslation } from '@/lib/i18n-context';
 
 interface Account {
   accountId: number;
@@ -32,6 +33,7 @@ interface WithdrawResponse {
 }
 
 export default function CommissionPage() {
+  const { t } = useTranslation();
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,7 +64,7 @@ export default function CommissionPage() {
       const accessToken = secureStorage.getAccessToken();
       
       if (!accessToken) {
-        throw new Error('Authentication required. Please login again.');
+        throw new Error(t('commission.authRequired'));
       }
 
   const response = await fetch('https://core-api.ddin.rw/v1/agency/accounts/all/accounts/info/balance', {
@@ -75,7 +77,7 @@ export default function CommissionPage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error('Session expired. Please login again.');
+          throw new Error(t('commission.sessionExpired'));
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -83,12 +85,12 @@ export default function CommissionPage() {
       const data: AccountsResponse = await response.json();
 
       if (!data.success) {
-        throw new Error('Failed to fetch commission information');
+        throw new Error(t('commission.fetchFailed'));
       }
 
       setAccounts(data.accounts || []);
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch commission balances');
+      setError(err.message || t('commission.fetchFailed'));
       console.error('Error fetching commission balances:', err);
     } finally {
       setIsLoading(false);
@@ -102,15 +104,15 @@ export default function CommissionPage() {
     const numAmount = parseFloat(amount);
     
     if (isNaN(numAmount) || numAmount <= 0) {
-      return 'Please enter a valid amount';
+      return t('commission.validAmount');
     }
     
     if (numAmount < MIN_WITHDRAWAL_AMOUNT) {
-      return `Minimum withdrawal amount is RWF ${MIN_WITHDRAWAL_AMOUNT.toLocaleString()}`;
+      return t('commission.minWithdrawal', { amount: MIN_WITHDRAWAL_AMOUNT.toLocaleString() });
     }
     
     if (numAmount > availableBalance) {
-      return `Amount exceeds available balance of RWF ${availableBalance.toLocaleString()}`;
+      return t('commission.exceedsBalance', { amount: availableBalance.toLocaleString() });
     }
     
     return '';
@@ -133,7 +135,7 @@ export default function CommissionPage() {
     }
 
     if (!instantCommissionAccount) {
-      setWithdrawError('Commission account not available');
+      setWithdrawError(t('commission.accountNotAvailable'));
       return;
     }
 
@@ -147,7 +149,7 @@ export default function CommissionPage() {
       const accessToken = secureStorage.getAccessToken();
       
       if (!accessToken) {
-        throw new Error('Authentication required. Please login again.');
+        throw new Error(t('commission.authRequired'));
       }
 
       // Use the correct withdrawal endpoint
@@ -166,10 +168,10 @@ export default function CommissionPage() {
       const data: WithdrawResponse = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.message || 'Withdrawal failed');
+        throw new Error(data.message || t('commission.withdrawalFailed'));
       }
 
-      setWithdrawSuccess(data.message || `Successfully withdrawn RWF ${amount.toLocaleString()}`);
+      setWithdrawSuccess(data.message || t('commission.withdrawalSuccess', { amount: amount.toLocaleString() }));
       setWithdrawAmount('');
       setValidationError('');
       
@@ -177,7 +179,7 @@ export default function CommissionPage() {
       setTimeout(() => fetchCommissionBalance(true), 1000);
       
     } catch (err: any) {
-      setWithdrawError(err.message || 'Withdrawal failed. Please try again.');
+      setWithdrawError(err.message || t('commission.withdrawalError'));
     } finally {
       setIsWithdrawing(false);
     }
@@ -203,7 +205,7 @@ export default function CommissionPage() {
     if (availableBalance >= MIN_WITHDRAWAL_AMOUNT) {
       handleAmountChange(availableBalance.toString());
     } else {
-      setWithdrawError(`Insufficient balance for withdrawal. Minimum is RWF ${MIN_WITHDRAWAL_AMOUNT.toLocaleString()}`);
+      setWithdrawError(t('commission.insufficientBalance', { amount: MIN_WITHDRAWAL_AMOUNT.toLocaleString() }));
     }
   };
 
@@ -212,7 +214,7 @@ export default function CommissionPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="text-center">
           <RefreshCw className="w-8 h-8 animate-spin text-[#ff6600] mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading commission balances...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('commission.loading')}</p>
         </div>
       </div>
     );
@@ -225,13 +227,13 @@ export default function CommissionPage() {
           <div className="flex items-center gap-3">
             <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">Error</h3>
+              <h3 className="text-lg font-semibold text-red-800 dark:text-red-200">{t('commission.error')}</h3>
               <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
               <button
                 onClick={() => fetchCommissionBalance()}
                 className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
               >
-                Try Again
+                {t('commission.tryAgain')}
               </button>
             </div>
           </div>
@@ -247,7 +249,7 @@ export default function CommissionPage() {
         {/* Header with Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white text-center sm:text-left">
-            Commission Dashboard
+            {t('commission.title')}
           </h2>
           
           <div className="flex items-center gap-3">
@@ -259,12 +261,12 @@ export default function CommissionPage() {
               {showAmounts ? (
                 <>
                   <EyeOff className="w-4 h-4" />
-                  <span className="hidden sm:inline">Hide Amounts</span>
+                  <span className="hidden sm:inline">{t('commission.hideAmounts')}</span>
                 </>
               ) : (
                 <>
                   <Eye className="w-4 h-4" />
-                  <span className="hidden sm:inline">Show Amounts</span>
+                  <span className="hidden sm:inline">{t('commission.showAmounts')}</span>
                 </>
               )}
             </button>
@@ -277,7 +279,7 @@ export default function CommissionPage() {
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">
-                {refreshing ? 'Refreshing...' : 'Refresh'}
+                {refreshing ? t('commission.refreshing') : t('commission.refresh')}
               </span>
             </button>
           </div>
@@ -298,7 +300,7 @@ export default function CommissionPage() {
                 <Coins className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Instant Commission</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('commission.instantCommission')}</p>
                 <p className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400 truncate">
                   {showAmounts 
                     ? (instantCommissionAccount ? instantCommissionAccount.formattedBalance : 'RWF 0.00')
@@ -306,16 +308,16 @@ export default function CommissionPage() {
                   }
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Available: {showAmounts 
+                  {t('commission.available')}: {showAmounts 
                     ? (instantCommissionAccount ? instantCommissionAccount.formattedAvailableBalance : 'RWF 0.00')
                     : (instantCommissionAccount ? formatHiddenAmount(instantCommissionAccount.formattedAvailableBalance) : '••••••')
                   }
                 </p>
                 <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-semibold">
-                  Min. withdrawal: RWF {MIN_WITHDRAWAL_AMOUNT.toLocaleString()}
+                  {t('commission.minWithdrawalLabel')}: RWF {MIN_WITHDRAWAL_AMOUNT.toLocaleString()}
                 </p>
                 <p className="text-xs text-gray-500 mt-2 italic">
-                  Click to {showAmounts ? 'hide' : 'show'} amount • Ready to withdraw
+                  {t('commission.clickTo')} {showAmounts ? t('commission.hide') : t('commission.show')} {t('commission.amount')} • {t('commission.readyToWithdraw')}
                 </p>
               </div>
             </div>
@@ -334,16 +336,16 @@ export default function CommissionPage() {
                 <Timer className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Delayed Commission</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('commission.delayedCommission')}</p>
                 <p className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 truncate">
                   {showAmounts 
                     ? (delayedCommissionAccount ? delayedCommissionAccount.formattedBalance : 'RWF 0.00')
                     : (delayedCommissionAccount ? formatHiddenAmount(delayedCommissionAccount.formattedBalance) : '••••••')
                   }
                 </p>
-                <p className="text-xs text-gray-400 mt-1">Pending release</p>
+                <p className="text-xs text-gray-400 mt-1">{t('commission.pendingRelease')}</p>
                 <p className="text-xs text-gray-500 mt-2 italic">
-                  Click to {showAmounts ? 'hide' : 'show'} amount
+                  {t('commission.clickTo')} {showAmounts ? t('commission.hide') : t('commission.show')} {t('commission.amount')}
                 </p>
               </div>
             </div>
@@ -358,7 +360,7 @@ export default function CommissionPage() {
           className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all"
         >
           <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 text-center sm:text-left">
-            Withdraw Commission
+            {t('commission.withdrawCommission')}
           </h3>
 
           {/* Success Message */}
@@ -380,7 +382,7 @@ export default function CommissionPage() {
               <div className="relative">
                 <input
                   type="number"
-                  placeholder={`Enter amount (RWF) - Min: ${MIN_WITHDRAWAL_AMOUNT.toLocaleString()}`}
+                  placeholder={t('commission.enterAmountPlaceholder', { amount: MIN_WITHDRAWAL_AMOUNT.toLocaleString() })}
                   value={withdrawAmount}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#ff6600] text-sm sm:text-base pr-20"
@@ -393,7 +395,7 @@ export default function CommissionPage() {
                   disabled={availableBalance < MIN_WITHDRAWAL_AMOUNT}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 px-2 py-1 bg-[#13294b] text-white text-xs rounded hover:bg-[#0f213d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  MAX
+                  {t('commission.max')}
                 </button>
               </div>
             </div>
@@ -407,7 +409,7 @@ export default function CommissionPage() {
               ) : (
                 <Download className="w-4 h-4 sm:w-5 sm:h-5" />
               )}
-              {isWithdrawing ? 'Processing...' : 'Withdraw Now'}
+              {isWithdrawing ? t('commission.processing') : t('commission.withdrawNow')}
             </button>
           </div>
 
@@ -415,10 +417,10 @@ export default function CommissionPage() {
           {instantCommissionAccount && (
             <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
               <p className="text-xs text-blue-600 dark:text-blue-400">
-                Available for withdrawal: <span className="font-semibold">{instantCommissionAccount.formattedAvailableBalance}</span>
+                {t('commission.availableForWithdrawal')}: <span className="font-semibold">{instantCommissionAccount.formattedAvailableBalance}</span>
                 {availableBalance < MIN_WITHDRAWAL_AMOUNT && (
                   <span className="text-red-600 dark:text-red-400 ml-2">
-                    (Minimum RWF {MIN_WITHDRAWAL_AMOUNT.toLocaleString()} required)
+                    ({t('commission.minimumRequired', { amount: MIN_WITHDRAWAL_AMOUNT.toLocaleString() })})
                   </span>
                 )}
               </p>
@@ -434,25 +436,25 @@ export default function CommissionPage() {
           className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg"
         >
           <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
-            Withdrawal Guidelines
+            {t('commission.withdrawalGuidelines')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
             <div>
-              <h4 className="font-semibold text-[#ff6600] mb-2">Amount Limits</h4>
+              <h4 className="font-semibold text-[#ff6600] mb-2">{t('commission.amountLimits')}</h4>
               <ul className="space-y-1 text-xs">
-                <li>• Minimum withdrawal: <strong>RWF 5,000</strong></li>
-                <li>• Maximum withdrawal: Available balance</li>
-                <li>• Only whole numbers allowed</li>
-                <li>• Must be multiples of 100 RWF</li>
+                <li>• {t('commission.minimumWithdrawal')}: <strong>RWF 5,000</strong></li>
+                <li>• {t('commission.maximumWithdrawal')}: {t('commission.availableBalance')}</li>
+                <li>• {t('commission.wholeNumbersOnly')}</li>
+                <li>• {t('commission.multiplesOf100')}</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-green-600 dark:text-green-400 mb-2">Processing</h4>
+              <h4 className="font-semibold text-green-600 dark:text-green-400 mb-2">{t('commission.processing')}</h4>
               <ul className="space-y-1 text-xs">
-                <li>• Instant commission only</li>
-                <li>• Processed within 24 hours</li>
-                <li>• No withdrawal fees</li>
-                <li>• Requires administrative approval</li>
+                <li>• {t('commission.instantCommissionOnly')}</li>
+                <li>• {t('commission.processedWithin24Hours')}</li>
+                <li>• {t('commission.noWithdrawalFees')}</li>
+                <li>• {t('commission.requiresAdminApproval')}</li>
               </ul>
             </div>
           </div>
