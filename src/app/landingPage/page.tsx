@@ -282,7 +282,7 @@ export default function LandingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [current, setCurrent] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeCategory, setActiveCategory] = useState(t('landing.all'));
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const [activeFeature, setActiveFeature] = useState(0);
@@ -326,24 +326,24 @@ export default function LandingPage() {
   ];
 
   const allServicesTranslated = [
-    { name: t('landing.electricityPayment'), icon: Zap, category: 'Utilities', description: t('landing.electricityPaymentDesc'), color: 'text-yellow-500' },
-    { name: t('landing.rraTaxPayment'), icon: FileText, category: 'Government', description: t('landing.rraTaxPaymentDesc'), color: 'text-red-500' },
-    { name: t('landing.buyAirtime'), icon: Phone, category: 'Telecom', description: t('landing.buyAirtimeDesc'), color: 'text-green-500' },
-    { name: t('landing.startimesTV'), icon: Tv, category: 'Entertainment', description: t('landing.startimesTVDesc'), color: 'text-purple-500' },
-    { name: t('landing.bulkSMS'), icon: MessageSquare, category: 'Communication', description: t('landing.bulkSMSDesc'), color: 'text-blue-500' },
-    { name: t('landing.iremboServices'), icon: Globe, category: 'Government', description: t('landing.iremboServicesDesc'), color: 'text-indigo-500' },
-    { name: t('landing.wasacWater'), icon: Droplet, category: 'Utilities', description: t('landing.wasacWaterDesc'), color: 'text-cyan-500' },
-    { name: t('landing.schoolFees'), icon: BookOpen, category: 'Education', description: t('landing.schoolFeesDesc'), color: 'text-orange-500' },
-    { name: t('landing.bulkSalary'), icon: Users, category: 'Business', description: t('landing.bulkSalaryDesc'), color: 'text-teal-500' },
-    { name: t('landing.invoicePayments'), icon: CreditCard, category: 'Business', description: t('landing.invoicePaymentsDesc'), color: 'text-pink-500' },
-    { name: t('landing.taxCalculation'), icon: Calculator, category: 'Business', description: t('landing.taxCalculationDesc'), color: 'text-gray-600' },
-    { name: t('landing.expenseManagement'), icon: FileSpreadsheet, category: 'Business', description: t('landing.expenseManagementDesc'), color: 'text-amber-600' },
-    { name: t('landing.mobileMoney'), icon: Smartphone, category: 'Finance', description: t('landing.mobileMoneyDesc'), color: 'text-green-600' },
-    { name: t('landing.internetBills'), icon: Wifi, category: 'Utilities', description: t('landing.internetBillsDesc'), color: 'text-blue-600' },
-    { name: t('landing.rentPayment'), icon: Home, category: 'Housing', description: t('landing.rentPaymentDesc'), color: 'text-brown-500' },
-    { name: t('landing.transport'), icon: Car, category: 'Transport', description: t('landing.transportDesc'), color: 'text-gray-500' },
-    { name: t('landing.healthInsurance'), icon: Heart, category: 'Insurance', description: t('landing.healthInsuranceDesc'), color: 'text-red-400' },
-    { name: t('landing.onlineShopping'), icon: ShoppingCart, category: 'Shopping', description: t('landing.onlineShoppingDesc'), color: 'text-purple-600' },
+    { name: t('landing.electricityPayment'), icon: Zap, category: t('landing.utilities'), description: t('landing.electricityPaymentDesc'), color: 'text-yellow-500' },
+    { name: t('landing.rraTaxPayment'), icon: FileText, category: t('landing.government'), description: t('landing.rraTaxPaymentDesc'), color: 'text-red-500' },
+    { name: t('landing.buyAirtime'), icon: Phone, category: t('landing.telecom'), description: t('landing.buyAirtimeDesc'), color: 'text-green-500' },
+    { name: t('landing.startimesTV'), icon: Tv, category: t('landing.entertainment'), description: t('landing.startimesTVDesc'), color: 'text-purple-500' },
+    { name: t('landing.bulkSMS'), icon: MessageSquare, category: t('landing.communication'), description: t('landing.bulkSMSDesc'), color: 'text-blue-500' },
+    { name: t('landing.iremboServices'), icon: Globe, category: t('landing.government'), description: t('landing.iremboServicesDesc'), color: 'text-indigo-500' },
+    { name: t('landing.wasacWater'), icon: Droplet, category: t('landing.utilities'), description: t('landing.wasacWaterDesc'), color: 'text-cyan-500' },
+    { name: t('landing.schoolFees'), icon: BookOpen, category: t('landing.education'), description: t('landing.schoolFeesDesc'), color: 'text-orange-500' },
+    { name: t('landing.bulkSalary'), icon: Users, category: t('landing.business'), description: t('landing.bulkSalaryDesc'), color: 'text-teal-500' },
+    { name: t('landing.invoicePayments'), icon: CreditCard, category: t('landing.business'), description: t('landing.invoicePaymentsDesc'), color: 'text-pink-500' },
+    { name: t('landing.taxCalculation'), icon: Calculator, category: t('landing.business'), description: t('landing.taxCalculationDesc'), color: 'text-gray-600' },
+    { name: t('landing.expenseManagement'), icon: FileSpreadsheet, category: t('landing.business'), description: t('landing.expenseManagementDesc'), color: 'text-amber-600' },
+    { name: t('landing.mobileMoney'), icon: Smartphone, category: t('landing.finance'), description: t('landing.mobileMoneyDesc'), color: 'text-green-600' },
+    { name: t('landing.internetBills'), icon: Wifi, category: t('landing.utilities'), description: t('landing.internetBillsDesc'), color: 'text-blue-600' },
+    { name: t('landing.rentPayment'), icon: Home, category: t('landing.housing'), description: t('landing.rentPaymentDesc'), color: 'text-brown-500' },
+    { name: t('landing.transport'), icon: Car, category: t('landing.transport'), description: t('landing.transportDesc'), color: 'text-gray-500' },
+    { name: t('landing.healthInsurance'), icon: Heart, category: t('landing.insurance'), description: t('landing.healthInsuranceDesc'), color: 'text-red-400' },
+    { name: t('landing.onlineShopping'), icon: ShoppingCart, category: t('landing.shopping'), description: t('landing.onlineShoppingDesc'), color: 'text-purple-600' },
   ];
 
   const paymentFeaturesTranslated = [
@@ -446,7 +446,7 @@ export default function LandingPage() {
   ];
 
   // Get unique categories
-  const categories = ['All', ...new Set(allServicesTranslated.map(service => service.category))];
+  const categories = [t('landing.all'), ...new Set(allServicesTranslated.map(service => service.category))];
 
   // Filter services
   const filteredServices = useMemo(() => {
@@ -459,7 +459,7 @@ export default function LandingPage() {
       );
     }
 
-    if (activeCategory !== 'All') {
+    if (activeCategory !== t('landing.all')) {
       filtered = filtered.filter(service => service.category === activeCategory);
     }
 
@@ -534,7 +534,7 @@ export default function LandingPage() {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setActiveCategory('All');
+    setActiveCategory(t('landing.all'));
   };
 
   const nextTestimonial = () => {
@@ -963,7 +963,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {(searchTerm || activeCategory !== 'All') && (
+          {(searchTerm || activeCategory !== t('landing.all')) && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
@@ -978,10 +978,10 @@ export default function LandingPage() {
                   </button>
                 </span>
               )}
-              {activeCategory !== 'All' && (
+              {activeCategory !== t('landing.all') && (
                 <span className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm px-4 py-2 rounded-full">
                   {t('landing.category')}: {activeCategory}
-                  <button onClick={() => setActiveCategory('All')} className="hover:text-green-600 transition-colors">
+                  <button onClick={() => setActiveCategory(t('landing.all'))} className="hover:text-green-600 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 </span>
