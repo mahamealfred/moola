@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { Sun, Moon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from '@/lib/i18n-context';
+import LanguageSelector from '@/components/LanguageSelector';
 export const runtime = "edge";
 
 export default function RegistrationPage() {
@@ -21,6 +23,7 @@ export default function RegistrationPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isDark, setIsDark] = useState(true);
   const router = useRouter();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -52,23 +55,23 @@ export default function RegistrationPage() {
       case 1:
         return (
           <>
-            <Input label="Email" name="email" type="email" value={formData.email} onChange={handleChange} />
-            <Input label="Username" name="username" value={formData.username} onChange={handleChange} />
-            <PasswordInput label="Password" name="password" value={formData.password} onChange={handleChange} showPassword={showPassword} setShowPassword={setShowPassword} />
+            <Input label={t('registration.email')} name="email" type="email" value={formData.email} onChange={handleChange} />
+            <Input label={t('registration.username')} name="username" value={formData.username} onChange={handleChange} />
+            <PasswordInput label={t('registration.password')} name="password" value={formData.password} onChange={handleChange} showPassword={showPassword} setShowPassword={setShowPassword} t={t} />
           </>
         );
       case 2:
         return (
           <>
-            <Input label="First Name" name="firstName" value={formData.firstName} onChange={handleChange} />
-            <Input label="Last Name" name="lastName" value={formData.lastName} onChange={handleChange} />
+            <Input label={t('registration.firstName')} name="firstName" value={formData.firstName} onChange={handleChange} />
+            <Input label={t('registration.lastName')} name="lastName" value={formData.lastName} onChange={handleChange} />
           </>
         );
       case 3:
         return (
           <>
-            <Input label="National ID / Passport" name="identity" value={formData.identity} onChange={handleChange} />
-            <Input label="Phone Number" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} />
+            <Input label={t('registration.identity')} name="identity" value={formData.identity} onChange={handleChange} />
+            <Input label={t('registration.phoneNumber')} name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} />
           </>
         );
       default:
@@ -97,16 +100,19 @@ export default function RegistrationPage() {
             <h1 className="text-2xl font-extrabold text-[#13294b] dark:text-white">
               <span className="text-[#ff6600]">X</span>-Pay
             </h1>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
-              aria-label="Toggle theme"
-            >
-              {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
-            </button>
+            <div className="flex items-center gap-2">
+              <LanguageSelector />
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+                aria-label="Toggle theme"
+              >
+                {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
+              </button>
+            </div>
           </header>
 
-          <h2 className="text-xl font-semibold text-[#13294b] dark:text-white">Create your account</h2>
+          <h2 className="text-xl font-semibold text-[#13294b] dark:text-white">{t('registration.title')}</h2>
 
           <form className="space-y-5" onSubmit={e => e.preventDefault()}>
             {renderStep()}
@@ -114,7 +120,7 @@ export default function RegistrationPage() {
             <div className="flex justify-between items-center">
               {step > 1 && (
                 <button type="button" onClick={handleBack} className="text-sm text-gray-600 dark:text-gray-300 hover:underline">
-                  Back
+                  {t('registration.back')}
                 </button>
               )}
               <button
@@ -122,14 +128,14 @@ export default function RegistrationPage() {
                 onClick={handleNext}
                 className="ml-auto bg-[#13294b] dark:bg-[#ff6600] hover:bg-[#0f213d] dark:hover:bg-[#e65c00] text-white font-semibold py-3 px-6 rounded-2xl transition shadow-lg hover:shadow-xl"
               >
-                {step < 3 ? 'Next' : 'Register'}
+                {step < 3 ? t('registration.next') : t('registration.register')}
               </button>
             </div>
 
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-              Already have an account?{' '}
+              {t('registration.alreadyHaveAccount')}{' '}
               <Link href="/login" className="text-[#13294b] dark:text-[#ff6600] font-medium hover:underline">
-                Sign In
+                {t('registration.signIn')}
               </Link>
             </p>
           </form>
@@ -152,7 +158,7 @@ export default function RegistrationPage() {
             transition={{ delay: 0.5, duration: 0.6, type: 'spring', stiffness: 60 }}
             className="text-4xl font-extrabold mb-4"
           >
-            Join X-pay Today
+            {t('registration.welcomeTitle')}
           </motion.h2>
           <motion.p
             initial={{ y: 20, opacity: 0 }}
@@ -160,7 +166,7 @@ export default function RegistrationPage() {
             transition={{ delay: 0.8, duration: 0.6, type: 'spring', stiffness: 60 }}
             className="text-lg font-medium max-w-md"
           >
-            Create an account and start accessing secure, agent-powered financial services with ease and speed.
+            {t('registration.welcomeDescription')}
           </motion.p>
         </motion.div>
       </div>
@@ -184,7 +190,7 @@ function Input({ label, name, type = 'text', value, onChange }: any) {
   );
 }
 
-function PasswordInput({ label, name, value, onChange, showPassword, setShowPassword }: any) {
+function PasswordInput({ label, name, value, onChange, showPassword, setShowPassword, t }: any) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
@@ -203,7 +209,7 @@ function PasswordInput({ label, name, value, onChange, showPassword, setShowPass
           className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#ff6600] hover:text-[#e65c00]"
           onClick={() => setShowPassword(!showPassword)}
         >
-          {showPassword ? 'Hide' : 'Show'}
+          {showPassword ? t('registration.hide') : t('registration.show')}
         </button>
       </div>
     </div>

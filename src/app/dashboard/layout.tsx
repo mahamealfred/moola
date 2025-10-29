@@ -19,14 +19,9 @@ import {
   Shield,
 } from 'lucide-react';
 import { useAuth } from '..//../lib/auth-context';
+import { useTranslation } from '@/lib/i18n-context';
+import LanguageSelector from '@/components/LanguageSelector';
 
-const navItems = [
-  { label: 'Home', href: '/dashboard', icon: Home },
-  { label: 'Check Balance', href: '/dashboard/balance', icon: Wallet },
-  { label: 'Transactions', href: '/dashboard/transactions', icon: CreditCard },
-  { label: 'Commissions', href: '/dashboard/commission', icon: BarChart2 },
-  { label: 'Settings', href: '/dashboard/settings', icon: Settings },
-];
 
 function SidebarItem({
   href,
@@ -69,10 +64,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const { user, isLoading, isAuthenticated, logout } = useAuth();
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  const navItems = [
+    { label: t('nav.home'), href: '/dashboard', icon: Home },
+    { label: t('nav.checkBalance'), href: '/dashboard/balance', icon: Wallet },
+    { label: t('nav.transactions'), href: '/dashboard/transactions', icon: CreditCard },
+    { label: t('nav.commissions'), href: '/dashboard/commission', icon: BarChart2 },
+    { label: t('nav.settings'), href: '/dashboard/settings', icon: Settings },
+  ];
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -134,7 +138,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="mx-auto w-12 h-12 border-4 border-[#ff6600] border-t-transparent rounded-full mb-4"
           />
-          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('common.loadingDashboard')}</p>
         </div>
       </div>
     );
@@ -209,10 +213,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-all mt-auto"
-          aria-label="Logout"
+          aria-label={t('nav.logout')}
         >
           <LogOut size={20} />
-          {isExpanded && <span className="text-sm font-medium">Logout</span>}
+          {isExpanded && <span className="text-sm font-medium">{t('nav.logout')}</span>}
         </button>
       </motion.aside>
 
@@ -280,7 +284,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 transition-all mt-auto"
               >
                 <LogOut size={20} />
-                <span className="text-sm font-medium">Logout</span>
+                <span className="text-sm font-medium">{t('nav.logout')}</span>
               </button>
             </motion.aside>
           </>
@@ -305,6 +309,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <div className="flex items-center gap-3 sm:gap-6">
+            {/* Language Selector */}
+            <LanguageSelector />
+
             {/* Notifications */}
             <div className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
               <Bell size={20} />
@@ -347,13 +354,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => setDropdownOpen(false)}
                     >
-                      Settings
+                      {t('nav.settings')}
                     </Link>
                     <button
                       className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600 dark:text-red-400"
                       onClick={handleLogout}
                     >
-                      <LogOut size={16} /> Logout
+                      <LogOut size={16} /> {t('nav.logout')}
                     </button>
                   </motion.div>
                 )}

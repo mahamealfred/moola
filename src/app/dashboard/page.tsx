@@ -10,44 +10,8 @@ import {
   Zap,
   ArrowRight,
 } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n-context';
 
-const services = [
-  { 
-    name: 'Balance', 
-    href: '/dashboard/balance', 
-    icon: DollarSign,
-    description: 'View your current balance and transaction history',
-    gradient: 'from-blue-500 to-cyan-500'
-  },
-  { 
-    name: 'Commissions', 
-    href: '/dashboard/commission', 
-    icon: MonitorCheck,
-    description: 'Track your earnings and commission reports',
-    gradient: 'from-green-500 to-emerald-500'
-  },
-  { 
-    name: 'Services', 
-    href: '/dashboard/services', 
-    icon: Zap,
-    description: 'Access all available payment and banking services',
-    gradient: 'from-orange-500 to-red-500'
-  },
-  { 
-    name: 'Transactions', 
-    href: '/dashboard/transactions', 
-    icon: CreditCard,
-    description: 'Monitor your recent transactions and payments',
-    gradient: 'from-purple-500 to-pink-500'
-  },
-  { 
-    name: 'Settings', 
-    href: '/dashboard/settings', 
-    icon: Settings,
-    description: 'Manage your account preferences and security',
-    gradient: 'from-gray-600 to-gray-800'
-  },
-];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -73,6 +37,46 @@ const itemVariants = {
 };
 
 export default function DashboardHome() {
+  const { t } = useTranslation();
+
+  const services = [
+    { 
+      name: t('dashboardHome.balance'), 
+      href: '/dashboard/balance', 
+      icon: DollarSign,
+      description: t('dashboardHome.balanceDesc'),
+      gradient: 'from-blue-500 to-cyan-500'
+    },
+    { 
+      name: t('dashboardHome.commissions'), 
+      href: '/dashboard/commission', 
+      icon: MonitorCheck,
+      description: t('dashboardHome.commissionsDesc'),
+      gradient: 'from-green-500 to-emerald-500'
+    },
+    { 
+      name: t('dashboardHome.services'), 
+      href: '/dashboard/services', 
+      icon: Zap,
+      description: t('dashboardHome.servicesDesc'),
+      gradient: 'from-orange-500 to-red-500'
+    },
+    { 
+      name: t('dashboardHome.transactions'), 
+      href: '/dashboard/transactions', 
+      icon: CreditCard,
+      description: t('dashboardHome.transactionsDesc'),
+      gradient: 'from-purple-500 to-pink-500'
+    },
+    { 
+      name: t('dashboardHome.settings'), 
+      href: '/dashboard/settings', 
+      icon: Settings,
+      description: t('dashboardHome.settingsDesc'),
+      gradient: 'from-gray-600 to-gray-800'
+    },
+  ];
+
   return (
     <div className="relative bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 transition-colors px-4 sm:px-6 py-6 sm:py-8 w-full">
       
@@ -84,10 +88,10 @@ export default function DashboardHome() {
         className="text-center mb-8 sm:mb-12 w-full"
       >
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#13294b] to-[#13294b] dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-3">
-          Dashboard
+          {t('dashboardHome.title')}
         </h1>
         <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4">
-          Manage your finances and access all services from one convenient location
+          {t('dashboardHome.subtitle')}
         </p>
       </motion.div>
 
@@ -132,7 +136,7 @@ export default function DashboardHome() {
                   
                   {/* CTA Arrow */}
                   <div className="flex items-center text-[#ff6600] opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
-                    <span className="text-xs sm:text-sm font-medium mr-2">Explore</span>
+                    <span className="text-xs sm:text-sm font-medium mr-2">{t('dashboardHome.explore')}</span>
                     <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                   </div>
                 </div>
@@ -154,19 +158,19 @@ export default function DashboardHome() {
       >
         <div className="bg-white dark:bg-gray-900 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-700 shadow-sm w-full">
           <div className="text-xl sm:text-2xl font-bold text-[#ff6600]">5</div>
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Services</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">{t('dashboardHome.servicesCount')}</div>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-700 shadow-sm w-full">
           <div className="text-xl sm:text-2xl font-bold text-[#ff6600]">24/7</div>
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Available</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">{t('dashboardHome.available')}</div>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-700 shadow-sm w-full">
-          <div className="text-xl sm:text-2xl font-bold text-[#ff6600]">Secure</div>
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Protected</div>
+          <div className="text-xl sm:text-2xl font-bold text-[#ff6600]">{t('dashboardHome.secure')}</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">{t('dashboardHome.protected')}</div>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-xl p-4 text-center border border-gray-200 dark:border-gray-700 shadow-sm w-full">
-          <div className="text-xl sm:text-2xl font-bold text-[#ff6600]">Fast</div>
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Processing</div>
+          <div className="text-xl sm:text-2xl font-bold text-[#ff6600]">{t('dashboardHome.fast')}</div>
+          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">{t('dashboardHome.processing')}</div>
         </div>
       </motion.div>
 
