@@ -17,6 +17,7 @@ import autoTable from 'jspdf-autotable';
 import { FiPrinter, FiSearch, FiDownload, FiChevronLeft, FiChevronRight, FiRefreshCw, FiEye, FiX, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import StatusBadge from './StatusBadge';
 import { secureStorage } from '../../../lib/auth-context';
+import { useTranslation } from '@/lib/i18n-context';
 
 interface Transaction {
   id: string;
@@ -62,7 +63,8 @@ const MobileTransactionCard: React.FC<{
   transaction: Transaction;
   onView: (tx: Transaction) => void;
   onPrint: (tx: Transaction) => void;
-}> = ({ transaction, onView, onPrint }) => {
+  t: (key: string) => string;
+}> = ({ transaction, onView, onPrint, t }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -102,7 +104,7 @@ const MobileTransactionCard: React.FC<{
       {/* Basic Info */}
       <div className="grid grid-cols-2 gap-2 text-sm mb-3">
         <div>
-          <span className="text-gray-500 dark:text-gray-400 text-xs">Amount:</span>
+          <span className="text-gray-500 dark:text-gray-400 text-xs">{t('transactions.amount')}:</span>
           <p className="font-medium text-gray-800 dark:text-white">
             RWF {transaction.amount.toLocaleString('en-US', { 
               minimumFractionDigits: 2, 
@@ -112,7 +114,7 @@ const MobileTransactionCard: React.FC<{
         </div>
         {transaction.token && (
           <div>
-            <span className="text-gray-500 dark:text-gray-400 text-xs">Token:</span>
+            <span className="text-gray-500 dark:text-gray-400 text-xs">{t('transactions.token')}:</span>
             <p className="font-mono text-xs text-gray-800 dark:text-white truncate">
               {transaction.token}
             </p>
@@ -130,14 +132,14 @@ const MobileTransactionCard: React.FC<{
         >
           <div className="space-y-2 text-sm">
             <div>
-              <span className="text-gray-500 dark:text-gray-400 text-xs">Description:</span>
+              <span className="text-gray-500 dark:text-gray-400 text-xs">{t('transactions.description')}:</span>
               <p className="text-gray-800 dark:text-white text-xs leading-relaxed">
                 {transaction.description}
               </p>
             </div>
             {transaction.processDate && (
               <div>
-                <span className="text-gray-500 dark:text-gray-400 text-xs">Processed:</span>
+                <span className="text-gray-500 dark:text-gray-400 text-xs">{t('transactions.processed')}:</span>
                 <p className="text-gray-800 dark:text-white text-xs">
                   {transaction.formattedProcessDate}
                 </p>
@@ -152,14 +154,14 @@ const MobileTransactionCard: React.FC<{
               className="flex-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 py-2 px-3 rounded-lg text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors flex items-center justify-center gap-1"
             >
               <FiEye className="w-3 h-3" />
-              View
+              {t('transactions.view')}
             </button>
             <button
               onClick={() => onPrint(transaction)}
               className="flex-1 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 py-2 px-3 rounded-lg text-xs font-medium hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors flex items-center justify-center gap-1"
             >
               <FiPrinter className="w-3 h-3" />
-              Print
+              {t('transactions.print')}
             </button>
           </div>
         </motion.div>
@@ -173,14 +175,14 @@ const MobileTransactionCard: React.FC<{
             className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs flex items-center gap-1"
           >
             <FiEye className="w-3 h-3" />
-            View
+            {t('transactions.view')}
           </button>
           <button
             onClick={() => onPrint(transaction)}
             className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 text-xs flex items-center gap-1"
           >
             <FiPrinter className="w-3 h-3" />
-            Print
+            {t('transactions.print')}
           </button>
         </div>
       )}
@@ -218,7 +220,8 @@ const TransactionDetailModal: React.FC<{
   transaction: Transaction | null;
   isOpen: boolean;
   onClose: () => void;
-}> = ({ transaction, isOpen, onClose }) => {
+  t: (key: string) => string;
+}> = ({ transaction, isOpen, onClose, t }) => {
   if (!isOpen || !transaction) return null;
 
   return (
@@ -233,7 +236,7 @@ const TransactionDetailModal: React.FC<{
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white">
-              Transaction Details
+              {t('transactions.transactionDetails')}
             </h2>
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               ID: {transaction.id}
@@ -253,13 +256,13 @@ const TransactionDetailModal: React.FC<{
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white border-b pb-2">
-                Basic Information
+                {t('transactions.basicInformation')}
               </h3>
               
               <div className="space-y-3">
                 <div>
                   <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Transaction ID
+                    {t('transactions.transactionId')}
                   </label>
                   <p className="text-xs sm:text-sm text-gray-800 dark:text-white font-mono">
                     {transaction.id}
@@ -268,21 +271,21 @@ const TransactionDetailModal: React.FC<{
 
                 <div>
                   <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Date & Time
+                    {t('transactions.dateTime')}
                   </label>
                   <p className="text-xs sm:text-sm text-gray-800 dark:text-white">
                     {transaction.formattedDate}
                   </p>
                   {transaction.processDate && (
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Processed: {transaction.formattedProcessDate}
+                      {t('transactions.processed')}: {transaction.formattedProcessDate}
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Service
+                    {t('transactions.service')}
                   </label>
                   <p className="text-xs sm:text-sm text-gray-800 dark:text-white capitalize">
                     {transaction.serviceName}
@@ -291,7 +294,7 @@ const TransactionDetailModal: React.FC<{
 
                 <div>
                   <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Status
+                    {t('transactions.status')}
                   </label>
                   <div className="mt-1">
                     <StatusBadge status={transaction.status} />
@@ -303,13 +306,13 @@ const TransactionDetailModal: React.FC<{
             {/* Financial Information */}
             <div className="space-y-4">
               <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white border-b pb-2">
-                Financial Details
+                {t('transactions.financialDetails')}
               </h3>
               
               <div className="space-y-3">
                 <div>
                   <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Amount
+                    {t('transactions.amount')}
                   </label>
                   <p className="text-sm sm:text-lg font-bold text-gray-800 dark:text-white">
                     RWF {transaction.amount.toLocaleString('en-US', { 
@@ -322,7 +325,7 @@ const TransactionDetailModal: React.FC<{
                 {transaction.customerCharge > 0 && (
                   <div>
                     <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Customer Charge
+                      {t('transactions.customerCharge')}
                     </label>
                     <p className="text-xs sm:text-sm text-gray-800 dark:text-white">
                       RWF {transaction.customerCharge.toLocaleString('en-US', { 
@@ -336,7 +339,7 @@ const TransactionDetailModal: React.FC<{
                 {transaction.token && (
                   <div>
                     <label className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Token
+                      {t('transactions.token')}
                     </label>
                     <p className="text-xs sm:text-sm text-gray-800 dark:text-white font-mono break-all">
                       {transaction.token}
@@ -349,7 +352,7 @@ const TransactionDetailModal: React.FC<{
             {/* Description */}
             <div className="md:col-span-2 space-y-4">
               <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white border-b pb-2">
-                Description
+                {t('transactions.description')}
               </h3>
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                 {transaction.description}
@@ -364,7 +367,7 @@ const TransactionDetailModal: React.FC<{
             onClick={onClose}
             className="px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors order-2 sm:order-1"
           >
-            Close
+            {t('transactions.close')}
           </button>
           <button
             onClick={() => {
@@ -374,7 +377,7 @@ const TransactionDetailModal: React.FC<{
             className="px-4 py-2 text-xs sm:text-sm font-medium text-white bg-[#ff6600] rounded-lg hover:bg-[#e65c00] transition-colors flex items-center justify-center gap-2 order-1 sm:order-2"
           >
             <FiPrinter className="w-4 h-4" />
-            Print Receipt
+            {t('transactions.printReceipt')}
           </button>
         </div>
       </motion.div>
@@ -383,6 +386,7 @@ const TransactionDetailModal: React.FC<{
 };
 
 export default function TransactionsPage() {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState('');
   const [data, setData] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -425,7 +429,7 @@ export default function TransactionsPage() {
       const accessToken = secureStorage.getAccessToken();
       
       if (!accessToken) {
-        throw new Error('Authentication required. Please login again.');
+        throw new Error(t('transactions.authRequired'));
       }
 
       // Try different endpoint variations
@@ -632,7 +636,7 @@ export default function TransactionsPage() {
       <div className="p-3 sm:p-4 md:p-6 bg-white dark:bg-gray-950 transition-colors w-full max-w-full overflow-x-hidden min-h-screen flex items-center justify-center">
         <div className="text-center">
           <FiRefreshCw className="w-8 h-8 animate-spin text-[#ff6600] mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading transactions...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('transactions.loading')}</p>
         </div>
       </div>
     );
@@ -645,12 +649,12 @@ export default function TransactionsPage() {
         <div className="mb-4 sm:mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">Transaction History</h1>
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">View and manage your payment transactions</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">{t('transactions.title')}</h1>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{t('transactions.subtitle')}</p>
               {error && (
                 <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                   <p className="text-yellow-700 dark:text-yellow-300 text-xs">
-                    {error} - Showing sample data for demonstration
+                    {error} - {t('transactions.showingSampleData')}
                   </p>
                 </div>
               )}
@@ -661,7 +665,7 @@ export default function TransactionsPage() {
               className="flex items-center gap-2 px-4 py-2 bg-[#13294b] dark:bg-[#ff6600] text-white rounded-xl hover:bg-[#0f213d] dark:hover:bg-[#e65c00] transition-colors disabled:opacity-50 text-sm"
             >
               <FiRefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-              {refreshing ? 'Refreshing...' : 'Refresh'}
+              {refreshing ? t('transactions.refreshing') : t('transactions.refresh')}
             </button>
           </div>
         </div>
@@ -673,7 +677,7 @@ export default function TransactionsPage() {
             <input
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              placeholder="Search transactions..."
+              placeholder={t('transactions.searchPlaceholder')}
               className="border rounded-lg sm:rounded-xl pl-9 pr-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#ff6600] dark:bg-gray-800 dark:text-white dark:border-gray-700 text-sm sm:text-base"
             />
           </div>
@@ -683,14 +687,14 @@ export default function TransactionsPage() {
             className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 sm:px-5 py-2 rounded-lg sm:rounded-xl transition flex items-center gap-2 text-sm w-full sm:w-auto justify-center"
           >
             <FiDownload className="text-sm" />
-            <span>Export CSV</span>
+            <span>{t('transactions.exportCSV')}</span>
           </CSVLink>
         </div>
 
         {/* Results count */}
         {filter && (
           <div className="mb-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            {table.getFilteredRowModel().rows.length} transaction(s) found
+            {table.getFilteredRowModel().rows.length} {t('transactions.transactionsFound')}
           </div>
         )}
 
@@ -704,11 +708,12 @@ export default function TransactionsPage() {
                   transaction={row.original}
                   onView={handleViewTransaction}
                   onPrint={printPDF}
+                  t={t}
                 />
               ))
             ) : (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                {data.length === 0 ? 'No transactions found.' : 'No transactions match your search.'}
+                {data.length === 0 ? t('transactions.noTransactions') : t('transactions.noMatches')}
               </div>
             )}
           </div>
@@ -768,7 +773,7 @@ export default function TransactionsPage() {
                 ) : (
                   <tr>
                     <td colSpan={columns.length} className="px-4 py-6 text-center text-gray-500 dark:text-gray-400 text-sm">
-                      {data.length === 0 ? 'No transactions found.' : 'No transactions match your search.'}
+                      {data.length === 0 ? t('transactions.noTransactions') : t('transactions.noMatches')}
                     </td>
                   </tr>
                 )}
@@ -782,7 +787,7 @@ export default function TransactionsPage() {
           <div className="flex flex-col sm:flex-row justify-between items-center mt-4 sm:mt-6 gap-3">
             <div className="flex items-center gap-2">
               <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                Showing {table.getRowModel().rows.length} of {table.getFilteredRowModel().rows.length} entries
+                {t('transactions.showing')} {table.getRowModel().rows.length} {t('transactions.of')} {table.getFilteredRowModel().rows.length} {t('transactions.entries')}
               </span>
             </div>
             
@@ -791,23 +796,23 @@ export default function TransactionsPage() {
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
                 className="p-2 border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm flex items-center gap-1"
-                title="Previous page"
+                title={t('transactions.previousPage')}
               >
                 <FiChevronLeft className="text-sm" />
-                <span className="hidden sm:inline">Previous</span>
+                <span className="hidden sm:inline">{t('transactions.previous')}</span>
               </button>
               
               <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 px-2">
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                {t('transactions.page')} {table.getState().pagination.pageIndex + 1} {t('transactions.of')} {table.getPageCount()}
               </span>
               
               <button
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
                 className="p-2 border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm flex items-center gap-1"
-                title="Next page"
+                title={t('transactions.nextPage')}
               >
-                <span className="hidden sm:inline">Next</span>
+                <span className="hidden sm:inline">{t('transactions.next')}</span>
                 <FiChevronRight className="text-sm" />
               </button>
             </div>
@@ -820,6 +825,7 @@ export default function TransactionsPage() {
         transaction={selectedTransaction}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
+        t={t}
       />
     </>
   );
