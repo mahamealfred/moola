@@ -4,6 +4,7 @@ import React, { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
 import { secureStorage } from '@/lib/auth-context';
+import { useTranslation } from '@/lib/i18n-context';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -43,6 +44,7 @@ interface PaymentResponse {
 }
 
 export default function ElectricityPayment() {
+  const { t } = useTranslation();
   const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -60,19 +62,19 @@ export default function ElectricityPayment() {
   const validateField = (name: string, value: string): string => {
     switch (name) {
       case 'meterNumber':
-        if (!value.trim()) return 'Meter number is required';
-        if (!/^\d+$/.test(value)) return 'Meter number must contain only digits';
-        if (value.length < 5) return 'Meter number must be at least 5 digits';
-        if (value.length > 20) return 'Meter number is too long';
+        if (!value.trim()) return t('validations.meterNumberRequired');
+        if (!/^\d+$/.test(value)) return t('validations.meterNumberDigits');
+        if (value.length < 5) return t('validations.meterNumberMinLength');
+        if (value.length > 20) return t('validations.meterNumberMaxLength');
         return '';
       
       case 'amount':
         const numValue = Number(value);
-        if (!value.trim()) return 'Amount is required';
-        if (isNaN(numValue) || numValue <= 0) return 'Amount must be greater than 0';
-        if (numValue < 500) return 'Minimum amount is RWF 500';
+        if (!value.trim()) return t('validations.amountRequired');
+        if (isNaN(numValue) || numValue <= 0) return t('validations.amountPositive');
+        if (numValue < 500) return t('validations.amountMin500');
         if (validationData && numValue > validationData.maxAmount) {
-          return `Maximum amount is RWF ${validationData.maxAmount.toLocaleString()}`;
+          return `${t('validations.maxAmount')} RWF ${validationData.maxAmount.toLocaleString()}`;
         }
         return '';
       
@@ -207,13 +209,13 @@ export default function ElectricityPayment() {
         
         if (!data.isValid) {
           // Display the API error message directly in the form
-          setApiError(data.message || 'Meter validation failed. Please check the meter number and try again.');
+          setApiError(data.message || t('electricity.meterValidationFailed'));
           return;
         }
         
         setStep(2);
       } catch (error) {
-        setApiError('Meter validation failed. Please try again.');
+        setApiError(t('electricity.meterValidationError'));
       } finally {
         setLoading(false);
       }
@@ -238,10 +240,10 @@ export default function ElectricityPayment() {
           }));
           setStep(4);
         } else {
-          setApiError(result.message || 'Payment failed. Please try again.');
+          setApiError(result.message || t('messages.error'));
         }
       } catch (error) {
-        setApiError('Payment processing failed. Please try again.');
+        setApiError(t('electricity.paymentProcessingFailed'));
       } finally {
         setLoading(false);
       }
@@ -283,9 +285,9 @@ export default function ElectricityPayment() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">Electricity Payment</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">{t('electricity.title')}</h1>
           </div>
-          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Pay your electricity bill securely</p>
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">{t('electricity.subtitle')}</p>
         </div>
 
         {/* Progress Bar */}
@@ -305,10 +307,10 @@ export default function ElectricityPayment() {
             ))}
           </div>
           <div className="flex justify-between mt-1 text-[10px] md:text-xs text-gray-500">
-            <span>Meter Info</span>
-            <span>Amount</span>
-            <span>Confirm</span>
-            <span>Receipt</span>
+            <span>{t('electricity.meterInfo')}</span>
+            <span>{t('forms.amount')}</span>
+            <span>{t('common.confirm')}</span>
+            <span>{t('forms.receipt')}</span>
           </div>
         </div>
 
@@ -327,7 +329,7 @@ export default function ElectricityPayment() {
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
-                  Validation Error
+                  {t('electricity.validationError')}
                 </h3>
                 <div className="mt-1 text-sm text-red-700 dark:text-red-300">
                   {apiError}
@@ -340,22 +342,22 @@ export default function ElectricityPayment() {
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="step1" {...stepAnimation}>
-              <h2 className="text-lg md:text-xl font-bold mb-3 text-gray-900 dark:text-white">Validate Meter Number</h2>
+              <h2 className="text-lg md:text-xl font-bold mb-3 text-gray-900 dark:text-white">{t('electricity.validateMeterNumber')}</h2>
               <div>
                 <div className="mb-3 md:mb-4">
                   <Input
-                    label="Enter Meter Number"
+                    label={t('forms.enterMeterNumber')}
                     name="meterNumber"
                     value={formData.meterNumber}
                     onChange={onInputChange}
                     onBlur={onInputBlur}
                     disabled={loading}
-                    placeholder="e.g., 123456789"
+                    placeholder={t('electricity.meterPlaceholder')}
                     error={errors.meterNumber}
                   />
                   {!errors.meterNumber && !apiError && (
                     <p className="text-xs text-gray-500 mt-1">
-                      Enter your electricity meter number (numbers only)
+                      {t('electricity.meterHelp')}
                     </p>
                   )}
                 </div>
@@ -365,7 +367,7 @@ export default function ElectricityPayment() {
 
           {step === 2 && (
             <motion.div key="step2" {...stepAnimation}>
-              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Enter Payment Amount</h2>
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">{t('electricity.enterPaymentAmount')}</h2>
               
               {/* Horizontal Layout for Customer Information */}
               <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-lg mb-4">
@@ -373,25 +375,25 @@ export default function ElectricityPayment() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Customer Information
+                  {t('messages.customerDetails')}
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 text-sm md:text-base">
                   <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">Customer Name</p>
+                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('forms.customerName')}</p>
                     <p className="text-gray-900 dark:text-white font-semibold">{formData.customerName}</p>
                   </div>
                   
                   <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">Meter Number</p>
+                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('forms.meterNumber')}</p>
                     <p className="text-gray-900 dark:text-white font-semibold">{formData.meterNumber}</p>
                   </div>
                   
                   {validationData && (
                     <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">Utility</p>
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('electricity.utility')}</p>
                       <p className="text-gray-900 dark:text-white font-semibold">
-                        {validationData.productName || 'Electricity'}
+                        {validationData.productName || t('electricity.electricity')}
                       </p>
                     </div>
                   )}
@@ -402,27 +404,27 @@ export default function ElectricityPayment() {
               <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-lg">
                 <div className="mb-4">
                   <Input
-                    label="Enter Amount (RWF)"
+                    label={t('electricity.enterAmountRWF')}
                     name="amount"
                     type="number"
                     value={formData.amount.toString()}
                     onChange={onInputChange}
                     onBlur={onInputBlur}
                     error={errors.amount}
-                    placeholder="e.g., 10000"
+                    placeholder={t('electricity.amountPlaceholder')}
                     min={500}
                     max={validationData?.maxAmount || 1000000}
                   />
                   {validationData && (
                     <p className="text-xs text-gray-500 mt-1">
-                      Minimum: RWF 500 | Maximum: RWF {validationData.maxAmount.toLocaleString()}
+                      {t('electricity.minimum')}: RWF 500 | {t('electricity.maximum')}: RWF {validationData.maxAmount.toLocaleString()}
                     </p>
                   )}
                 </div>
                 
                 {/* Quick Amount Buttons */}
                 <div className="mb-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Quick Select:</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('electricity.quickSelect')}:</p>
                   <div className="flex flex-wrap gap-2">
                     {[1000, 5000, 10000, 20000, 50000].map((amount) => (
                       <button
@@ -442,7 +444,7 @@ export default function ElectricityPayment() {
                 
                 <div className="border-t pt-3">
                   <p className="font-semibold text-[#ff6600] text-base md:text-lg">
-                    <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">Total Amount to Pay</span>
+                    <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('electricity.totalAmountToPay')}</span>
                     RWF {formData.amount.toLocaleString()}
                   </p>
                 </div>
@@ -452,31 +454,31 @@ export default function ElectricityPayment() {
 
           {step === 3 && (
             <motion.div key="step3" {...stepAnimation}>
-              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Confirm Payment</h2>
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">{t('messages.confirmPayment')}</h2>
               <div className="bg-[#ff660010] dark:bg-[#ff660020] p-3 md:p-4 rounded-lg">
-                <h3 className="font-semibold mb-3 text-gray-700 dark:text-gray-300 text-sm md:text-base">Please confirm your payment details</h3>
+                <h3 className="font-semibold mb-3 text-gray-700 dark:text-gray-300 text-sm md:text-base">{t('electricity.confirmPaymentDetails')}</h3>
                 
                 {/* Horizontal confirmation layout */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="space-y-3">
                     <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Customer Name</p>
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('forms.customerName')}</p>
                       <p className="text-gray-900 dark:text-white font-semibold">{formData.customerName}</p>
                     </div>
                     <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Meter Number</p>
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('forms.meterNumber')}</p>
                       <p className="text-gray-900 dark:text-white font-semibold">{formData.meterNumber}</p>
                     </div>
                   </div>
                   
                   <div className="space-y-3">
                     <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Amount</p>
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('forms.amount')}</p>
                       <p className="text-gray-900 dark:text-white font-semibold">RWF {formData.amount.toLocaleString()}</p>
                     </div>
                     {validationData && (
                       <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Request ID</p>
+                        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('electricity.requestId')}</p>
                         <p className="text-gray-900 dark:text-white font-semibold text-xs">{validationData.requestId}</p>
                       </div>
                     )}
@@ -485,7 +487,7 @@ export default function ElectricityPayment() {
                 
                 <div className="border-t pt-3">
                   <p className="font-semibold text-[#ff6600] text-base md:text-lg">
-                    <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Total Amount to Pay</span>
+                    <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('electricity.totalAmountToPay')}</span>
                     RWF {formData.amount.toLocaleString()}
                   </p>
                 </div>
@@ -495,7 +497,7 @@ export default function ElectricityPayment() {
 
           {step === 4 && (
             <motion.div key="step4" {...stepAnimation}>
-              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Payment Successful</h2>
+              <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">{t('electricity.paymentSuccessful')}</h2>
               <div
                 id="receipt"
                 className="p-3 md:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
@@ -508,41 +510,41 @@ export default function ElectricityPayment() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                       </svg>
                     </div>
-                    <h3 className="text-md md:text-lg font-bold text-[#ff6600] dark:text-[#ff6600]">Electricity Payment Receipt</h3>
+                    <h3 className="text-md md:text-lg font-bold text-[#ff6600] dark:text-[#ff6600]">{t('electricity.receiptTitle')}</h3>
                   </div>
-                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Official Payment Receipt</p>
+                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">{t('electricity.officialReceipt')}</p>
                 </div>
                 
                 <div className="space-y-2 md:space-y-3 text-sm md:text-base">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                     <div>
                       <p>
-                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Receipt ID</strong>
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('electricity.receiptId')}</strong>
                         {formData.receiptId}
                       </p>
                       <p className="mt-1 md:mt-2">
-                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Date</strong>
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('forms.date')}</strong>
                         {new Date().toLocaleDateString()}
                       </p>
                       {paymentData && (
                         <p className="mt-1 md:mt-2">
-                          <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Transaction ID</strong>
+                          <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('messages.transactionId')}</strong>
                           {paymentData.transactionId}
                         </p>
                       )}
                     </div>
                     <div>
                       <p>
-                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Meter Number</strong>
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('forms.meterNumber')}</strong>
                         {formData.meterNumber}
                       </p>
                       <p className="mt-1 md:mt-2">
-                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Customer Name</strong>
+                        <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('forms.customerName')}</strong>
                         {formData.customerName}
                       </p>
                       {paymentData && (
                         <p className="mt-1 md:mt-2">
-                          <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">Request ID</strong>
+                          <strong className="block text-xs md:text-sm text-gray-500 dark:text-gray-400">{t('electricity.requestId')}</strong>
                           {paymentData.requestId}
                         </p>
                       )}
@@ -550,20 +552,20 @@ export default function ElectricityPayment() {
                   </div>
 
                   <div className="bg-[#ff660010] dark:bg-[#ff660020] p-2 md:p-3 rounded">
-                    <h4 className="font-semibold text-[#ff6600] dark:text-[#ff6600] mb-1 text-sm md:text-base">Payment Details</h4>
+                    <h4 className="font-semibold text-[#ff6600] dark:text-[#ff6600] mb-1 text-sm md:text-base">{t('messages.paymentDetails')}</h4>
                     <div className="space-y-1 text-xs md:text-sm">
                       <div className="flex justify-between">
-                        <span>Amount:</span>
+                        <span>{t('forms.amount')}:</span>
                         <span>RWF {formData.amount.toLocaleString()}</span>
                       </div>
                       {paymentData && (
                         <div className="flex justify-between">
-                          <span>Delivery Method:</span>
+                          <span>{t('electricity.deliveryMethod')}:</span>
                           <span>{paymentData.deliveryMethod}</span>
                         </div>
                       )}
                       <div className="flex justify-between font-semibold border-t pt-1 text-[#ff6600] dark:text-[#ff6600]">
-                        <span>Total Paid:</span>
+                        <span>{t('electricity.totalPaid')}:</span>
                         <span>RWF {formData.amount.toLocaleString()}</span>
                       </div>
                     </div>
@@ -572,7 +574,7 @@ export default function ElectricityPayment() {
 
                 <div className="mt-3 md:mt-4 pt-2 md:pt-3 border-t border-gray-200 dark:border-gray-600 text-center">
                   <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                    Thank you for your payment. Transaction completed successfully.
+                    {t('electricity.thankYou')}
                   </p>
                   <p className="text-[10px] md:text-xs text-gray-400 dark:text-gray-500 mt-1">
                     ID: {formData.receiptId} | {new Date().toLocaleString()}
@@ -594,7 +596,7 @@ export default function ElectricityPayment() {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Back
+              {t('common.back')}
             </button>
           )}
 
@@ -610,11 +612,11 @@ export default function ElectricityPayment() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  {step === 1 ? 'Validating...' : 'Processing...'}
+                  {step === 1 ? t('messages.validating') : t('messages.processing')}
                 </>
               ) : (
                 <>
-                  Next
+                  {t('common.next')}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -635,11 +637,11 @@ export default function ElectricityPayment() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Processing Payment...
+                  {t('electricity.processingPayment')}
                 </>
               ) : (
                 <>
-                  Confirm Payment
+                  {t('messages.confirmPayment')}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -657,13 +659,13 @@ export default function ElectricityPayment() {
                 <svg className="w-3 h-3 md:w-4 md:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                Download Receipt
+                {t('messages.downloadReceipt')}
               </button>
               <button
                 onClick={() => window.location.reload()}
                 className="bg-gray-200 hover:bg-gray-300 text-gray-900 px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full text-center font-semibold"
               >
-                New Payment
+                {t('electricity.newPayment')}
               </button>
             </div>
           )}
