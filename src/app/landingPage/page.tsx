@@ -42,7 +42,9 @@ import {
   Bell,
   Settings,
   HelpCircle,
-  Mail
+  Mail,
+  Fingerprint,
+  DollarSign
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
