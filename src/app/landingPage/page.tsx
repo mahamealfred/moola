@@ -282,7 +282,7 @@ export default function LandingPage() {
   const [submitted, setSubmitted] = useState(false);
   const [current, setCurrent] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState(t('landing.all'));
+  const [activeCategoryKey, setActiveCategoryKey] = useState('all');
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const [activeFeature, setActiveFeature] = useState(0);
@@ -326,24 +326,24 @@ export default function LandingPage() {
   ];
 
   const allServicesTranslated = [
-    { name: t('landing.electricityPayment'), icon: Zap, category: t('landing.utilities'), description: t('landing.electricityPaymentDesc'), color: 'text-yellow-500' },
-    { name: t('landing.rraTaxPayment'), icon: FileText, category: t('landing.government'), description: t('landing.rraTaxPaymentDesc'), color: 'text-red-500' },
-    { name: t('landing.buyAirtime'), icon: Phone, category: t('landing.telecom'), description: t('landing.buyAirtimeDesc'), color: 'text-green-500' },
-    { name: t('landing.startimesTV'), icon: Tv, category: t('landing.entertainment'), description: t('landing.startimesTVDesc'), color: 'text-purple-500' },
-    { name: t('landing.bulkSMS'), icon: MessageSquare, category: t('landing.communication'), description: t('landing.bulkSMSDesc'), color: 'text-blue-500' },
-    { name: t('landing.iremboServices'), icon: Globe, category: t('landing.government'), description: t('landing.iremboServicesDesc'), color: 'text-indigo-500' },
-    { name: t('landing.wasacWater'), icon: Droplet, category: t('landing.utilities'), description: t('landing.wasacWaterDesc'), color: 'text-cyan-500' },
-    { name: t('landing.schoolFees'), icon: BookOpen, category: t('landing.education'), description: t('landing.schoolFeesDesc'), color: 'text-orange-500' },
-    { name: t('landing.bulkSalary'), icon: Users, category: t('landing.business'), description: t('landing.bulkSalaryDesc'), color: 'text-teal-500' },
-    { name: t('landing.invoicePayments'), icon: CreditCard, category: t('landing.business'), description: t('landing.invoicePaymentsDesc'), color: 'text-pink-500' },
-    { name: t('landing.taxCalculation'), icon: Calculator, category: t('landing.business'), description: t('landing.taxCalculationDesc'), color: 'text-gray-600' },
-    { name: t('landing.expenseManagement'), icon: FileSpreadsheet, category: t('landing.business'), description: t('landing.expenseManagementDesc'), color: 'text-amber-600' },
-    { name: t('landing.mobileMoney'), icon: Smartphone, category: t('landing.finance'), description: t('landing.mobileMoneyDesc'), color: 'text-green-600' },
-    { name: t('landing.internetBills'), icon: Wifi, category: t('landing.utilities'), description: t('landing.internetBillsDesc'), color: 'text-blue-600' },
-    { name: t('landing.rentPayment'), icon: Home, category: t('landing.housing'), description: t('landing.rentPaymentDesc'), color: 'text-brown-500' },
-    { name: t('landing.transport'), icon: Car, category: t('landing.transport'), description: t('landing.transportDesc'), color: 'text-gray-500' },
-    { name: t('landing.healthInsurance'), icon: Heart, category: t('landing.insurance'), description: t('landing.healthInsuranceDesc'), color: 'text-red-400' },
-    { name: t('landing.onlineShopping'), icon: ShoppingCart, category: t('landing.shopping'), description: t('landing.onlineShoppingDesc'), color: 'text-purple-600' },
+    { name: t('landing.electricityPayment'), icon: Zap, categoryKey: 'utilities', description: t('landing.electricityPaymentDesc'), color: 'text-yellow-500' },
+    { name: t('landing.rraTaxPayment'), icon: FileText, categoryKey: 'government', description: t('landing.rraTaxPaymentDesc'), color: 'text-red-500' },
+    { name: t('landing.buyAirtime'), icon: Phone, categoryKey: 'telecom', description: t('landing.buyAirtimeDesc'), color: 'text-green-500' },
+    { name: t('landing.startimesTV'), icon: Tv, categoryKey: 'entertainment', description: t('landing.startimesTVDesc'), color: 'text-purple-500' },
+    { name: t('landing.bulkSMS'), icon: MessageSquare, categoryKey: 'communication', description: t('landing.bulkSMSDesc'), color: 'text-blue-500' },
+    { name: t('landing.iremboServices'), icon: Globe, categoryKey: 'government', description: t('landing.iremboServicesDesc'), color: 'text-indigo-500' },
+    { name: t('landing.wasacWater'), icon: Droplet, categoryKey: 'utilities', description: t('landing.wasacWaterDesc'), color: 'text-cyan-500' },
+    { name: t('landing.schoolFees'), icon: BookOpen, categoryKey: 'education', description: t('landing.schoolFeesDesc'), color: 'text-orange-500' },
+    { name: t('landing.bulkSalary'), icon: Users, categoryKey: 'business', description: t('landing.bulkSalaryDesc'), color: 'text-teal-500' },
+    { name: t('landing.invoicePayments'), icon: CreditCard, categoryKey: 'business', description: t('landing.invoicePaymentsDesc'), color: 'text-pink-500' },
+    { name: t('landing.taxCalculation'), icon: Calculator, categoryKey: 'business', description: t('landing.taxCalculationDesc'), color: 'text-gray-600' },
+    { name: t('landing.expenseManagement'), icon: FileSpreadsheet, categoryKey: 'business', description: t('landing.expenseManagementDesc'), color: 'text-amber-600' },
+    { name: t('landing.mobileMoney'), icon: Smartphone, categoryKey: 'finance', description: t('landing.mobileMoneyDesc'), color: 'text-green-600' },
+    { name: t('landing.internetBills'), icon: Wifi, categoryKey: 'utilities', description: t('landing.internetBillsDesc'), color: 'text-blue-600' },
+    { name: t('landing.rentPayment'), icon: Home, categoryKey: 'housing', description: t('landing.rentPaymentDesc'), color: 'text-brown-500' },
+    { name: t('landing.transport'), icon: Car, categoryKey: 'transport', description: t('landing.transportDesc'), color: 'text-gray-500' },
+    { name: t('landing.healthInsurance'), icon: Heart, categoryKey: 'insurance', description: t('landing.healthInsuranceDesc'), color: 'text-red-400' },
+    { name: t('landing.onlineShopping'), icon: ShoppingCart, categoryKey: 'shopping', description: t('landing.onlineShoppingDesc'), color: 'text-purple-600' },
   ];
 
   const paymentFeaturesTranslated = [
@@ -445,8 +445,8 @@ export default function LandingPage() {
     { title: t('landing.analytics'), icon: TrendingUp, color: 'text-orange-500' }
   ];
 
-  // Get unique categories
-  const categories = [t('landing.all'), ...new Set(allServicesTranslated.map(service => service.category))];
+  // Get unique category keys
+  const categoryKeys = ['all', ...new Set(allServicesTranslated.map(service => service.categoryKey))];
 
   // Filter services
   const filteredServices = useMemo(() => {
@@ -459,12 +459,12 @@ export default function LandingPage() {
       );
     }
 
-    if (activeCategory !== t('landing.all')) {
-      filtered = filtered.filter(service => service.category === activeCategory);
+    if (activeCategoryKey !== 'all') {
+      filtered = filtered.filter(service => service.categoryKey === activeCategoryKey);
     }
 
     return filtered;
-  }, [searchTerm, activeCategory, allServicesTranslated]);
+  }, [searchTerm, activeCategoryKey, allServicesTranslated]);
 
   // Update carousel to use filtered services
   const displayServices = filteredServices.length > 0 ? filteredServices : allServicesTranslated;
@@ -534,7 +534,7 @@ export default function LandingPage() {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setActiveCategory(t('landing.all'));
+    setActiveCategoryKey('all');
   };
 
   const nextTestimonial = () => {
@@ -945,25 +945,25 @@ export default function LandingPage() {
             </div>
 
             <div className="flex flex-wrap gap-3 justify-center">
-              {categories.map((category) => (
+              {categoryKeys.map((categoryKey) => (
                 <motion.button
-                  key={category}
+                  key={categoryKey}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setActiveCategory(category)}
+                  onClick={() => setActiveCategoryKey(categoryKey)}
                   className={`px-5 py-2.5 rounded-xl text-base font-medium transition-all ${
-                    activeCategory === category
+                    activeCategoryKey === categoryKey
                       ? 'bg-gradient-to-r from-[#ff6600] to-[#ff8c00] text-white shadow-lg'
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
-                  {category}
+                  {t(`landing.${categoryKey}`)}
                 </motion.button>
               ))}
             </div>
           </div>
 
-          {(searchTerm || activeCategory !== t('landing.all')) && (
+          {(searchTerm || activeCategoryKey !== 'all') && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
@@ -978,10 +978,10 @@ export default function LandingPage() {
                   </button>
                 </span>
               )}
-              {activeCategory !== t('landing.all') && (
+              {activeCategoryKey !== 'all' && (
                 <span className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm px-4 py-2 rounded-full">
-                  {t('landing.category')}: {activeCategory}
-                  <button onClick={() => setActiveCategory(t('landing.all'))} className="hover:text-green-600 transition-colors">
+                  {t('landing.category')}: {t(`landing.${activeCategoryKey}`)}
+                  <button onClick={() => setActiveCategoryKey('all')} className="hover:text-green-600 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 </span>
@@ -998,7 +998,7 @@ export default function LandingPage() {
 
         {/* Enhanced Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {displayServices.slice(0, 8).map(({ name, icon: Icon, description, category, color }, idx) => (
+          {displayServices.slice(0, 8).map(({ name, icon: Icon, description, categoryKey, color }, idx) => (
             <motion.div
               key={name}
               initial={{ opacity: 0, y: 20 }}
