@@ -6,7 +6,7 @@ import { translations, type Locale } from './translations';
 interface I18nContextType {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -34,7 +34,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const t = (key: string): string => {
+  const t = (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
     let value: any = translations[locale];
     
@@ -47,7 +47,17 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       }
     }
     
-    return typeof value === 'string' ? value : key;
+    let result = typeof value === 'string' ? value : key;
+    
+    // Handle parameter interpolation
+    if (params && typeof result === 'string') {
+      Object.entries(params).forEach(([paramKey, paramValue]) => {
+        const placeholder = `{{${paramKey}}}`;
+        result = result.replace(new RegExp(placeholder, 'g'), String(paramValue));
+      });
+    }
+    
+    return result;
   };
 
   const value = {

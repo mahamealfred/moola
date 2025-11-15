@@ -193,7 +193,7 @@ export default function BalancePage() {
             transition={{ duration: 0.3 }}
             className="bg-gradient-to-r from-[#13294b] to-[#ff6600] p-4 sm:p-6 rounded-2xl text-white text-center mb-6 sm:mb-8"
           >
-            <p className="text-base sm:text-lg font-semibold">{t('balance.welcome', { name: user.name })}</p>
+            <p className="text-base sm:text-lg font-semibold">{t('balance.welcomeUser')} {user?.name || 'User'}</p>
             <p className="text-xs sm:text-sm opacity-90 mt-1">{t('balance.agentCategory')}: {user.category} • {t('balance.phone')}: {user.phoneNumber}</p>
             <p className="text-xs opacity-75 mt-2">{t('balance.lastUpdated')}: {new Date().toLocaleString()}</p>
           </motion.div>

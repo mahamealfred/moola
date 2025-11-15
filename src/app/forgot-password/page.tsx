@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
         >
           <header className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-extrabold text-[#13294b] dark:text-white">
-              <span className="text-[#ff6600]">X</span>-Pay
+              <span className="text-[#ff6600]">M</span>oola
             </h1>
             <button
               onClick={toggleDarkMode}
@@ -120,7 +120,7 @@ export default function ForgotPasswordPage() {
             transition={{ delay: 0.8, duration: 0.6, type: 'spring', stiffness: 60 }}
             className="text-lg font-medium max-w-md"
           >
-            Enter your email and get back access to your X-pay account securely and quickly.
+            Enter your email and get back access to your M-oola account securely and quickly.
           </motion.p>
         </motion.div>
       </div>

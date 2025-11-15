@@ -17,13 +17,11 @@ import {
   Clock,
   Shield,
   Zap,
-  TrendingUp,
-  CheckCircle
+  TrendingUp
 } from 'lucide-react';
 
 import OpenAccount from './account-openning/page';
 import DepositForm from './deposit/page';
-import ElectricityPayment from '../../payment-services/electricity/page';
 import RemittanceForm from './remittance/page';
 import Withdrawal from './withdral/page';
 import ExpressCashToken from './expressCashToken/page';

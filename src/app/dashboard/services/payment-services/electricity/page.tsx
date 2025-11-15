@@ -3,8 +3,8 @@
 import React, { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
-import { secureStorage } from '@/lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
+import { api } from '@/lib/api-client';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -111,16 +111,10 @@ export default function ElectricityPayment() {
 
   async function validateMeter(meter: string) {
     try {
-  const response = await fetch('https://core-api.ddin.rw/v1/agency/thirdpartyagency/services/validate/biller', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          billerCode: "electricity",
-          productCode: "electricity",
-          customerId: meter
-        })
+      const response = await api.post('/agency/thirdpartyagency/services/validate/biller', {
+        billerCode: "electricity",
+        productCode: "electricity",
+        customerId: meter
       });
 
       if (!response.ok) {
@@ -152,28 +146,15 @@ export default function ElectricityPayment() {
     }
 
     try {
-      const accessToken = secureStorage.getAccessToken();
-            
-      if (!accessToken) {
-        throw new Error('Authentication required. Please login again.');
-      }
-
-  const response = await fetch('https://core-api.ddin.rw/v1/agency/thirdpartyagency/services/execute/bill-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({
-          email: "mahamealfred@gmail.com",
-          clientPhone: "+250789595309", // You might want to make this dynamic
-          customerId: formData.meterNumber,
-          billerCode: "electricity",
-          productCode: "electricity",
-          amount: formData.amount.toString(),
-          ccy: "RWF",
-          requestId: validationData.requestId
-        })
+      const response = await api.postAuth('/agency/thirdpartyagency/services/execute/bill-payment', {
+        email: "mahamealfred@gmail.com",
+        clientPhone: "+250789595309", // You might want to make this dynamic
+        customerId: formData.meterNumber,
+        billerCode: "electricity",
+        productCode: "electricity",
+        amount: formData.amount.toString(),
+        ccy: "RWF",
+        requestId: validationData.requestId
       });
 
       if (!response.ok) {

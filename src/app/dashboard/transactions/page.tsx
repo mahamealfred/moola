@@ -18,6 +18,7 @@ import { FiPrinter, FiSearch, FiDownload, FiChevronLeft, FiChevronRight, FiRefre
 import StatusBadge from './StatusBadge';
 import { secureStorage } from '../../../lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
+import { api } from '@/lib/api-client';
 
 interface Transaction {
   id: string;
@@ -434,10 +435,10 @@ export default function TransactionsPage() {
 
       // Try different endpoint variations
       const endpoints = [
-  'https://core-api.ddin.rw/v1/agency/thirdpartyagency/services/transactions/history',
-  'https://core-api.ddin.rw/v1/agency/thirdpartyagency/transactions/history',
-  'https://core-api.ddin.rw/v1/agency/transactions/history',
-  'https://core-api.ddin.rw/v1/transactions/history'
+        '/agency/thirdpartyagency/services/transactions/history',
+        '/agency/thirdpartyagency/transactions/history',
+        '/agency/transactions/history',
+        '/transactions/history'
       ];
 
       let response = null;
@@ -447,13 +448,7 @@ export default function TransactionsPage() {
       for (const endpoint of endpoints) {
         try {
           console.log(`Trying endpoint: ${endpoint}`);
-          response = await fetch(endpoint, {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          });
+          response = await api.getAuth(endpoint);
 
           if (response.ok) {
             const apiResponse: ApiResponse = await response.json();

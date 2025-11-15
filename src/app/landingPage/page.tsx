@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, Variants, easeOut, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Search, Filter, X, Quote, Download, Upload, Smartphone, Laptop, Wifi, Home, Car, Heart, ShoppingCart, Coffee, Plane, GraduationCap, Gift } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, X, Quote, Download, Smartphone, Wifi, Home, Car, Heart, ShoppingCart } from 'lucide-react';
 import {
   Sun,
   Moon,
@@ -23,7 +23,6 @@ import {
   Calculator,
   FileSpreadsheet,
   Banknote,
-  Landmark,
   ShieldCheck,
   Sparkles,
   Star,
@@ -31,7 +30,6 @@ import {
   Pause,
   Lock,
   Eye,
-  Clock,
   TrendingUp,
   BarChart3,
   Wallet,
@@ -40,23 +38,22 @@ import {
   Receipt,
   Calendar,
   Bell,
-  Settings,
-  HelpCircle,
-  Mail,
   Fingerprint,
   DollarSign
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n-context';
+import FlagLanguageSelector from '@/components/FlagLanguageSelector';
 
 // Testimonials Data
+/*
 const testimonials = [
   {
     id: 1,
     name: "Alice Uwase",
     role: "Small Business Owner",
-    content: "X-Pay has transformed how I manage my business payments. The bulk salary feature saves me hours every month!",
+    content: "Moola has transformed how I manage my business payments. The bulk salary feature saves me hours every month!",
     rating: 5,
     avatar: "AU"
   },
@@ -80,13 +77,15 @@ const testimonials = [
     id: 4,
     name: "Eric Habimana",
     role: "Freelancer",
-    content: "I use X-Pay for all my utility payments and tax calculations. It's reliable and saves me so much time.",
+    content: "I use Moola for all my utility payments and tax calculations. It's reliable and saves me so much time.",
     rating: 5,
     avatar: "EH"
   }
 ];
+*/
 
 // All Services Data with consistent icon colors
+/*
 const allServices = [
   { name: 'Electricity Payment', icon: Zap, category: 'Utilities', description: 'Pay electricity bills instantly', color: 'text-yellow-500' },
   { name: 'RRA Tax Payment', icon: FileText, category: 'Government', description: 'Handle tax payments efficiently', color: 'text-red-500' },
@@ -107,9 +106,10 @@ const allServices = [
   { name: 'Health Insurance', icon: Heart, category: 'Insurance', description: 'Medical and health payments', color: 'text-red-400' },
   { name: 'Online Shopping', icon: ShoppingCart, category: 'Shopping', description: 'E-commerce payments', color: 'text-purple-600' },
 ];
+*/
 
 // New Payment Features
-const paymentFeatures = [
+/*const paymentFeatures = [
   {
     title: 'QR Code Payments',
     description: 'Scan to pay instantly with QR codes',
@@ -137,7 +137,7 @@ const paymentFeatures = [
 ];
 
 // Security Features
-const securityFeatures = [
+/*const securityFeatures = [
   {
     title: 'Biometric Authentication',
     description: 'Secure your account with fingerprint or face ID',
@@ -162,20 +162,20 @@ const securityFeatures = [
     icon: ShieldCheck,
     color: 'text-purple-500'
   }
-];
+];*/
 
 // Banks
-const banks = [
+/*const banks = [
   { name: 'Equity Bank', icon: Building, color: 'text-blue-600' },
   { name: 'Bank of Kigali', icon: Building, color: 'text-green-600' },
   { name: 'Ecobank', icon: Building, color: 'text-orange-600' },
   { name: 'GT Bank', icon: Building, color: 'text-red-600' },
   { name: 'I&M Bank', icon: Building, color: 'text-purple-600' },
   { name: 'Cogebank', icon: Building, color: 'text-teal-600' },
-];
+];*/
 
 // Benefits
-const benefits = [
+/*const benefits = [
   { 
     title: 'Secure Transactions', 
     description: 'Bank-level security for all your payments', 
@@ -200,7 +200,7 @@ const benefits = [
     icon: Banknote,
     color: 'text-green-600'
   }
-];
+];*/
 
 // Pie Chart Icon Component (typed and hoisted before usage)
 const PieChart = ({ className, color = 'currentColor' }: { className?: string; color?: string }): React.ReactElement => (
@@ -210,7 +210,7 @@ const PieChart = ({ className, color = 'currentColor' }: { className?: string; c
 );
 
 // Mobile App Features
-const appFeatures = [
+/*const appFeatures = [
   {
     title: 'Easy Dashboard',
     description: 'Manage all your payments in one place',
@@ -235,7 +235,7 @@ const appFeatures = [
     icon: PieChart,
     color: 'text-orange-500'
   }
-];
+];*/
 
 // Animation Variants
 const fadeUp: Variants = {
@@ -254,33 +254,30 @@ const staggerContainer: Variants = {
   },
 };
 
-const scaleIn: Variants = {
+/*const scaleIn: Variants = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
     scale: 1,
     transition: { duration: 0.5, ease: easeOut }
   }
-};
+};*/
 
-const slideIn: Variants = {
+/*const slideIn: Variants = {
   hidden: { opacity: 0, x: -50 },
   visible: {
     opacity: 1,
     x: 0,
     transition: { duration: 0.6, ease: easeOut }
   }
-};
-
-// Pie Chart Icon Component
-// ...existing code...
+};*/
 
 export default function LandingPage() {
   const { t } = useTranslation();
   const [isDark, setIsDark] = useState(true);
   const [newService, setNewService] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [current, setCurrent] = useState(0);
+  // const [current, setCurrent] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [testimonialIndex, setTestimonialIndex] = useState(0);
@@ -288,7 +285,7 @@ export default function LandingPage() {
   const [activeFeature, setActiveFeature] = useState(0);
   const router = useRouter();
 
-  const itemsPerView = 3;
+  // const itemsPerView = 3;
 
   const testimonials = [
     {
@@ -518,6 +515,7 @@ export default function LandingPage() {
     }
   };
 
+  /*
   const nextSlide = () => {
     setCurrent((prev) =>
       prev + itemsPerView >= displayServices.length ? 0 : prev + itemsPerView
@@ -531,6 +529,7 @@ export default function LandingPage() {
         : prev - itemsPerView
     );
   };
+  */
 
   const clearFilters = () => {
     setSearchTerm('');
@@ -573,33 +572,53 @@ export default function LandingPage() {
       <motion.header 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
         className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center"
       >
-        <div className="flex items-center gap-3">
+        {/* Enhanced Logo Component */}
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
+          className="flex items-center gap-3"
+        >
           <motion.div
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, rotate: [0, -5, 0] }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-3 cursor-pointer group"
+            onClick={() => router.push('/')}
           >
-            <div className="w-10 h-10 bg-[#ff6600] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">X</span>
+            {/* Enhanced Logo Container */}
+            <div className="relative">
+              <div className="w-14 h-14 bg-gradient-to-br from-[#ff6600] to-[#ff8533] rounded-2xl flex items-center justify-center shadow-2xl group-hover:shadow-3xl transition-all duration-500 border-2 border-white/20">
+                <span className="text-white font-black text-2xl tracking-tighter drop-shadow-lg">M</span>
+              </div>
+              {/* Subtle glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#ff6600] to-[#ff8533] rounded-2xl blur-sm opacity-50 group-hover:opacity-70 transition-opacity duration-500 -z-10" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              {/* <span className="text-[#ff6600]">X</span> */}
-              <span className="text-[#13294b] dark:text-white">-Pay</span>
-            </h1>
+            
+            {/* Enhanced Text Logo */}
+            <div className="flex flex-col">
+              <h1 className="text-3xl font-black tracking-tight leading-none">
+                <span className="bg-gradient-to-r from-[#ff6600] via-[#ff7700] to-[#ff8533] bg-clip-text text-transparent drop-shadow-sm">
+                  M
+                </span>
+                <span className="text-[#13294b] dark:text-white drop-shadow-sm">oola</span>
+              </h1>
+              <p className="text-xs text-gray-600 dark:text-gray-300 font-medium tracking-wider mt-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                Premium Payment Solutions
+              </p>
+            </div>
           </motion.div>
-        </div>
-        <div className="flex items-center gap-4">
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Link
-              href="/login"
-              className="text-[#13294b] dark:text-white font-medium hover:text-[#ff6600] dark:hover:text-[#ff6600] transition-colors px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              {t('landing.login')}
-            </Link>
-          </motion.div>
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
+          className="flex items-center gap-4"
+        >
+          <FlagLanguageSelector />
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -614,7 +633,7 @@ export default function LandingPage() {
               <Moon className="w-5 h-5 text-gray-800" />
             )}
           </motion.button>
-        </div>
+        </motion.div>
       </motion.header>
 
       {/* Enhanced Hero Section */}
@@ -622,7 +641,7 @@ export default function LandingPage() {
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="text-center pt-16 pb-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto"
+        className="text-center pt-8 pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto"
       >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -638,7 +657,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#13294b] dark:text-white mb-8 leading-tight"
+          className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#13294b] dark:text-white mb-6 leading-tight"
         >
           {t('landing.heroTitle')}
           <motion.span
@@ -655,7 +674,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="text-xl sm:text-2xl max-w-4xl mx-auto text-gray-700 dark:text-gray-300 mb-12 leading-relaxed"
+          className="text-lg sm:text-xl max-w-4xl mx-auto text-gray-700 dark:text-gray-300 mb-8 leading-relaxed"
         >
           {t('landing.heroDescription')}
         </motion.p>
@@ -669,7 +688,7 @@ export default function LandingPage() {
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/registration"
-              className="px-10 py-4 bg-gradient-to-r from-[#ff6600] to-[#ff8c00] text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 shadow-lg hover:shadow-[#ff6600]/25 flex items-center justify-center gap-3 text-lg"
+              className="px-6 py-3 bg-gradient-to-r from-[#ff6600] to-[#ff8c00] text-white rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 shadow-lg hover:shadow-[#ff6600]/25 flex items-center justify-center gap-3 text-base"
             >
               {t('landing.getStarted')} <ArrowRight className="w-5 h-5" />
             </Link>
@@ -677,7 +696,7 @@ export default function LandingPage() {
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
               href="/login"
-              className="px-10 py-4 border-2 border-[#13294b] text-[#13294b] dark:border-gray-400 dark:text-gray-300 rounded-2xl font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
+              className="px-6 py-3 border-2 border-[#13294b] text-[#13294b] dark:border-gray-400 dark:text-gray-300 rounded-2xl font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl text-base"
             >
               {t('landing.signIn')}
             </Link>
@@ -686,9 +705,9 @@ export default function LandingPage() {
 
         {/* Stats Bar */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 0.8, duration: 0.5, ease: "easeOut" }}
           className="grid grid-cols-3 gap-8 max-w-2xl mx-auto mt-16 pt-8 border-t border-gray-200 dark:border-gray-800"
         >
           {[
@@ -698,9 +717,9 @@ export default function LandingPage() {
           ].map((stat, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.2 + index * 0.1 }}
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 1 + index * 0.1, duration: 0.4, ease: "easeOut" }}
               className="text-center"
             >
               <div className="text-2xl font-bold text-[#ff6600]">{stat.number}</div>
@@ -711,17 +730,17 @@ export default function LandingPage() {
       </motion.section>
 
       {/* Payment Features Section */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section className="max-w-7xl mx-auto px-6 py-12">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center mb-16"
+          className="text-center mb-8"
         >
-          <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
+          <h3 className="text-3xl sm:text-4xl font-bold text-[#13294b] dark:text-white mb-4">
             {t('landing.smartPayment')} <span className="text-[#ff6600]">{t('landing.paymentFeatures')}</span>
           </h3>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             {t('landing.paymentFeaturesDesc')}
           </p>
         </motion.div>
@@ -746,15 +765,15 @@ export default function LandingPage() {
                 >
                   <div className={`bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 p-6 rounded-2xl w-20 h-20 mx-auto mb-6 flex items-center justify-center`}>
                     {(() => {
-                      const Icon = paymentFeatures[activeFeature].icon as any;
-                      return <Icon className={`w-10 h-10 ${paymentFeatures[activeFeature].color}`} />;
+                      const Icon = paymentFeaturesTranslated[activeFeature].icon as any;
+                      return <Icon className={`w-10 h-10 ${paymentFeaturesTranslated[activeFeature].color}`} />;
                     })()}
                   </div>
                   <h4 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
-                    {paymentFeatures[activeFeature].title}
+                    {paymentFeaturesTranslated[activeFeature].title}
                   </h4>
                   <p className="text-gray-600 dark:text-gray-400 text-lg">
-                    {paymentFeatures[activeFeature].description}
+                    {paymentFeaturesTranslated[activeFeature].description}
                   </p>
                 </motion.div>
               </AnimatePresence>
@@ -816,17 +835,17 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Benefits Section */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section className="max-w-7xl mx-auto px-6 py-12">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center mb-16"
+          className="text-center mb-8"
         >
-          <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
-            {t('landing.whyChoose')} <span className="text-[#ff6600]">X-Pay</span>?
+          <h3 className="text-3xl sm:text-4xl font-bold text-[#13294b] dark:text-white mb-4">
+            {t('landing.whyChoose')} <span className="text-[#ff6600]">Moola</span>?
           </h3>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             {t('landing.whyChooseDesc')}
           </p>
         </motion.div>
@@ -840,9 +859,11 @@ export default function LandingPage() {
           {benefitsTranslated.map(({ title, description, icon: Icon, color }, idx) => (
             <motion.div
               key={idx}
-              variants={scaleIn}
-              whileHover={{ y: -10, transition: { duration: 0.3 } }}
-              className="group relative bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 dark:border-gray-800 transition-all duration-500"
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: idx * 0.1, duration: 0.4, ease: "easeOut" }}
+              whileHover={{ y: -10, scale: 1.02, transition: { duration: 0.2, ease: "easeOut" } }}
+              className="group relative bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 dark:border-gray-800 transition-all duration-300"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-[#ff6600]/5 to-[#13294b]/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10">
@@ -866,17 +887,17 @@ export default function LandingPage() {
       </section>
 
       {/* Security Section */}
-      <section className="max-w-7xl mx-auto px-6 py-20 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-3xl my-12">
+      <section className="max-w-7xl mx-auto px-6 py-12 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-3xl my-12">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center mb-16"
+          className="text-center mb-8"
         >
-          <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
+          <h3 className="text-3xl sm:text-4xl font-bold text-[#13294b] dark:text-white mb-4">
             {t('landing.bankLevel')} <span className="text-[#ff6600]">{t('landing.security')}</span>
           </h3>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             {t('landing.securityDesc')}
           </p>
         </motion.div>
@@ -890,8 +911,10 @@ export default function LandingPage() {
           {securityFeaturesTranslated.map(({ title, description, icon: Icon, color }, idx) => (
             <motion.div
               key={idx}
-              variants={scaleIn}
-              whileHover={{ scale: 1.05 }}
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: idx * 0.1, duration: 0.4, ease: "easeOut" }}
+              whileHover={{ scale: 1.03, y: -5, transition: { duration: 0.2 } }}
               className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 text-center"
             >
               <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-600 p-4 rounded-2xl w-fit mx-auto mb-6">
@@ -909,17 +932,17 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Services Section */}
-      <section className="max-w-7xl mx-auto px-6 py-20 relative">
+      <section className="max-w-7xl mx-auto px-6 py-12 relative">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center mb-16"
+          className="text-center mb-8"
         >
-          <h3 className="text-4xl sm:text-5xl font-bold text-[#13294b] dark:text-white mb-6">
+          <h3 className="text-3xl sm:text-4xl font-bold text-[#13294b] dark:text-white mb-4">
             {t('landing.ourServices')} <span className="text-[#ff6600]">{t('landing.services')}</span>
           </h3>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             {t('landing.servicesDesc')}
           </p>
         </motion.div>
@@ -928,7 +951,7 @@ export default function LandingPage() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-900 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-xl mb-12"
+          className="bg-white dark:bg-gray-900 rounded-3xl p-4 border border-gray-200 dark:border-gray-700 shadow-xl mb-8"
         >
           <div className="flex flex-col lg:flex-row gap-6 items-center">
             <div className="flex-1 w-full lg:max-w-sm">
@@ -997,14 +1020,19 @@ export default function LandingPage() {
         </motion.div>
 
         {/* Enhanced Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        >
           {displayServices.slice(0, 8).map(({ name, icon: Icon, description, category, color }, idx) => (
             <motion.div
               key={name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              whileHover={{ scale: 1.03, y: -5 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: idx * 0.05, duration: 0.4, ease: "easeOut" }}
+              whileHover={{ scale: 1.03, y: -5, transition: { duration: 0.2 } }}
               onClick={goToLogin}
               className="group cursor-pointer"
             >
@@ -1031,7 +1059,7 @@ export default function LandingPage() {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* View More Button */}
         {displayServices.length > 8 && (
@@ -1074,7 +1102,7 @@ export default function LandingPage() {
       </section>
 
       {/* Mobile App Section */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -1138,7 +1166,7 @@ export default function LandingPage() {
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-[#ff6600] rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold">X</span>
+                    <span className="text-white font-bold">M</span>
                   </div>
                   <div>
                     <div className="font-bold text-gray-800 dark:text-white">{t('landing.xpayWallet')}</div>
@@ -1175,7 +1203,7 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
+      <section className="max-w-6xl mx-auto px-6 py-12">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -1313,8 +1341,10 @@ export default function LandingPage() {
           {banksTranslated.map(({ name, icon: Icon, color }, idx) => (
             <motion.div
               key={idx}
-              variants={scaleIn}
-              whileHover={{ scale: 1.05, y: -5 }}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: idx * 0.08, duration: 0.3, ease: "easeOut" }}
+              whileHover={{ scale: 1.05, y: -5, transition: { duration: 0.2 } }}
               onClick={goToLogin}
               className="group cursor-pointer"
             >
@@ -1347,9 +1377,11 @@ export default function LandingPage() {
           ].map((stat, index) => (
             <motion.div
               key={index}
-              variants={fadeUp}
-              whileHover={{ scale: 1.05 }}
-              className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 text-center transition-all duration-500"
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: index * 0.1, duration: 0.4, ease: "easeOut" }}
+              whileHover={{ scale: 1.05, y: -5, transition: { duration: 0.2 } }}
+              className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 p-8 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 text-center transition-all duration-300"
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -1368,7 +1400,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Service Request Section */}
-      <section className="max-w-4xl mx-auto px-6 py-20">
+      <section className="max-w-4xl mx-auto px-6 py-12">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -1442,14 +1474,22 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[#ff6600] rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">X</span>
+              {/* Enhanced Footer Logo */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#ff6600] to-[#ff8533] rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-xl">M</span>
                 </div>
-                <h1 className="text-3xl font-extrabold tracking-tight">
-                  <span className="text-[#ff6600]">X</span>
-                  <span className="text-white">-Pay</span>
-                </h1>
+                <div className="flex flex-col">
+                  <h1 className="text-2xl font-black tracking-tight leading-none">
+                    <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8533] bg-clip-text text-transparent">
+                      M
+                    </span>
+                    <span className="text-white">oola</span>
+                  </h1>
+                  <p className="text-xs text-gray-300 font-medium tracking-wide mt-1 opacity-80">
+                    Premium Solutions
+                  </p>
+                </div>
               </div>
               <p className="text-gray-300 text-lg">
                 {t('landing.footerTagline')}
@@ -1498,7 +1538,7 @@ export default function LandingPage() {
             className="border-t border-gray-700 pt-8 text-center"
           >
             <p className="text-gray-400 text-lg">
-              © {new Date().getFullYear()} X-Pay. {t('landing.allRightsReserved')}. {t('landing.madeWithLove')}
+              © {new Date().getFullYear()} Moola. {t('landing.allRightsReserved')}. {t('landing.madeWithLove')}
             </p>
           </motion.div>
         </div>

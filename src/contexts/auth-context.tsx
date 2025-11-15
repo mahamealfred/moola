@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 type AuthContextType = {
   user: any;
   accessToken: string | null;
-  login: (user: any, token: string) => void;
+  login: (_user: any, _token: string) => void;
   logout: () => void;
 };
 

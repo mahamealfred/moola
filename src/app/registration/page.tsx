@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sun, Moon } from 'lucide-react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n-context';
-import LanguageSelector from '@/components/LanguageSelector';
 export const runtime = "edge";
 
 export default function RegistrationPage() {
@@ -21,23 +20,10 @@ export default function RegistrationPage() {
     phoneNumber: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [isDark, setIsDark] = useState(true);
   const router = useRouter();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    setIsDark(prefersDark);
-    document.documentElement.classList.toggle('dark', prefersDark);
-  }, []);
 
-  const toggleDarkMode = () => {
-    const nextTheme = !isDark;
-    setIsDark(nextTheme);
-    localStorage.setItem('theme', nextTheme ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', nextTheme);
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -96,20 +82,10 @@ export default function RegistrationPage() {
           transition={{ duration: 0.5 }}
           className="p-8 sm:p-10 space-y-6"
         >
-          <header className="flex justify-between items-center mb-6">
+          <header className="mb-6">
             <h1 className="text-2xl font-extrabold text-[#13294b] dark:text-white">
-              <span className="text-[#ff6600]">X</span>-Pay
+              <span className="text-[#ff6600]">M</span>oola
             </h1>
-            <div className="flex items-center gap-2">
-              <LanguageSelector />
-              <button
-                onClick={toggleDarkMode}
-                className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
-                aria-label="Toggle theme"
-              >
-                {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
-              </button>
-            </div>
           </header>
 
           <h2 className="text-xl font-semibold text-[#13294b] dark:text-white">{t('registration.title')}</h2>

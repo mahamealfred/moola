@@ -18,8 +18,7 @@ import {
   FiEdit,
   FiTrash2,
   FiPlus,
-  FiCheck,
-  FiX
+  FiCheck
 } from 'react-icons/fi';
 import { secureStorage } from '../../../lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
@@ -52,10 +51,6 @@ interface Language {
   code: string;
   name: string;
   nativeName: string;
-}
-
-interface SettingsComponentProps {
-  initialAgentInfo?: AgentInfo;
 }
 
 export default function SettingsComponent(props?: any) {
@@ -1153,7 +1148,7 @@ export default function SettingsComponent(props?: any) {
                 </p>
                 <div className="space-y-2 text-sm">
                   <p>📞 <strong>{t('settings.phone')}:</strong> +250 788 123 456</p>
-                  <p>✉️ <strong>{t('settings.email')}:</strong> support@xpay.com</p>
+                  <p>✉️ <strong>{t('settings.email')}:</strong> support@moola.com</p>
                   <p>💬 <strong>{t('settings.liveChat')}:</strong> {t('settings.available247')}</p>
                 </div>
               </div>

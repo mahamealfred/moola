@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Sun, Moon, Eye, EyeOff, AlertCircle, Loader2, Shield } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2, Shield } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
-import LanguageSelector from '@/components/LanguageSelector';
+import { api } from '@/lib/api-client';
 
 export const runtime = "edge";
 
@@ -15,7 +15,6 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isDark, setIsDark] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -31,19 +30,7 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, authLoading, redirect, router]);
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    setIsDark(prefersDark);
-    document.documentElement.classList.toggle('dark', prefersDark);
-  }, []);
 
-  const toggleDarkMode = () => {
-    const nextTheme = !isDark;
-    setIsDark(nextTheme);
-    localStorage.setItem('theme', nextTheme ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', nextTheme);
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,11 +44,7 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-  const res = await fetch('https://core-api.ddin.rw/v1/agency/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
+      const res = await api.post('/agency/auth/login', { username, password });
       
       const result = await res.json();
       
@@ -123,20 +106,10 @@ export default function LoginPage() {
           transition={{ duration: 0.5 }}
           className="p-8 sm:p-10 space-y-6"
         >
-          <header className="flex justify-between items-center mb-6">
+          <header className="mb-6">
             <h1 className="text-2xl font-extrabold text-[#13294b] dark:text-white">
-              <span className="text-[#ff6600]">X</span>-Pay
+              <span className="text-[#ff6600]">M</span>oola
             </h1>
-            <div className="flex items-center gap-2">
-              <LanguageSelector />
-              <button
-                onClick={toggleDarkMode}
-                className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                aria-label="Toggle dark mode"
-              >
-                {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
-              </button>
-            </div>
           </header>
 
           <h2 className="text-xl font-semibold text-[#13294b] dark:text-white">{t('login.title')}</h2>

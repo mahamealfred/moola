@@ -15,12 +15,10 @@ import {
   LogOut,
   Bell,
   UserCircle,
-  Loader2,
-  Shield,
 } from 'lucide-react';
 import { useAuth } from '..//../lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
-import LanguageSelector from '@/components/LanguageSelector';
+import FlagLanguageSelector from '@/components/FlagLanguageSelector';
 
 
 function SidebarItem({
@@ -102,7 +100,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (_event: MouseEvent) => {
       if (isDropdownOpen) {
         setDropdownOpen(false);
       }
@@ -310,7 +308,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           <div className="flex items-center gap-3 sm:gap-6">
             {/* Language Selector */}
-            <LanguageSelector />
+            <FlagLanguageSelector />
 
             {/* Notifications */}
             <div className="relative cursor-pointer p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">

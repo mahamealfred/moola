@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 
 export default function BulkSalaryPayment() {
-  const [file, setFile] = useState<File | null>(null);
+  const [_file, setFile] = useState<File | null>(null);
   const [employees,] = useState([
     { name: 'John Doe', account: '1234567890', amount: 500000 },
     { name: 'Jane Smith', account: '0987654321', amount: 450000 },
