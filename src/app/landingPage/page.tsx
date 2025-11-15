@@ -585,7 +585,7 @@ export default function LandingPage() {
           <motion.div
             whileHover={{ scale: 1.05, rotate: [0, -5, 0] }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-1 cursor-pointer group"
             onClick={() => router.push('/')}
           >
             {/* Enhanced Logo Container */}
@@ -1475,7 +1475,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div>
               {/* Enhanced Footer Logo */}
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-1 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#ff6600] to-[#ff8533] rounded-xl flex items-center justify-center shadow-lg">
                   <span className="text-white font-bold text-xl">M</span>
                 </div>
@@ -1487,7 +1487,7 @@ export default function LandingPage() {
                     <span className="text-white">oola</span>
                   </h1>
                   <p className="text-xs text-gray-300 font-medium tracking-wide mt-1 opacity-80">
-                    Premium Solutions
+                    Premium Payment Solutions
                   </p>
                 </div>
               </div>
