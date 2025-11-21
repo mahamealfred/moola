@@ -251,12 +251,12 @@ export default function BalancePage() {
             onClick={toggleAmountsVisibility}
           >
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full p-2 sm:p-3">
+              <div className="bg-[#ff6600]/10 dark:bg-[#ff6600]/20 text-[#ff6600] rounded-full p-2 sm:p-3">
                 <Coins className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('balance.instantCommission')}</p>
-                <p className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400 truncate">
+                <p className="text-xl sm:text-2xl font-bold text-[#ff6600] dark:text-[#ff8c00] truncate">
                   {showAmounts 
                     ? (instantCommissionAccount ? instantCommissionAccount.formattedBalance : 'RWF 0.00')
                     : (instantCommissionAccount ? formatHiddenAmount(instantCommissionAccount.formattedBalance) : '••••••')
@@ -279,12 +279,12 @@ export default function BalancePage() {
             onClick={toggleAmountsVisibility}
           >
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full p-2 sm:p-3">
+              <div className="bg-[#13294b]/10 dark:bg-[#13294b]/30 text-[#13294b] dark:text-[#1a3a5f] rounded-full p-2 sm:p-3">
                 <Coins className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('balance.delayedCommission')}</p>
-                <p className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 truncate">
+                <p className="text-xl sm:text-2xl font-bold text-[#13294b] dark:text-[#1a3a5f] truncate">
                   {showAmounts 
                     ? (delayedCommissionAccount ? delayedCommissionAccount.formattedBalance : 'RWF 0.00')
                     : (delayedCommissionAccount ? formatHiddenAmount(delayedCommissionAccount.formattedBalance) : '••••••')

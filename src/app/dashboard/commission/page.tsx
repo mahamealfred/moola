@@ -296,12 +296,12 @@ export default function CommissionPage() {
             onClick={toggleAmountsVisibility}
           >
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full p-2 sm:p-3">
+              <div className="bg-[#ff6600]/10 dark:bg-[#ff6600]/20 text-[#ff6600] rounded-full p-2 sm:p-3">
                 <Coins className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('commission.instantCommission')}</p>
-                <p className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400 truncate">
+                <p className="text-xl sm:text-2xl font-bold text-[#ff6600] dark:text-[#ff8c00] truncate">
                   {showAmounts 
                     ? (instantCommissionAccount ? instantCommissionAccount.formattedBalance : 'RWF 0.00')
                     : (instantCommissionAccount ? formatHiddenAmount(instantCommissionAccount.formattedBalance) : '••••••')
@@ -313,7 +313,7 @@ export default function CommissionPage() {
                     : (instantCommissionAccount ? formatHiddenAmount(instantCommissionAccount.formattedAvailableBalance) : '••••••')
                   }
                 </p>
-                <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-semibold">
+                <p className="text-xs text-[#ff6600] dark:text-[#ff8c00] mt-1 font-semibold">
                   {t('commission.minWithdrawalLabel')}: RWF {MIN_WITHDRAWAL_AMOUNT.toLocaleString()}
                 </p>
                 <p className="text-xs text-gray-500 mt-2 italic">
@@ -332,12 +332,12 @@ export default function CommissionPage() {
             onClick={toggleAmountsVisibility}
           >
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full p-2 sm:p-3">
+              <div className="bg-[#13294b]/10 dark:bg-[#13294b]/30 text-[#13294b] dark:text-[#1a3a5f] rounded-full p-2 sm:p-3">
                 <Timer className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{t('commission.delayedCommission')}</p>
-                <p className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400 truncate">
+                <p className="text-xl sm:text-2xl font-bold text-[#13294b] dark:text-[#1a3a5f] truncate">
                   {showAmounts 
                     ? (delayedCommissionAccount ? delayedCommissionAccount.formattedBalance : 'RWF 0.00')
                     : (delayedCommissionAccount ? formatHiddenAmount(delayedCommissionAccount.formattedBalance) : '••••••')
@@ -365,7 +365,7 @@ export default function CommissionPage() {
 
           {/* Success Message */}
           {withdrawSuccess && (
-            <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <div className="mb-4 p-3 bg-[#ff6600]/5 dark:bg-[#ff6600]/10 border border-[#ff6600]/20 dark:border-[#ff6600]/30 rounded-lg">
               <p className="text-green-700 dark:text-green-300 text-sm">{withdrawSuccess}</p>
             </div>
           )}
@@ -415,8 +415,8 @@ export default function CommissionPage() {
 
           {/* Available Balance Info */}
           {instantCommissionAccount && (
-            <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <p className="text-xs text-blue-600 dark:text-blue-400">
+            <div className="mt-3 p-2 bg-[#13294b]/5 dark:bg-[#13294b]/10 rounded-lg">
+              <p className="text-xs text-[#13294b] dark:text-[#1a3a5f]">
                 {t('commission.availableForWithdrawal')}: <span className="font-semibold">{instantCommissionAccount.formattedAvailableBalance}</span>
                 {availableBalance < MIN_WITHDRAWAL_AMOUNT && (
                   <span className="text-red-600 dark:text-red-400 ml-2">

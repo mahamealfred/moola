@@ -152,7 +152,7 @@ const MobileTransactionCard: React.FC<{
           <div className="flex gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={() => onView(transaction)}
-              className="flex-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 py-2 px-3 rounded-lg text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors flex items-center justify-center gap-1"
+              className="flex-1 bg-[#13294b]/5 dark:bg-[#13294b]/20 text-[#13294b] dark:text-[#1a3a5f] py-2 px-3 rounded-lg text-xs font-medium hover:bg-[#13294b]/10 dark:hover:bg-[#13294b]/30 transition-colors flex items-center justify-center gap-1"
             >
               <FiEye className="w-3 h-3" />
               {t('transactions.view')}
@@ -173,7 +173,7 @@ const MobileTransactionCard: React.FC<{
         <div className="flex gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={() => onView(transaction)}
-            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs flex items-center gap-1"
+            className="text-[#13294b] dark:text-[#1a3a5f] hover:text-[#ff6600] dark:hover:text-[#ff8c00] text-xs flex items-center gap-1"
           >
             <FiEye className="w-3 h-3" />
             {t('transactions.view')}
@@ -396,6 +396,10 @@ export default function TransactionsPage() {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 8,
+  });
 
   // Check screen size
   useEffect(() => {
@@ -433,86 +437,32 @@ export default function TransactionsPage() {
         throw new Error(t('transactions.authRequired'));
       }
 
-      // Try different endpoint variations
-      const endpoints = [
-        '/agency/thirdpartyagency/services/transactions/history',
-        '/agency/thirdpartyagency/transactions/history',
-        '/agency/transactions/history',
-        '/transactions/history'
-      ];
+      console.log('Fetching transactions from API...');
+      
+      // Call the transactions API endpoint
+      const response = await api.getAuth('/agency/thirdpartyagency/services/transactions/history');
 
-      let response = null;
-      let lastError = null;
-
-      // Try each endpoint until one works
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`Trying endpoint: ${endpoint}`);
-          response = await api.getAuth(endpoint);
-
-          if (response.ok) {
-            const apiResponse: ApiResponse = await response.json();
-            
-            if (apiResponse.success) {
-              setData(apiResponse.data || []);
-              return; // Success, exit the function
-            } else {
-              lastError = new Error(apiResponse.message || 'Failed to fetch transactions');
-            }
-          } else if (response.status !== 404) {
-            // If it's not 404, throw the error
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          // If 404, continue to next endpoint
-        } catch (err) {
-          lastError = err;
-          // Continue to next endpoint
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // If we get here, all endpoints failed
-      throw lastError || new Error('All endpoints failed. Please check the API URL.');
+      const apiResponse: ApiResponse = await response.json();
+      
+      if (apiResponse.success && apiResponse.data) {
+        console.log('Transactions loaded successfully:', apiResponse.data.length);
+        setData(apiResponse.data);
+        setError('');
+      } else {
+        throw new Error(apiResponse.message || 'Failed to fetch transactions');
+      }
 
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to fetch transactions';
       setError(errorMessage);
       console.error('Error fetching transactions:', err);
       
-      // For development - show sample data when API fails
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Using sample data for development');
-        setData([
-          {
-            "id": "179885",
-            "date": "2025-09-30T15:32:12.000Z",
-            "formattedDate": "30/09/2025",
-            "processDate": "2025-09-30T15:32:12.000Z",
-            "formattedProcessDate": "30/09/2025",
-            "amount": 100,
-            "formattedAmount": "100.00 Rwf",
-            "customerCharge": 0,
-            "token": "59685371670521636119",
-            "status": "successful",
-            "description": "Payment processed successfully for electricity token. Customer received token immediately.",
-            "serviceName": "electricity"
-          },
-          {
-            "id": "179912",
-            "date": "2025-09-30T15:50:07.000Z",
-            "formattedDate": "30/09/2025",
-            "processDate": "2025-09-30T15:50:07.000Z",
-            "formattedProcessDate": "30/09/2025",
-            "amount": 100,
-            "formattedAmount": "100.00 Rwf",
-            "customerCharge": 0,
-            "token": null,
-            "status": "successful",
-            "description": "Airtime top-up completed successfully. Amount credited to customer's phone number.",
-            "serviceName": "airtime"
-          }
-        ]);
-        setError(''); // Clear error since we're using sample data
-      }
+      // Set empty data array on error
+      setData([]);
     } finally {
       setIsLoading(false);
       setRefreshing(false);
@@ -523,6 +473,11 @@ export default function TransactionsPage() {
     fetchTransactions();
   }, []);
 
+  // Reset to first page when filter changes
+  useEffect(() => {
+    setPagination(prev => ({ ...prev, pageIndex: 0 }));
+  }, [filter]);
+
   const handleRefresh = () => {
     fetchTransactions(true);
   };
@@ -532,33 +487,33 @@ export default function TransactionsPage() {
 
   const columns = [
     helper.accessor('id', { 
-      header: 'Tx ID',
+      header: t('transactions.txId'),
       cell: (info) => (
         <span className="font-mono text-xs sm:text-sm">{info.getValue()}</span>
       ),
       size: 100,
     }),
     helper.accessor('formattedDate', { 
-      header: 'Date',
+      header: t('transactions.date'),
       cell: (info) => (
         <span className="whitespace-nowrap text-xs sm:text-sm">{info.getValue()}</span>
       ),
       size: 110,
     }),
     helper.accessor('serviceName', { 
-      header: 'Service',
+      header: t('transactions.service'),
       cell: (info) => (
         <span className="truncate block text-xs sm:text-sm capitalize">{info.getValue()}</span>
       ),
       size: 120,
     }),
     helper.accessor('status', {
-      header: 'Status',
+      header: t('transactions.status'),
       cell: (info) => <StatusBadge status={info.getValue()} />,
       size: 100,
     }),
     helper.accessor('amount', {
-      header: 'Amount (RWF)',
+      header: t('transactions.amountRwf'),
       cell: (info) => (
         <span className="font-medium whitespace-nowrap text-xs sm:text-sm">
           {info.getValue().toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -567,7 +522,7 @@ export default function TransactionsPage() {
       size: 120,
     }),
     helper.accessor('token', {
-      header: 'Token',
+      header: t('transactions.token'),
       cell: (info) => (
         <span className="font-mono text-xs sm:text-sm truncate block">
           {info.getValue() || 'N/A'}
@@ -576,7 +531,7 @@ export default function TransactionsPage() {
       size: 120,
     }),
     helper.accessor('description', { 
-      header: 'Description',
+      header: t('transactions.description'),
       cell: (info) => (
         <span className="truncate block text-xs sm:text-sm">{info.getValue()}</span>
       ),
@@ -584,24 +539,24 @@ export default function TransactionsPage() {
     }),
     helper.display({
       id: 'actions',
-      header: 'Actions',
+      header: t('transactions.actions'),
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleViewTransaction(row.original)}
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 text-xs sm:text-sm"
-            title="View Details"
+            className="text-[#ff6600] hover:text-[#ff8c00] dark:text-[#ff8c00] dark:hover:text-[#ff6600] flex items-center gap-1 text-xs sm:text-sm"
+            title={t('transactions.viewDetails')}
           >
             <FiEye className="text-xs sm:text-sm" /> 
-            <span className="hidden xs:inline">View</span>
+            <span className="hidden xs:inline">{t('transactions.view')}</span>
           </button>
           <button
             onClick={() => printPDF(row.original)}
             className="text-[#ff6600] hover:text-[#e65c00] flex items-center gap-1 text-xs sm:text-sm"
-            title="Print Receipt"
+            title={t('transactions.printReceipt')}
           >
             <FiPrinter className="text-xs sm:text-sm" /> 
-            <span className="hidden xs:inline">Print</span>
+            <span className="hidden xs:inline">{t('transactions.print')}</span>
           </button>
         </div>
       ),
@@ -614,16 +569,15 @@ export default function TransactionsPage() {
     columns,
     state: { 
       globalFilter: filter,
-      pagination: {
-        pageSize: 8,
-        pageIndex: 0,
-      }
+      pagination,
     },
     onGlobalFilterChange: setFilter,
+    onPaginationChange: setPagination,
     globalFilterFn,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: false,
   });
 
   if (isLoading) {

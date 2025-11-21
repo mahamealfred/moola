@@ -45,35 +45,35 @@ export default function DashboardHome() {
       href: '/dashboard/balance', 
       icon: DollarSign,
       description: t('dashboardHome.balanceDesc'),
-      gradient: 'from-blue-500 to-cyan-500'
+      gradient: 'from-[#ff6600] to-[#ff8c00]'
     },
     { 
       name: t('dashboardHome.commissions'), 
       href: '/dashboard/commission', 
       icon: MonitorCheck,
       description: t('dashboardHome.commissionsDesc'),
-      gradient: 'from-green-500 to-emerald-500'
+      gradient: 'from-[#13294b] to-[#1a3a5f]'
     },
     { 
       name: t('dashboardHome.services'), 
       href: '/dashboard/services', 
       icon: Zap,
       description: t('dashboardHome.servicesDesc'),
-      gradient: 'from-orange-500 to-red-500'
+      gradient: 'from-[#ff6600] to-[#ff8533]'
     },
     { 
       name: t('dashboardHome.transactions'), 
       href: '/dashboard/transactions', 
       icon: CreditCard,
       description: t('dashboardHome.transactionsDesc'),
-      gradient: 'from-purple-500 to-pink-500'
+      gradient: 'from-[#13294b] to-[#1a3a5f]'
     },
     { 
       name: t('dashboardHome.settings'), 
       href: '/dashboard/settings', 
       icon: Settings,
       description: t('dashboardHome.settingsDesc'),
-      gradient: 'from-gray-600 to-gray-800'
+      gradient: 'from-[#ff6600] to-[#ff8c00]'
     },
   ];
 
@@ -87,7 +87,7 @@ export default function DashboardHome() {
         transition={{ duration: 0.6 }}
         className="text-center mb-8 sm:mb-12 w-full"
       >
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#13294b] to-[#13294b] dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-3">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent mb-3">
           {t('dashboardHome.title')}
         </h1>
         <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4">

@@ -17,8 +17,14 @@ import {
   Clock,
   Shield,
   Zap,
-  TrendingUp
+  TrendingUp,
+  Star,
+  Crown,
+  Rocket,
+  Target,
+  Banknote
 } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n-context';
 
 import OpenAccount from './account-openning/page';
 import DepositForm from './deposit/page';
@@ -93,39 +99,146 @@ const ecobankServices: EcobankServices[] = [
   },
 ];
 
+// Enhanced Animation Variants
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  visible: { 
+    opacity: 1, 
+    transition: { 
+      staggerChildren: 0.08,
+      duration: 0.6
+    } 
+  },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
+  hidden: { 
+    opacity: 0, 
+    y: 30,
+    scale: 0.9
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 15
+    }
+  },
+  hover: {
+    y: -8,
+    scale: 1.02,
+    transition: {
+      type: "spring" as const,
+      stiffness: 400,
+      damping: 25
+    }
+  },
+  tap: {
+    scale: 0.98,
+    transition: {
+      type: "spring" as const,
+      stiffness: 400,
+      damping: 25
+    }
+  }
 };
 
 const modalVariants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.25 } },
-  exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } }
+  hidden: { 
+    opacity: 0, 
+    scale: 0.8,
+    y: 20
+  },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    y: 0,
+    transition: { 
+      type: "spring" as const,
+      stiffness: 300,
+      damping: 30,
+      duration: 0.4
+    } 
+  },
+  exit: { 
+    opacity: 0, 
+    scale: 0.8,
+    y: -20,
+    transition: { 
+      duration: 0.3 
+    } 
+  }
 };
 
 const statsVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } }
+  hidden: { 
+    opacity: 0, 
+    y: 20,
+    scale: 0.95
+  },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    scale: 1,
+    transition: { 
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 15,
+      duration: 0.5 
+    } 
+  }
 };
 
-export default function DashboardHome() {
+const floatingAnimation = {
+  y: [0, -10, 0],
+  transition: {
+    duration: 3,
+    repeat: Infinity,
+    ease: "easeInOut" as const
+  }
+};
+
+export default function EcobankServicesPage() {
+  const { t } = useTranslation();
   const [selectedService, setSelectedService] = useState<EcobankServices | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [sortBy, setSortBy] = useState<'popularity' | 'name' | 'status'>('popularity');
+  const [hoveredService, setHoveredService] = useState<string | null>(null);
 
   // Get unique categories for filtering
   const categories = ['All', ...new Set(ecobankServices.map(service => service.category))];
+  
+  // Translate category names
+  const translateCategory = (category: string) => {
+    const categoryMap: Record<string, string> = {
+      'All': t('ecobank.all'),
+      'Transactions': t('ecobank.transactions'),
+      'Account': t('ecobank.account'),
+      'Security': t('ecobank.security'),
+      'Transfers': t('ecobank.transfers'),
+    };
+    return categoryMap[category] || category;
+  };
+
+  // Helper to get translation key from service name
+  const getServiceKey = (name: string) => {
+    return name.toLowerCase().replace(/ /g, '');
+  };
+
+  // Translate services
+  const translatedServices: EcobankServices[] = ecobankServices.map(service => ({
+    ...service,
+    name: t(`ecobank.${getServiceKey(service.name)}`) || service.name,
+    description: t(`ecobank.${getServiceKey(service.name)}Desc`) || service.description,
+  }));
 
   // Filter and sort services
   const filteredServices = useMemo(() => {
-    let filtered = ecobankServices;
+    let filtered = translatedServices;
 
     // Filter by search term
     if (searchTerm) {
@@ -157,85 +270,152 @@ export default function DashboardHome() {
     }
 
     return filtered;
-  }, [searchTerm, activeCategory, sortBy]);
+  }, [searchTerm, activeCategory, sortBy, translatedServices]);
 
   // Count services by status
-  const activeServicesCount = ecobankServices.filter(s => s.status === 'active').length;
-  const newServicesCount = ecobankServices.filter(s => s.status === 'new').length;
+  const activeServicesCount = translatedServices.filter(s => s.status === 'active').length;
+  const newServicesCount = translatedServices.filter(s => s.status === 'new').length;
 
   const renderServiceCard = (service: EcobankServices) => (
     <motion.div
       key={service.name}
       variants={cardVariants}
-      whileHover={{ 
-        scale: 1.02,
-        y: -2
-      }}
-      whileTap={{ scale: 0.98 }}
-      className={`bg-white dark:bg-gray-900 p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer relative ${
-        service.status === 'coming-soon' ? 'opacity-60' : ''
+      whileHover="hover"
+      whileTap="tap"
+      onHoverStart={() => setHoveredService(service.name)}
+      onHoverEnd={() => setHoveredService(null)}
+      className={`bg-white dark:bg-gray-900 rounded-2xl shadow-lg hover:shadow-xl p-5 cursor-pointer transition-all duration-300 border-2 relative overflow-hidden ${
+        service.status === 'coming-soon' ? 'opacity-60' : 'border-gray-100 dark:border-gray-800'
       }`}
       onClick={() => {
         if (service.status === 'coming-soon') return;
         setSelectedService(service);
       }}
     >
+      {/* Animated Background Gradient */}
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-br from-[#ff6600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        whileHover={{ scale: 1.1 }}
+        transition={{ duration: 0.3 }}
+      />
+      
+      {/* Floating Particles */}
+      <AnimatePresence>
+        {hoveredService === service.name && (
+          <>
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              className="absolute top-2 right-2 w-2 h-2 bg-[#ff6600] rounded-full"
+              transition={{ delay: 0.1 }}
+            />
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              className="absolute bottom-2 left-2 w-1.5 h-1.5 bg-[#13294b] rounded-full"
+              transition={{ delay: 0.2 }}
+            />
+          </>
+        )}
+      </AnimatePresence>
+
       {/* Status Badges */}
-      <div className="absolute top-4 right-4 flex gap-1">
+      <div className="absolute top-3 right-3 flex gap-1 z-10">
         {service.status === 'new' && (
-          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
-            New
-          </span>
+          <motion.span 
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 200 }}
+            className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1"
+          >
+            <Rocket className="w-3 h-3" />
+            {t('ecobank.new')}
+          </motion.span>
         )}
         {service.status === 'coming-soon' && (
-          <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full font-medium">
-            Coming Soon
-          </span>
+          <motion.span 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
+            className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full font-medium"
+          >
+            {t('ecobank.comingSoon')}
+          </motion.span>
         )}
         {service.status === 'active' && (
-          <span className="bg-[#ff6600] text-white text-xs px-2 py-1 rounded-full font-medium">
-            Active
-          </span>
+          <motion.span 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+            className="bg-[#ff6600] text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1"
+          >
+            <Zap className="w-3 h-3" />
+            {t('ecobank.active')}
+          </motion.span>
         )}
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="bg-[#ff660020] dark:bg-[#ff660030] text-[#ff6600] rounded-full p-3 transition-all duration-300 group-hover:scale-110">
-          <service.icon className="w-5 h-5 sm:w-6 sm:h-6" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-[#ff6600] transition-colors text-base sm:text-lg truncate">
-            {service.name}
+      <div className="relative z-10">
+        {/* Icon with Enhanced Animation */}
+        <motion.div 
+          className={`p-3 rounded-2xl transition-all duration-300 group-hover:scale-110 bg-[#ff660020] dark:bg-[#ff660030] text-[#ff6600] mb-4`}
+          whileHover={{ rotate: 360 }}
+          transition={{ duration: 0.6 }}
+        >
+          <service.icon className="w-6 h-6" />
+        </motion.div>
+
+        {/* Content */}
+        <div className="space-y-2">
+          <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-[#ff6600] transition-colors text-lg leading-tight">
+            {service.name} 
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
             {service.description || 'Ecobank banking service'}
           </p>
-        </div>
-        <ChevronRight className={`w-4 h-4 text-gray-400 group-hover:text-[#ff6600] transition-colors flex-shrink-0 ${
-          service.status === 'coming-soon' ? 'opacity-50' : ''
-        }`} />
-      </div>
 
-      {/* Popularity indicator */}
-      {service.popularity && (
-        <div className="mt-4 flex items-center gap-2">
-          <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-            <div 
-              className="bg-[#ff6600] h-1.5 rounded-full transition-all duration-500"
-              style={{ width: `${service.popularity}%` }}
-            ></div>
-          </div>
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-            {service.popularity}%
-          </span>
-        </div>
-      )}
+          {/* Animated Arrow and Popularity */}
+          <motion.div 
+            className="flex items-center justify-between mt-3"
+            initial={false}
+            animate={{ x: hoveredService === service.name ? 5 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex-1">
+              {/* Category tag */}
+              <span className="inline-block bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs px-2 py-1 rounded">
+                {translateCategory(service.category)}
+              </span>
+            </div>
+            
+            <motion.div
+              className={`p-2 rounded-lg bg-gray-100 dark:bg-gray-800 group-hover:bg-[#ff6600] group-hover:text-white transition-colors ${
+                service.status === 'coming-soon' ? 'opacity-50' : ''
+              }`}
+              whileHover={{ scale: 1.1 }}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </motion.div>
+          </motion.div>
 
-      {/* Category tag */}
-      <div className="mt-3">
-        <span className="inline-block bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs px-2 py-1 rounded">
-          {service.category}
-        </span>
+          {/* Popularity indicator - Removed progress bar, showing only percentage */}
+          {service.popularity && (
+            <motion.div 
+              className="flex items-center gap-2 mt-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <Star className="w-3 h-3 text-yellow-500" />
+              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                {service.popularity}% {t('ecobank.popular')}
+              </span>
+            </motion.div>
+          )}
+        </div>
       </div>
     </motion.div>
   );
@@ -245,25 +425,65 @@ export default function DashboardHome() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-6 lg:p-8"
+      className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 p-4 sm:p-6 lg:p-8"
     >
-      {/* Enhanced Header */}
+      {/* Enhanced Header with Floating Elements */}
       <motion.div 
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-8 sm:mb-12"
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+        className="text-center mb-8 sm:mb-12 relative"
       >
-        <div className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full px-4 py-2 mb-4 border border-gray-200 dark:border-gray-600">
-          <Sparkles className="w-4 h-4 text-[#ff6600]" />
+        {/* Floating Background Elements */}
+        <motion.div 
+          animate={floatingAnimation}
+          className="absolute top-4 left-10 w-6 h-6 bg-[#ff6600]/20 rounded-full blur-sm"
+        />
+        <motion.div 
+          animate={floatingAnimation}
+          transition={{ delay: 1 }}
+          className="absolute top-8 right-12 w-4 h-4 bg-[#13294b]/20 rounded-full blur-sm"
+        />
+        <motion.div 
+          animate={floatingAnimation}
+          transition={{ delay: 2 }}
+          className="absolute bottom-4 left-1/4 w-3 h-3 bg-[#ff6600]/10 rounded-full blur-sm"
+        />
+
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+          className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full px-4 py-2 mb-4 border border-gray-200 dark:border-gray-600 shadow-lg"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles className="w-4 h-4 text-[#ff6600]" />
+          </motion.div>
           <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-            Ecobank Digital Services
+            {t('ecobank.digitalServices')}
           </span>
-        </div>
+        </motion.div>
         
-      
-        <p className="text-gray-500 dark:text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">
-          Complete banking solutions at your fingertips
-        </p>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[#13294b] via-[#ff6600] to-[#13294b] bg-clip-text text-transparent mb-4"
+        >
+          {t('ecobank.bankingServices')}
+        </motion.h1>
+        
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="text-gray-500 dark:text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto"
+        >
+          {t('ecobank.subtitle')}
+        </motion.p>
       </motion.div>
 
       {/* Service Modal */}
@@ -273,7 +493,7 @@ export default function DashboardHome() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4 sm:p-6"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-4 sm:p-6"
             onClick={() => setSelectedService(null)}
           >
             <motion.div
@@ -281,208 +501,275 @@ export default function DashboardHome() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg md:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
+              className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-md sm:max-w-lg md:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col border-2 border-[#ff6600]/20"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center p-4 sm:p-5 md:p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
-                <div className="flex items-center gap-3">
+              <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
+                <motion.div 
+                  className="flex items-center gap-3"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
                   <div className="p-2 rounded-lg bg-[#ff660020] dark:bg-[#ff660030]">
                     {selectedService.icon && React.createElement(selectedService.icon, { 
-                      className: "w-5 h-5 sm:w-6 sm:h-6 text-[#ff6600]" 
+                      className: "w-6 h-6 text-[#ff6600]" 
                     })}
                   </div>
                   <div>
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                       {selectedService.name}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                       {selectedService.description}
                     </p>
                   </div>
-                </div>
-                <button
+                </motion.div>
+                <motion.button
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
                   onClick={() => setSelectedService(null)}
                   className="text-gray-500 hover:text-gray-800 dark:hover:text-white p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex-shrink-0"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 >
-                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
+                  <X className="w-6 h-6" />
+                </motion.button>
               </div>
-              <div className="overflow-y-auto flex-1 p-4 sm:p-5 md:p-6">
-                <div className="text-gray-800 dark:text-gray-100">
+              <div className="overflow-y-auto flex-1 p-6">
+                <motion.div 
+                  className="text-gray-800 dark:text-gray-100"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
                   {typeof selectedService.content === 'string' ? (
-                    <div className="text-center py-6 sm:py-8 text-base sm:text-lg">{selectedService.content}</div>
+                    <div className="text-center py-8 text-lg">{selectedService.content}</div>
                   ) : (
                     <div className="w-full h-full">{selectedService.content}</div>
                   )}
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Advanced Stats Section */}
+      {/* Enhanced Stats Section */}
       <motion.div 
         variants={statsVariants}
         initial="hidden"
         animate="visible"
         className="max-w-7xl mx-auto mb-8 sm:mb-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
       >
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-[#ff660020] dark:bg-[#ff660030]">
-              <TrendingUp className="w-6 h-6 text-[#ff6600]" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {ecobankServices.length}
+        {[
+          {
+            icon: Banknote,
+            value: ecobankServices.length,
+            label: t('ecobank.totalServices'),
+            color: 'from-[#ff6600] to-orange-400',
+            bg: 'bg-[#ff660020] dark:bg-[#ff660030]'
+          },
+          {
+            icon: Zap,
+            value: activeServicesCount,
+            label: t('ecobank.active'),
+            color: 'from-green-500 to-emerald-400',
+            bg: 'bg-green-100 dark:bg-green-900/20'
+          },
+          {
+            icon: Clock,
+            value: '24/7',
+            label: t('ecobank.available'),
+            color: 'from-[#13294b] to-blue-600',
+            bg: 'bg-[#13294b]/10 dark:bg-[#13294b]/20'
+          },
+          {
+            icon: Shield,
+            value: '100%',
+            label: t('ecobank.secure'),
+            color: 'from-purple-500 to-purple-400',
+            bg: 'bg-purple-100 dark:bg-purple-900/20'
+          }
+        ].map((stat, index) => (
+          <motion.div
+            key={index}
+            whileHover={{ 
+              y: -5,
+              scale: 1.02,
+              transition: { type: "spring", stiffness: 300 }
+            }}
+            className="bg-white dark:bg-gray-900 p-6 rounded-2xl border-2 border-gray-100 dark:border-gray-800 shadow-lg hover:shadow-xl transition-all group cursor-pointer"
+          >
+            <div className="flex items-center gap-4">
+              <motion.div 
+                className={`p-3 rounded-2xl ${stat.bg} group-hover:scale-110 transition-transform`}
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.6 }}
+              >
+                <stat.icon className={`w-6 h-6 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`} />
+              </motion.div>
+              <div>
+                <motion.div 
+                  className="text-2xl font-bold text-gray-900 dark:text-white"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: index * 0.1 + 0.5, type: "spring" }}
+                >
+                  {stat.value}
+                </motion.div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</div>
               </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Total Services</div>
             </div>
-          </div>
-        </div>
-        
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-green-100 dark:bg-green-900/20">
-              <Zap className="w-6 h-6 text-green-600 dark:text-green-400" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                {activeServicesCount}
-              </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Active</div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-blue-100 dark:bg-blue-900/20">
-              <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                24/7
-              </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Available</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-2xl bg-purple-100 dark:bg-purple-900/20">
-              <Shield className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                100%
-              </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Secure</div>
-            </div>
-          </div>
-        </div>
+          </motion.div>
+        ))}
       </motion.div>
 
-      {/* Services Section with Filters */}
+      {/* Services Section with Enhanced Filters */}
       <motion.section
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.3, type: "spring" }}
         className="max-w-7xl mx-auto space-y-6"
       >
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white">
-              Available Services
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">
-              Explore all Ecobank digital banking services
-            </p>
+            <motion.h2 
+              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              {t('ecobank.availableServices')}
+            </motion.h2>
+            <motion.p 
+              className="text-gray-500 dark:text-gray-400 mt-2"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              {t('ecobank.exploreServices')}
+            </motion.p>
           </div>
-          <div className="w-12 sm:w-16 h-1 bg-gradient-to-r from-[#ff6600] to-orange-400 rounded-full lg:hidden"></div>
+          <motion.div 
+            className="w-12 sm:w-16 h-1 bg-gradient-to-r from-[#ff6600] to-orange-400 rounded-full lg:hidden"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 0.6 }}
+          />
         </div>
 
-        {/* Advanced Filter Bar */}
+        {/* Enhanced Filter Bar */}
         <motion.div 
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg"
+          transition={{ delay: 0.5 }}
+          className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border-2 border-gray-100 dark:border-gray-800 shadow-lg"
         >
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             {/* Search Box */}
-            <div className="flex-1 w-full sm:max-w-xs">
+            <motion.div 
+              className="flex-1 w-full sm:max-w-xs"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+            >
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Search services..."
+                  placeholder={t('ecobank.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all"
                 />
               </div>
-            </div>
+            </motion.div>
 
             {/* Category Filter */}
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
+            <motion.div 
+              className="flex flex-wrap gap-2"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              {categories.map((category, index) => (
+                <motion.button
                   key={category}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.8 + index * 0.1 }}
                   onClick={() => setActiveCategory(category)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     activeCategory === category
                       ? 'bg-[#ff6600] text-white shadow-lg'
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  {category}
-                </button>
+                  {translateCategory(category)}
+                </motion.button>
               ))}
-            </div>
+            </motion.div>
 
             {/* Sort Dropdown */}
-            <div className="flex items-center gap-2">
+            <motion.div 
+              className="flex items-center gap-2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.9 }}
+            >
               <Filter className="w-4 h-4 text-gray-400" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-gray-100 dark:bg-gray-800 border-0 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff6600] transition-all"
+                className="bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff6600] transition-all"
               >
-                <option value="popularity">Most Popular</option>
-                <option value="name">Alphabetical</option>
-                <option value="status">By Status</option>
+                <option value="popularity">{t('ecobank.mostPopular')}</option>
+                <option value="name">{t('ecobank.alphabetical')}</option>
+                <option value="status">{t('ecobank.byStatus')}</option>
               </select>
-            </div>
+            </motion.div>
           </div>
 
           {/* Active Filters Display */}
-          {(searchTerm || activeCategory !== 'All') && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              className="mt-4 flex flex-wrap gap-2"
-            >
-              {searchTerm && (
-                <span className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-sm px-3 py-1 rounded-full">
-                  Search: "{searchTerm}"
-                  <button onClick={() => setSearchTerm('')} className="hover:text-blue-600">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {activeCategory !== 'All' && (
-                <span className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 text-sm px-3 py-1 rounded-full">
-                  Category: {activeCategory}
-                  <button onClick={() => setActiveCategory('All')} className="hover:text-green-600">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-            </motion.div>
-          )}
+          <AnimatePresence>
+            {(searchTerm || activeCategory !== 'All') && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 flex flex-wrap gap-2"
+              >
+                {searchTerm && (
+                  <motion.span 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-sm px-3 py-1 rounded-full"
+                  >
+                    {t('ecobank.search')}: "{searchTerm}"
+                    <button onClick={() => setSearchTerm('')} className="hover:text-blue-600">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </motion.span>
+                )}
+                {activeCategory !== 'All' && (
+                  <motion.span 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="inline-flex items-center gap-1 bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 text-sm px-3 py-1 rounded-full"
+                  >
+                    {t('ecobank.category')}: {translateCategory(activeCategory)}
+                    <button onClick={() => setActiveCategory('All')} className="hover:text-green-600">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </motion.span>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Services Grid */}
@@ -490,67 +777,127 @@ export default function DashboardHome() {
           layout
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
         >
-          {filteredServices.map((service) => renderServiceCard(service))}
+          {filteredServices.map((service, index) => (
+            <motion.div
+              key={service.name}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 + 0.6 }}
+              layoutId={`service-${service.name}`}
+            >
+              {renderServiceCard(service)}
+            </motion.div>
+          ))}
         </motion.div>
 
         {/* No Results State */}
-        {filteredServices.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <div className="text-gray-400 dark:text-gray-500 text-lg">
-              No services found matching your criteria
-            </div>
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setActiveCategory('All');
-              }}
-              className="mt-4 text-[#ff6600] hover:text-[#e65c00] font-medium"
+        <AnimatePresence>
+          {filteredServices.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="text-center py-12"
             >
-              Clear all filters
-            </button>
-          </motion.div>
-        )}
+              <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <div className="text-gray-400 dark:text-gray-500 text-lg mb-2">
+                No services found matching your criteria
+              </div>
+              <motion.button
+                onClick={() => {
+                  setSearchTerm('');
+                  setActiveCategory('All');
+                }}
+                className="text-[#ff6600] hover:text-[#e65c00] font-medium"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {t('ecobank.clearAllFilters')}
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.section>
 
-      {/* Service Status Summary */}
+      {/* Enhanced Service Status Summary */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
         className="max-w-7xl mx-auto mt-8 sm:mt-12"
       >
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Service Status Overview
+        <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border-2 border-gray-100 dark:border-gray-800 shadow-lg">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+            {t('ecobank.serviceStatusOverview')}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <motion.div 
+              className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800"
+              whileHover={{ scale: 1.02 }}
+            >
+              <motion.div 
+                className="w-3 h-3 bg-green-500 rounded-full"
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  opacity: [1, 0.7, 1]
+                }}
+                transition={{ 
+                  duration: 2, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
               <div>
-                <div className="font-medium text-gray-900 dark:text-white">{activeServicesCount} Active</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Ready to use</div>
+                <div className="font-bold text-gray-900 dark:text-white">{activeServicesCount} {t('ecobank.active')}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('ecobank.readyToUse')}</div>
               </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            </motion.div>
+            <motion.div 
+              className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800"
+              whileHover={{ scale: 1.02 }}
+            >
+              <motion.div 
+                className="w-3 h-3 bg-blue-500 rounded-full"
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  opacity: [1, 0.7, 1]
+                }}
+                transition={{ 
+                  duration: 2, 
+                  repeat: Infinity,
+                  delay: 0.5,
+                  ease: "easeInOut"
+                }}
+              />
               <div>
-                <div className="font-medium text-gray-900 dark:text-white">{newServicesCount} New</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Recently added</div>
+                <div className="font-bold text-gray-900 dark:text-white">{newServicesCount} {t('ecobank.new')}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('ecobank.recentlyAdded')}</div>
               </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+            </motion.div>
+            <motion.div 
+              className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
+              whileHover={{ scale: 1.02 }}
+            >
+              <motion.div 
+                className="w-3 h-3 bg-gray-500 rounded-full"
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  opacity: [1, 0.8, 1]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity,
+                  delay: 1,
+                  ease: "easeInOut"
+                }}
+              />
               <div>
-                <div className="font-medium text-gray-900 dark:text-white">
-                  {ecobankServices.length - activeServicesCount - newServicesCount} Coming Soon
+                <div className="font-bold text-gray-900 dark:text-white">
+                  {ecobankServices.length - activeServicesCount - newServicesCount} {t('ecobank.comingSoon')}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">In development</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('ecobank.inDevelopment')}</div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </motion.div>

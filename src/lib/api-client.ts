@@ -1,5 +1,6 @@
 // API Client with Language Header Support
 import { translations, type Locale } from './translations';
+import { secureStorage } from './auth-context';
 
 // Get the current locale from localStorage or default to 'rw'
 function getCurrentLocale(): Locale {
@@ -38,7 +39,7 @@ function getAuthHeaders(): Record<string, string> {
   const headers = getDefaultHeaders();
   
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('access_token');
+    const token = secureStorage.getAccessToken();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
