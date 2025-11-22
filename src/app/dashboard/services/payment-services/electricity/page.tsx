@@ -44,7 +44,7 @@ interface PaymentResponse {
 }
 
 export default function ElectricityPayment() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -111,14 +111,20 @@ export default function ElectricityPayment() {
 
   async function validateMeter(meter: string) {
     try {
-      const response = await api.post('/agency/thirdpartyagency/services/validate/biller', {
+      const response = await api.post(`/agency/thirdpartyagency/services/validate/biller?language=${locale}`, {
         billerCode: "electricity",
         productCode: "electricity",
         customerId: meter
       });
 
       if (!response.ok) {
-        throw new Error('Validation failed');
+        // Try to get backend error message
+        try {
+          const errorData = await response.json();
+          return { isValid: false, message: errorData.message || 'Validation failed' };
+        } catch {
+          return { isValid: false, message: 'Validation failed' };
+        }
       }
 
       const data: ValidationResponse = await response.json();
@@ -131,11 +137,11 @@ export default function ElectricityPayment() {
         }));
         return { isValid: true, validationData: data.data };
       } else {
-        // Return the API error message directly
+        // Return the backend message directly
         return { isValid: false, message: data.message };
       }
     } catch (error) {
-      console.error('Validation error:', error);
+      console.log('Validation info:', error);
       throw error;
     }
   }
@@ -146,7 +152,7 @@ export default function ElectricityPayment() {
     }
 
     try {
-      const response = await api.postAuth('/agency/thirdpartyagency/services/execute/bill-payment', {
+      const response = await api.postAuth(`/agency/thirdpartyagency/services/execute/bill-payment?language=${locale}`, {
         email: "mahamealfred@gmail.com",
         clientPhone: "+250789595309", // You might want to make this dynamic
         customerId: formData.meterNumber,
@@ -158,7 +164,13 @@ export default function ElectricityPayment() {
       });
 
       if (!response.ok) {
-        throw new Error('Payment failed');
+        // Try to get backend error message
+        try {
+          const errorData = await response.json();
+          return { success: false, message: errorData.message || 'Payment failed' };
+        } catch {
+          return { success: false, message: 'Payment failed' };
+        }
       }
 
       const data: PaymentResponse = await response.json();
@@ -167,10 +179,11 @@ export default function ElectricityPayment() {
         setPaymentData(data.data);
         return { success: true, paymentData: data.data };
       } else {
+        // Return the backend message directly
         return { success: false, message: data.message };
       }
     } catch (error) {
-      console.error('Payment error:', error);
+      console.log('Payment info:', error);
       throw error;
     }
   }

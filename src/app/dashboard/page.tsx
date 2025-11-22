@@ -11,6 +11,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n-context';
+import { useAuth } from '@/lib/auth-context';
 
 
 const containerVariants = {
@@ -38,8 +39,14 @@ const itemVariants = {
 
 export default function DashboardHome() {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
-  const services = [
+  // Determine user role
+  const userRole = user?.category;
+  const isAgent = userRole === "Agent";
+  const isCorporate = userRole === "Corporate" || userRole === "Business";
+
+  const allServices = [
     { 
       name: t('dashboardHome.balance'), 
       href: '/dashboard/balance', 
@@ -52,7 +59,8 @@ export default function DashboardHome() {
       href: '/dashboard/commission', 
       icon: MonitorCheck,
       description: t('dashboardHome.commissionsDesc'),
-      gradient: 'from-[#13294b] to-[#1a3a5f]'
+      gradient: 'from-[#13294b] to-[#1a3a5f]',
+      showForAgent: true // Only show for agents
     },
     { 
       name: t('dashboardHome.services'), 
@@ -77,6 +85,14 @@ export default function DashboardHome() {
     },
   ];
 
+  // Filter services based on user role
+  const services = allServices.filter(service => {
+    if (service.showForAgent && isCorporate) {
+      return false; // Hide commission for Corporate users
+    }
+    return true;
+  });
+
   return (
     <div className="relative bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 transition-colors px-4 sm:px-6 py-6 sm:py-8 w-full">
       
@@ -87,8 +103,26 @@ export default function DashboardHome() {
         transition={{ duration: 0.6 }}
         className="text-center mb-8 sm:mb-12 w-full"
       >
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent mb-3">
-          {t('dashboardHome.title')}
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-3">
+          {isAgent ? (
+            <>
+              <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">{t('dashboardHome.welcomeTo')} </span>
+              <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">
+                <span className="text-[#ff6600]">M</span>oola<span className="text-[#ff6600]">X</span>
+              </span>
+            </>
+          ) : isCorporate ? (
+            <>
+              <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">{t('dashboardHome.welcomeTo')} </span>
+              <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">
+                <span className="text-[#ff6600]">M</span>oola<span className="text-[#ff6600]">P</span>lus
+              </span>
+            </>
+          ) : (
+            <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">
+              {t('dashboardHome.title')}
+            </span>
+          )}
         </h1>
         <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4">
           {t('dashboardHome.subtitle')}
@@ -100,7 +134,7 @@ export default function DashboardHome() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 w-full max-w-full"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 w-full max-w-7xl mx-auto justify-items-center"
       >
         {services.map(({ name, href, icon: Icon, description, gradient }) => (
           <motion.div

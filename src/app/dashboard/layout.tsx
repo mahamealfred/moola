@@ -64,17 +64,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, isLoading, isAuthenticated, logout } = useAuth();
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Determine user role for logo display
+  const userRole = user?.category;
+  const isAgent = userRole === "Agent";
+  const isCorporate = userRole === "Corporate" || userRole === "Business";
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  const navItems = [
+  const allNavItems = [
     { label: t('nav.home'), href: '/dashboard', icon: Home },
     { label: t('nav.checkBalance'), href: '/dashboard/balance', icon: Wallet },
     { label: t('nav.transactions'), href: '/dashboard/transactions', icon: CreditCard },
-    { label: t('nav.commissions'), href: '/dashboard/commission', icon: BarChart2 },
+    { label: t('nav.commissions'), href: '/dashboard/commission', icon: BarChart2, showForAgent: true },
     { label: t('nav.settings'), href: '/dashboard/settings', icon: Settings },
   ];
+
+  // Filter navigation items based on user role
+  const navItems = allNavItems.filter(item => {
+    if (item.showForAgent && isCorporate) {
+      return false; // Hide commission for Corporate users
+    }
+    return true;
+  });
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -165,11 +178,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex items-center justify-between w-full mb-8">
           {isExpanded ? (
             <h1 className="text-xl font-extrabold tracking-tight">
-              <span className="text-[#ff6600]">X</span>
-              <span className="text-[#13294b] dark:text-white">-Pay</span>
+              {isAgent ? (
+                <>
+                  <span className="text-[#ff6600]">M</span>
+                  <span className="text-[#13294b] dark:text-white">oola</span>
+                  <span className="text-[#ff6600]">X</span>
+                </>
+              ) : isCorporate ? (
+                <>
+                  <span className="text-[#ff6600]">M</span>
+                  <span className="text-[#13294b] dark:text-white">oola</span>
+                  <span className="text-[#ff6600]">P</span>
+                  <span className="text-[#13294b] dark:text-white">lus</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-[#ff6600]">X</span>
+                  <span className="text-[#13294b] dark:text-white">-Pay</span>
+                </>
+              )}
             </h1>
           ) : (
-            <h1 className="text-xl font-extrabold tracking-tight text-[#ff6600]">X</h1>
+            <h1 className="text-xl font-extrabold tracking-tight text-[#ff6600]">
+              {isAgent ? 'M' : isCorporate ? 'M' : 'X'}
+            </h1>
           )}
           <button
             onClick={toggleSidebar}
@@ -239,8 +271,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {/* Mobile Header */}
               <div className="flex items-center justify-between w-full mb-8">
                 <h1 className="text-xl font-extrabold tracking-tight">
-                  <span className="text-[#ff6600]">X</span>
-                  <span className="text-[#13294b] dark:text-white">-Pay</span>
+                  {isAgent ? (
+                    <>
+                      <span className="text-[#ff6600]">M</span>
+                      <span className="text-[#13294b] dark:text-white">oola</span>
+                      <span className="text-[#ff6600]">X</span>
+                    </>
+                  ) : isCorporate ? (
+                    <>
+                      <span className="text-[#ff6600]">M</span>
+                      <span className="text-[#13294b] dark:text-white">oola</span>
+                      <span className="text-[#ff6600]">P</span>
+                      <span className="text-[#13294b] dark:text-white">lus</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-[#ff6600]">X</span>
+                      <span className="text-[#13294b] dark:text-white">-Pay</span>
+                    </>
+                  )}
                 </h1>
                 <button
                   onClick={closeMobileMenu}
@@ -301,9 +350,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               <Menu size={20} />
             </button>
-            <h1 className="text-lg sm:text-xl font-semibold truncate">
-              {navItems.find(item => item.href === pathname)?.label || 'Dashboard'}
-            </h1>
           </div>
 
           <div className="flex items-center gap-3 sm:gap-6">

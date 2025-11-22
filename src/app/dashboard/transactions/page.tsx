@@ -387,7 +387,7 @@ const TransactionDetailModal: React.FC<{
 };
 
 export default function TransactionsPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [filter, setFilter] = useState('');
   const [data, setData] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -437,13 +437,27 @@ export default function TransactionsPage() {
         throw new Error(t('transactions.authRequired'));
       }
 
-      console.log('Fetching transactions from API...');
+      console.log('Fetching transactions from API with locale:', locale);
       
-      // Call the transactions API endpoint
-      const response = await api.getAuth('/agency/thirdpartyagency/services/transactions/history');
+      // Call the transactions API endpoint with language parameter
+      const response = await api.getAuth(`/agency/thirdpartyagency/services/transactions/history?language=${locale}`);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Try to parse error response from backend
+        try {
+          const errorData = await response.json();
+          if (errorData.message) {
+            throw new Error(errorData.message);
+          }
+        } catch (parseError) {
+          // Silently fail - don't show HTTP error to user
+          console.log('Transactions endpoint returned:', response.status);
+        }
+        // Set empty data and return without showing error
+        setData([]);
+        setIsLoading(false);
+        setRefreshing(false);
+        return;
       }
 
       const apiResponse: ApiResponse = await response.json();
@@ -453,13 +467,20 @@ export default function TransactionsPage() {
         setData(apiResponse.data);
         setError('');
       } else {
-        throw new Error(apiResponse.message || 'Failed to fetch transactions');
+        // Display actual backend message only if provided
+        if (apiResponse.message) {
+          setError(apiResponse.message);
+        }
+        setData([]);
       }
 
     } catch (err: any) {
-      const errorMessage = err.message || 'Failed to fetch transactions';
-      setError(errorMessage);
-      console.error('Error fetching transactions:', err);
+      // Only display error if it's not an HTTP status error
+      if (err.message && !err.message.includes('HTTP error')) {
+        setError(err.message);
+      }
+      // Use console.log instead of console.error to avoid Next.js error overlay
+      console.log('Transactions fetch info:', err?.message || 'No data available');
       
       // Set empty data array on error
       setData([]);
@@ -601,9 +622,9 @@ export default function TransactionsPage() {
               <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">{t('transactions.title')}</h1>
               <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{t('transactions.subtitle')}</p>
               {error && (
-                <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                  <p className="text-yellow-700 dark:text-yellow-300 text-xs">
-                    {error} - {t('transactions.showingSampleData')}
+                <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                  <p className="text-red-700 dark:text-red-300 text-xs">
+                    {error}
                   </p>
                 </div>
               )}

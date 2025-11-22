@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from '@/lib/i18n-context';
 import CSVUpload from './CSVUpload';
 import RecipientList from './RecipientList';
 import MessageForm from './MessageForm';
@@ -9,6 +10,7 @@ import Confirmation from './Confirmation';
 import Receipt from './Receipt';
 
 export default function BulkSmsForm() {
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [recipients, setRecipients] = useState<{ name: string; phone: string }[]>([]);
   const [message, setMessage] = useState('');
@@ -43,9 +45,9 @@ export default function BulkSmsForm() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">Bulk SMS Service</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">{t('bulkSms.title')}</h1>
           </div>
-          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Send messages to multiple recipients</p>
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">{t('bulkSms.subtitle')}</p>
         </div>
 
         {/* Progress Bar */}
@@ -65,11 +67,11 @@ export default function BulkSmsForm() {
             ))}
           </div>
           <div className="flex justify-between mt-1 text-[10px] md:text-xs text-gray-500">
-            <span>Upload</span>
-            <span>Recipients</span>
-            <span>Message</span>
-            <span>Confirm</span>
-            <span>Receipt</span>
+            <span>{t('bulkSms.upload')}</span>
+            <span>{t('bulkSms.recipients')}</span>
+            <span>{t('bulkSms.message')}</span>
+            <span>{t('common.confirm')}</span>
+            <span>{t('forms.receipt')}</span>
           </div>
         </div>
 
@@ -126,7 +128,7 @@ export default function BulkSmsForm() {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Back
+              {t('common.back')}
             </button>
           )}
 
@@ -136,7 +138,7 @@ export default function BulkSmsForm() {
               disabled={recipients.length === 0}
               className="bg-[#ff6600] hover:bg-[#e65c00] disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full sm:w-auto font-semibold transition flex items-center justify-center ml-auto"
             >
-              Next
+              {t('common.next')}
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -148,7 +150,7 @@ export default function BulkSmsForm() {
               onClick={handleNext}
               className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full sm:w-auto font-semibold flex items-center justify-center ml-auto"
             >
-              Confirm & Generate Receipt
+              {t('common.confirm')}
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>

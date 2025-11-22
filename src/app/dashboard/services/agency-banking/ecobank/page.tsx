@@ -224,9 +224,17 @@ export default function EcobankServicesPage() {
     return categoryMap[category] || category;
   };
 
-  // Helper to get translation key from service name
+  // Helper to get translation key from service name (convert to camelCase)
   const getServiceKey = (name: string) => {
-    return name.toLowerCase().replace(/ /g, '');
+    return name
+      .split(' ')
+      .map((word, index) => {
+        if (index === 0) {
+          return word.toLowerCase();
+        }
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
+      .join('');
   };
 
   // Translate services
