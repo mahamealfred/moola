@@ -2,8 +2,10 @@
 
 import html2pdf from 'html2pdf.js';
 import Link from 'next/link';
+import { useTranslation } from '@/lib/i18n-context';
 
 export default function Receipt({ receiptId, recipients, message, cost, total,senderId }: any) {
+  const { t } = useTranslation();
   const handleDownloadPDF = () => {
     const element = document.getElementById('receipt-pdf');
     if (element) {
@@ -17,14 +19,14 @@ export default function Receipt({ receiptId, recipients, message, cost, total,se
         id="receipt-pdf"
         className="p-4 border rounded-xl bg-gray-50 dark:bg-gray-700"
       >
-        <h2 className="text-xl font-bold">Bulk SMS Receipt</h2>
-        <p>ID: {receiptId}</p>
-        <p>Recipients: {recipients.length}</p>
-        <p>Sender ID: {senderId || 'N/A'}</p>
+        <h2 className="text-xl font-bold">{t('bulkSms.bulkSmsReceipt')}</h2>
+        <p>{t('bulkSms.receiptId')}: {receiptId}</p>
+        <p>{t('bulkSms.recipients')}: {recipients.length}</p>
+        <p>{t('bulkSms.senderId')}: {senderId || 'N/A'}</p>
 
-        <p>Message: {message}</p>
-        <p>Cost per SMS: {cost} RWF</p>
-        <p className="font-bold">Total Cost: {total} RWF</p>
+        <p>{t('bulkSms.yourMessage')}: {message}</p>
+        <p>{t('bulkSms.costPerMessage')}: {cost} RWF</p>
+        <p className="font-bold">{t('bulkSms.totalCost')}: {total} RWF</p>
       </div>
 
       <div className="flex gap-3">
@@ -32,13 +34,13 @@ export default function Receipt({ receiptId, recipients, message, cost, total,se
           onClick={handleDownloadPDF}
           className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl"
         >
-          Download PDF
+          {t('electricity.downloadReceipt')}
         </button>
         <Link
           href="/dashboard/services"
           className="bg-gray-300 hover:bg-gray-400 text-gray-900 px-6 py-2 rounded-xl text-center"
         >
-          Back to Services
+          {t('common.back')}
         </Link>
       </div>
     </div>

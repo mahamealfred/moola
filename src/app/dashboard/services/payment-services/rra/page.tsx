@@ -4,7 +4,7 @@ import React, { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
 import { useTranslation } from '@/lib/i18n-context';
-import * as api from '@/lib/api-client';
+import api from '@/lib/api-client';
 import { secureStorage } from '@/lib/auth-context';
 
 type Step = 1 | 2 | 3 | 4;

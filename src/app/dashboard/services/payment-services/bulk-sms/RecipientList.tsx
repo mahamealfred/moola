@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslation } from '@/lib/i18n-context';
 
 interface Recipient {
   name: string;
@@ -13,6 +14,7 @@ interface RecipientListProps {
 }
 
 export default function RecipientList({ recipients, setRecipients }: RecipientListProps) {
+  const { t } = useTranslation();
   const [newRecipient, setNewRecipient] = useState({ name: '', phone: '' });
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -23,14 +25,14 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
 
   const addRecipient = () => {
     if (!newRecipient.phone.trim()) {
-      alert('Phone number is required');
+      alert(t('forms.phoneRequired'));
       return;
     }
 
     // Basic phone validation
     const phoneRegex = /^\+?[\d\s-()]{10,}$/;
     if (!phoneRegex.test(newRecipient.phone)) {
-      alert('Please enter a valid phone number');
+      alert(t('forms.invalidPhone'));
       return;
     }
 
@@ -40,7 +42,7 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
   };
 
   const clearAll = () => {
-    if (confirm('Are you sure you want to remove all recipients?')) {
+    if (confirm(t('bulkSms.confirmClearAll'))) {
       setRecipients([]);
     }
   };
@@ -49,7 +51,7 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
     <div>
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
-          Recipients ({recipients.length})
+          {t('bulkSms.recipients')} ({recipients.length})
         </h2>
         {recipients.length > 0 && (
           <button
@@ -59,7 +61,7 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
-            Clear All
+            {t('bulkSms.clearAll')}
           </button>
         )}
       </div>
@@ -67,20 +69,20 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
       {/* Add Recipient Form */}
       {showAddForm && (
         <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg mb-3 border border-blue-200 dark:border-blue-800">
-          <h3 className="font-semibold text-blue-900 dark:text-blue-100 text-sm mb-2">Add New Recipient</h3>
+          <h3 className="font-semibold text-blue-900 dark:text-blue-100 text-sm mb-2">{t('bulkSms.addNewRecipient')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Name (Optional)</label>
+              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">{t('bulkSms.nameOptional')}</label>
               <input
                 type="text"
                 value={newRecipient.name}
                 onChange={(e) => setNewRecipient({ ...newRecipient, name: e.target.value })}
-                placeholder="Recipient name"
+                placeholder={t('bulkSms.recipientNamePlaceholder')}
                 className="w-full px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Phone Number *</label>
+              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">{t('bulkSms.phoneNumberRequired')}</label>
               <input
                 type="text"
                 value={newRecipient.phone}
@@ -98,13 +100,13 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add Recipient
+              {t('bulkSms.addRecipient')}
             </button>
             <button
               onClick={() => setShowAddForm(false)}
               className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-1 rounded text-sm font-medium"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>
@@ -119,7 +121,7 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Add Recipient Manually
+          {t('bulkSms.addManually')}
         </button>
       )}
 
@@ -130,8 +132,8 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <p className="text-sm">No recipients added yet</p>
-            <p className="text-xs mt-1">Upload a CSV file or add recipients manually</p>
+            <p className="text-sm">{t('bulkSms.noRecipients')}</p>
+            <p className="text-xs mt-1">{t('bulkSms.uploadOrAddManually')}</p>
           </div>
         ) : (
           <div className="max-h-60 overflow-y-auto">
@@ -142,14 +144,14 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
               >
                 <div className="flex-1">
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {recipient.name || <span className="italic text-gray-400">No Name</span>}
+                    {recipient.name || <span className="italic text-gray-400">{t('bulkSms.noName')}</span>}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">{recipient.phone}</p>
                 </div>
                 <button
                   onClick={() => removeRecipient(index)}
                   className="text-red-500 hover:text-red-700 p-1 ml-2 transition-colors"
-                  title="Remove recipient"
+                  title={t('bulkSms.remove')}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -165,7 +167,7 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
       {recipients.length > 0 && (
         <div className="mt-3 p-2 bg-[#ff660010] dark:bg-[#ff660020] rounded-lg">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-700 dark:text-gray-300">Total Recipients:</span>
+            <span className="text-gray-700 dark:text-gray-300">{t('bulkSms.totalRecipients')}:</span>
             <span className="font-semibold text-[#ff6600]">{recipients.length}</span>
           </div>
         </div>
