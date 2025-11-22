@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, Variants, easeOut, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Search, X, Quote, Download, Smartphone, Wifi, Home, Car, Heart, ShoppingCart } from 'lucide-react';
+import Image from 'next/image';
 import {
   Sun,
   Moon,
@@ -77,7 +78,7 @@ const staggerContainer: Variants = {
 
 export default function LandingPage() {
   const { t } = useTranslation();
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [newService, setNewService] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -132,18 +133,19 @@ export default function LandingPage() {
   ];
 
   const allServicesTranslated = [
-    { name: t('landing.electricityPayment'), icon: Zap, category: 'Utilities', description: t('landing.electricityPaymentDesc'), color: 'text-yellow-500', popularity: 95 },
-    { name: t('landing.rraTaxPayment'), icon: FileText, category: 'Government', description: t('landing.rraTaxPaymentDesc'), color: 'text-red-500', popularity: 88 },
-    { name: t('landing.buyAirtime'), icon: Phone, category: 'Telecom', description: t('landing.buyAirtimeDesc'), color: 'text-[#ff6600]', popularity: 92 },
-    { name: t('landing.startimesTV'), icon: Tv, category: 'Entertainment', description: t('landing.startimesTVDesc'), color: 'text-purple-500', popularity: 78 },
-    { name: t('landing.bulkSMS'), icon: MessageSquare, category: 'Communication', description: t('landing.bulkSMSDesc'), color: 'text-blue-500', popularity: 85 },
-    { name: t('landing.iremboServices'), icon: Globe, category: 'Government', description: t('landing.iremboServicesDesc'), color: 'text-indigo-500', popularity: 90 },
-    { name: t('landing.wasacWater'), icon: Droplet, category: 'Utilities', description: t('landing.wasacWaterDesc'), color: 'text-cyan-500', popularity: 82 },
-    { name: t('landing.schoolFees'), icon: BookOpen, category: 'Education', description: t('landing.schoolFeesDesc'), color: 'text-orange-500', popularity: 87 },
-    { name: t('landing.bulkSalary'), icon: Users, category: 'Business', description: t('landing.bulkSalaryDesc'), color: 'text-teal-500', popularity: 93 },
-    { name: t('landing.invoicePayments'), icon: CreditCard, category: 'Business', description: t('landing.invoicePaymentsDesc'), color: 'text-pink-500', popularity: 89 },
-    { name: t('landing.taxCalculation'), icon: Calculator, category: 'Business', description: t('landing.taxCalculationDesc'), color: 'text-gray-600', popularity: 84 },
-    { name: t('landing.expenseManagement'), icon: FileSpreadsheet, category: 'Business', description: t('landing.expenseManagementDesc'), color: 'text-amber-600', popularity: 86 }
+    { name: t('landing.electricityPayment'), logo: '/logos/services/electricity.png', category: 'Utilities', description: t('landing.electricityPaymentDesc'), color: 'text-yellow-500', popularity: 95 },
+    { name: t('landing.rraTaxPayment'), logo: '/logos/services/rra.jpg', category: 'Government', description: t('landing.rraTaxPaymentDesc'), color: 'text-red-500', popularity: 88 },
+    { name: t('landing.buyAirtime'), logo: '/logos/services/airtime.jpg', category: 'Telecom', description: t('landing.buyAirtimeDesc'), color: 'text-[#ff6600]', popularity: 92 },
+    { name: t('landing.startimesTV'), logo: '/logos/services/startime.png', category: 'Entertainment', description: t('landing.startimesTVDesc'), color: 'text-purple-500', popularity: 78 },
+    { name: t('landing.bulkSMS'), logo: '/logos/services/bulksms.png', category: 'Communication', description: t('landing.bulkSMSDesc'), color: 'text-blue-500', popularity: 85 },
+    { name: t('landing.iremboServices'), logo: '/logos/services/irembo.png', category: 'Government', description: t('landing.iremboServicesDesc'), color: 'text-indigo-500', popularity: 90 },
+    { name: t('landing.wasacWater'), logo: '/logos/services/wasac.jpg', category: 'Utilities', description: t('landing.wasacWaterDesc'), color: 'text-cyan-500', popularity: 82 },
+    { name: t('landing.schoolFees'), logo: '/logos/services/school.svg', category: 'Education', description: t('landing.schoolFeesDesc'), color: 'text-orange-500', popularity: 87 },
+    { name: t('landing.rnit'), logo: '/logos/services/rnit.png', category: 'Government', description: t('landing.rnitDesc'), color: 'text-blue-600', popularity: 91 },
+    { name: t('landing.bulkSalary'), logo: '/logos/services/salary.svg', category: 'Business', description: t('landing.bulkSalaryDesc'), color: 'text-teal-500', popularity: 93 },
+    { name: t('landing.invoicePayments'), logo: '/logos/services/invoice.svg', category: 'Business', description: t('landing.invoicePaymentsDesc'), color: 'text-pink-500', popularity: 89 },
+    { name: t('landing.taxCalculation'), logo: '/logos/services/taxcalc.svg', category: 'Business', description: t('landing.taxCalculationDesc'), color: 'text-gray-600', popularity: 84 },
+    { name: t('landing.expenseManagement'), logo: '/logos/services/expense.svg', category: 'Business', description: t('landing.expenseManagementDesc'), color: 'text-amber-600', popularity: 86 }
   ];
 
   const paymentFeaturesTranslated = [
@@ -205,12 +207,11 @@ export default function LandingPage() {
   ];
 
   const banksTranslated = [
-    { name: t('landing.equityBank'), icon: Building, color: 'text-blue-600', customers: '2M+' },
-    { name: t('landing.bankOfKigali'), icon: Building, color: 'text-[#13294b]', customers: '1.5M+' },
-    { name: t('landing.ecobank'), icon: Building, color: 'text-orange-600', customers: '1.2M+' },
-    { name: t('landing.gtBank'), icon: Building, color: 'text-red-600', customers: '800K+' },
-    { name: t('landing.imBank'), icon: Building, color: 'text-purple-600', customers: '900K+' },
-    { name: t('landing.cogebank'), icon: Building, color: 'text-teal-600', customers: '700K+' },
+    { name: t('landing.equityBank'), logo: '/logos/banks/equity.jpg', color: 'text-blue-600', customers: '2M+' },
+    { name: t('landing.bankOfKigali'), logo: '/logos/banks/bankofkigali.png', color: 'text-[#13294b]', customers: '1.5M+' },
+    { name: t('landing.ecobank'), logo: '/logos/banks/ECOBANK.jpg', color: 'text-orange-600', customers: '1.2M+' },
+    { name: t('landing.gtBank'), logo: '/logos/banks/gtbank.png', color: 'text-red-600', customers: '800K+' },
+    { name: t('landing.imBank'), logo: '/logos/banks/i&nbank.png', color: 'text-purple-600', customers: '900K+' },
   ];
 
   const benefitsTranslated = [
@@ -319,9 +320,7 @@ export default function LandingPage() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    const prefersDark =
-      savedTheme === 'dark' ||
-      (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const prefersDark = savedTheme === 'dark';
     setIsDark(prefersDark);
     document.documentElement.classList.toggle('dark', prefersDark);
   }, []);
@@ -392,30 +391,135 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-white dark:bg-gray-950 transition-colors duration-700 overflow-x-hidden">
-      {/* Enhanced Floating Background Elements */}
+    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950 transition-colors duration-700 overflow-x-hidden">
+      {/* Payment & Money Transfer Background Pattern */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+        {/* Animated Money Flow Lines */}
+        <svg className="absolute inset-0 w-full h-full opacity-10 dark:opacity-5">
+          <defs>
+            <linearGradient id="moneyFlow" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#ff6600" />
+              <stop offset="50%" stopColor="#4CAF50" />
+              <stop offset="100%" stopColor="#2196F3" />
+            </linearGradient>
+          </defs>
+          {/* Flowing connection lines */}
+          <motion.path
+            d="M0,100 Q250,50 500,100 T1000,100"
+            stroke="url(#moneyFlow)"
+            strokeWidth="2"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.path
+            d="M0,300 Q250,250 500,300 T1000,300"
+            stroke="url(#moneyFlow)"
+            strokeWidth="2"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "linear", delay: 0.5 }}
+          />
+          <motion.path
+            d="M0,500 Q250,450 500,500 T1000,500"
+            stroke="url(#moneyFlow)"
+            strokeWidth="2"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear", delay: 1 }}
+          />
+        </svg>
+
+        {/* Floating Payment Icons */}
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ 
+              opacity: [0.1, 0.3, 0.1],
+              scale: [1, 1.2, 1],
+              x: [0, Math.random() * 100 - 50, 0],
+              y: [0, Math.random() * 100 - 50, 0]
+            }}
+            transition={{
+              duration: 8 + i,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 0.5
+            }}
+            style={{
+              left: `${10 + i * 12}%`,
+              top: `${20 + (i % 3) * 25}%`,
+            }}
+          >
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-green-400/20 to-blue-400/20 flex items-center justify-center backdrop-blur-sm border border-green-400/30">
+              <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-green-500/40" />
+            </div>
+          </motion.div>
+        ))}
+
+        {/* Card/Wallet Icons */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={`wallet-${i}`}
+            className="absolute"
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: [0.05, 0.15, 0.05],
+              rotate: [0, 10, 0]
+            }}
+            transition={{
+              duration: 6 + i,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 0.8
+            }}
+            style={{
+              right: `${5 + i * 15}%`,
+              top: `${15 + (i % 4) * 20}%`,
+            }}
+          >
+            <CreditCard className="w-10 h-10 sm:w-14 sm:h-14 text-blue-500/30" />
+          </motion.div>
+        ))}
+
+        {/* Transfer Arrow Paths */}
+        <motion.div
+          className="absolute top-1/4 left-1/4 w-32 sm:w-48"
+          animate={{ x: [0, 100, 0], opacity: [0.1, 0.3, 0.1] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Send className="w-8 h-8 sm:w-12 sm:h-12 text-orange-500/30" />
+        </motion.div>
+
+        <motion.div
+          className="absolute bottom-1/3 right-1/4 w-32 sm:w-48"
+          animate={{ x: [0, -100, 0], opacity: [0.1, 0.3, 0.1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        >
+          <ArrowRight className="w-8 h-8 sm:w-12 sm:h-12 text-purple-500/30" />
+        </motion.div>
+
+        {/* Gradient Orbs */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 2, ease: "easeOut" }}
-          className="absolute w-48 h-48 sm:w-80 sm:h-80 bg-gradient-to-br from-[#13294b]/10 to-[#ff6600]/5 dark:from-[#13294b]/20 dark:to-[#ff6600]/10 blur-2xl rounded-full top-8 left-1/4 animate-pulse"
+          className="absolute w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-br from-green-400/10 to-blue-500/10 dark:from-green-400/5 dark:to-blue-500/5 blur-3xl rounded-full top-20 left-10 animate-pulse"
         />
         <motion.div 
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 2, delay: 0.3, ease: "easeOut" }}
-          className="absolute w-36 h-36 sm:w-56 sm:h-56 bg-gradient-to-br from-[#ff6600]/10 to-[#13294b]/5 dark:from-[#ff6600]/20 dark:to-[#13294b]/10 blur-xl rounded-full bottom-8 right-1/4 animate-pulse"
-        />
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2, delay: 0.6 }}
-          className="absolute w-48 h-48 sm:w-64 sm:h-64 bg-purple-500/5 dark:bg-purple-500/10 blur-2xl rounded-full top-1/2 left-4 sm:left-8 animate-pulse"
+          transition={{ duration: 2, delay: 0.5, ease: "easeOut" }}
+          className="absolute w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-br from-orange-400/10 to-purple-500/10 dark:from-orange-400/5 dark:to-purple-500/5 blur-3xl rounded-full bottom-20 right-10 animate-pulse"
         />
         
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
+        {/* Subtle Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(79,70,229,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(79,70,229,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(79,70,229,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(79,70,229,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
       {/* Enhanced Sticky Header */}
@@ -450,11 +554,21 @@ export default function LandingPage() {
               </div>
               
               <div className="flex flex-col">
-                <h1 className="text-lg sm:text-xl font-black tracking-tight leading-none">
+                <h1 className="text-lg sm:text-xl font-black tracking-tight leading-none relative">
                   <span className="bg-gradient-to-r from-[#ff6600] via-[#ff7700] to-[#ff8533] bg-clip-text text-transparent drop-shadow-sm">
                     M
                   </span>
                   <span className="text-[#13294b] dark:text-white drop-shadow-sm">oola</span>
+                  <span 
+                    className="text-[#13294b] dark:text-white drop-shadow-sm absolute"
+                    style={{
+                      fontSize: '0.6em',
+                      top: '-0.3em',
+                      marginLeft: '0.1em'
+                    }}
+                  >
+                    +
+                  </span>
                 </h1>
                 <p className="text-[10px] text-gray-600 dark:text-gray-300 font-medium tracking-wider mt-0.5 opacity-90 group-hover:opacity-100 transition-opacity">
                   {t('landing.premiumSolutions')}
@@ -523,38 +637,180 @@ export default function LandingPage() {
         </div>
       </motion.header>
 
-      {/* Enhanced Hero Section */}
+      {/* Enhanced Hero Section with Animated Background */}
       <motion.section
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="relative text-center pt-8 sm:pt-16 pb-12 sm:pb-20 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+        className="relative text-center pt-8 sm:pt-16 pb-12 sm:pb-20 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
       >
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
+        {/* Animated Background - Right Triangle from Left to Top */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Right-angled triangle shape covering left and top */}
+          <div 
+            className="absolute top-0 left-0 opacity-15 dark:opacity-10"
+            style={{
+              width: '0',
+              height: '0',
+              borderLeft: '100vw solid transparent',
+              borderTop: '100vh solid transparent',
+              borderImage: 'linear-gradient(135deg, rgba(255, 102, 0, 0.3) 0%, rgba(19, 41, 75, 0.3) 100%) 1',
+            }}
+          >
+            <svg className="absolute top-0 left-0 w-full h-full" style={{ width: '100vw', height: '100vh' }}>
+              <defs>
+                <linearGradient id="triangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ff6600" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#13294b" stopOpacity="0.3" />
+                </linearGradient>
+              </defs>
+              <polygon 
+                points="0,0 100,0 0,100" 
+                fill="url(#triangleGradient)"
+                style={{ transformOrigin: '0 0', transform: 'scale(15)' }}
+              />
+            </svg>
+          </div>
+
+          {/* Subtle glow along triangle edge */}
           <motion.div
             animate={{
-              rotate: 360,
-              scale: [1, 1.1, 1],
+              opacity: [0.2, 0.4, 0.2]
             }}
             transition={{
-              rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-              scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut"
             }}
-            className="absolute top-1/4 left-1/4 w-24 h-24 bg-[#ff6600]/10 rounded-full blur-lg"
-          />
-          <motion.div
-            animate={{
-              rotate: -360,
-              scale: [1.1, 1, 1.1],
-            }}
-            transition={{
-              rotate: { duration: 25, repeat: Infinity, ease: "linear" },
-              scale: { duration: 5, repeat: Infinity, ease: "easeInOut" }
-            }}
-            className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-[#13294b]/10 rounded-full blur-lg"
+            className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#ff6600]/20 to-[#13294b]/20 blur-3xl"
+            style={{ clipPath: 'polygon(0 0, 50% 0, 0 100%)' }}
           />
         </div>
+
+        {/* Large Animated Moola Branding */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5, y: -100 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ 
+            duration: 1, 
+            type: "spring", 
+            stiffness: 100,
+            damping: 15
+          }}
+          className="relative mx-auto mb-8 sm:mb-12 z-10"
+          style={{ maxWidth: '600px' }}
+        >
+          <div className="relative">
+            {/* Animated glow effects */}
+            <motion.div
+              animate={{
+                opacity: [0.3, 0.6, 0.3],
+                scale: [1, 1.1, 1]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="absolute inset-0 bg-gradient-to-r from-[#ff6600] to-[#13294b] blur-3xl opacity-40 rounded-full"
+              style={{ transform: 'scale(1.2)' }}
+            />
+            
+            {/* Main Moola text with shadows */}
+            <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 sm:p-12 border-4 border-transparent shadow-2xl"
+              style={{
+                boxShadow: '0 20px 60px rgba(255, 102, 0, 0.3), 0 0 40px rgba(19, 41, 75, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+                background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'
+              }}
+            >
+              {/* Gradient border */}
+              <div
+                className="absolute inset-0 rounded-3xl p-[4px]"
+                style={{
+                  background: 'linear-gradient(45deg, #ff6600, #13294b, #ff6600, #13294b)',
+                  backgroundSize: '300% 300%',
+                  zIndex: -1
+                }}
+              />
+              
+              <motion.h1
+                animate={{
+                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tight relative inline-block"
+                style={{
+                  background: 'linear-gradient(90deg, #ff6600 0%, #13294b 25%, #ff6600 50%, #13294b 75%, #ff6600 100%)',
+                  backgroundSize: '200% auto',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  textShadow: '0 4px 20px rgba(255, 102, 0, 0.3)',
+                  filter: 'drop-shadow(0 2px 8px rgba(19, 41, 75, 0.4))'
+                }}
+              >
+                Moola
+                <span 
+                  className="font-black absolute"
+                  style={{
+                    fontSize: '0.5em',
+                    top: '0.2em',
+                    marginLeft: '0.1em',
+                    background: 'linear-gradient(90deg, #ff6600 0%, #13294b 25%, #ff6600 50%, #13294b 75%, #ff6600 100%)',
+                    backgroundSize: '200% auto',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  +
+                </span>
+              </motion.h1>
+              
+              {/* Subtitle with animation */}
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-sm sm:text-base lg:text-lg mt-3 font-semibold"
+                style={{
+                  background: 'linear-gradient(90deg, #13294b, #ff6600)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
+                {t('landing.premiumSolutions')}
+              </motion.p>
+              
+              {/* Decorative elements */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute -top-4 -left-4 w-8 h-8 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] shadow-lg"
+              />
+              <motion.div
+                animate={{ rotate: -360 }}
+                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                className="absolute -bottom-4 -right-4 w-12 h-12 rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] shadow-lg"
+              />
+              <motion.div
+                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute top-1/2 -right-6 w-6 h-6 rounded-full bg-[#ff6600] blur-sm"
+              />
+              <motion.div
+                animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute top-1/4 -left-6 w-8 h-8 rounded-full bg-[#13294b] blur-sm"
+              />
+            </div>
+          </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -662,12 +918,45 @@ export default function LandingPage() {
       </motion.section>
 
       {/* Enhanced Services Section */}
-      <section id="services" ref={servicesRef} className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative">
+      <section id="services" ref={servicesRef} className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
+        {/* Triangle Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div 
+            className="absolute top-0 left-0 opacity-10 dark:opacity-5"
+          >
+            <svg className="absolute top-0 left-0 w-full h-full" style={{ width: '100%', height: '100%' }}>
+              <defs>
+                <linearGradient id="servicesTriangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ff6600" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#13294b" stopOpacity="0.2" />
+                </linearGradient>
+              </defs>
+              <polygon 
+                points="0,0 100,0 0,100" 
+                fill="url(#servicesTriangleGradient)"
+                style={{ transformOrigin: '0 0', transform: 'scale(15)' }}
+              />
+            </svg>
+          </div>
+          <motion.div
+            animate={{
+              opacity: [0.1, 0.3, 0.1]
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#ff6600]/10 to-[#13294b]/10 blur-3xl"
+            style={{ clipPath: 'polygon(0 0, 50% 0, 0 100%)' }}
+          />
+        </div>
+
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center mb-8 sm:mb-16"
+          className="text-center mb-8 sm:mb-16 relative z-10"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -793,7 +1082,7 @@ export default function LandingPage() {
           transition={{ duration: 0.3, ease: "easeOut" }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
         >
-          {displayServices.slice(0, isMobile ? 6 : 12).map(({ name, icon: Icon, description, category, color, popularity }, idx) => (
+          {displayServices.slice(0, isMobile ? 6 : 12).map(({ name, logo, description, category, color, popularity }, idx) => (
             <motion.div
               key={name}
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -803,31 +1092,53 @@ export default function LandingPage() {
               onClick={goToLogin}
               className="group cursor-pointer"
             >
-              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-4 sm:p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 h-full relative overflow-hidden">
-                {/* Background Gradient */}
-                <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-[#ff6600]/10 to-transparent rounded-bl-xl" />
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 h-full relative overflow-hidden group-hover:border-[#ff6600] group-hover:-translate-y-2">
+                {/* Animated Background Gradient */}
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-br from-[#ff6600]/5 via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  initial={{ scale: 0 }}
+                  whileHover={{ scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                />
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-[#ff6600]/10 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
                 
-                {/* Popularity Badge */}
-                <div className="absolute top-2 left-2 bg-[#ff6600] text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium">
-                  {popularity}% {t('landing.popular')}
-                </div>
-                
-                <div className="relative z-10">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 p-2 sm:p-3 rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                      <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${color}`} />
-                    </div>
-                    <span className="bg-[#ff6600]/10 text-[#ff6600] text-xs px-2 py-1 rounded-full font-medium">
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className="flex items-start justify-between mb-4">
+                    {/* Image with equal width and height, border radius, shadow, and animation */}
+                    <motion.div 
+                      className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 p-4 rounded-2xl shadow-md group-hover:shadow-xl relative overflow-hidden border-2 border-gray-100 dark:border-gray-600 group-hover:border-[#ff6600]/50"
+                      style={{ width: '80px', height: '80px', minWidth: '80px', minHeight: '80px' }}
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+                    >
+                      <Image src={logo} alt={name} fill className="object-contain p-2 group-hover:brightness-110 transition-all duration-300" />
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-br from-[#ff6600]/0 to-[#ff6600]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
+                      />
+                    </motion.div>
+                    <motion.span 
+                      className="bg-gradient-to-r from-[#ff6600]/10 to-orange-500/10 text-[#ff6600] text-xs px-3 py-1.5 rounded-full font-semibold border border-[#ff6600]/30 shadow-sm"
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      transition={{ duration: 0.2 }}
+                    >
                       {translateCategory(category)}
-                    </span>
+                    </motion.span>
                   </div>
                   
-                  <h4 className="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-1.5 group-hover:text-[#ff6600] transition-colors">
-                    {name}
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed group-hover:text-gray-800 dark:group-hover:text-gray-100 transition-colors duration-300 flex-grow">
                     {description}
                   </p>
+                  
+                  {/* Hover indicator */}
+                  <motion.div 
+                    className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    initial={{ y: 10 }}
+                    whileHover={{ y: 0 }}
+                  >
+                    <span className="text-[#ff6600] text-xs font-medium flex items-center gap-1">
+                      Click to explore <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </motion.div>
                 </div>
               </div>
             </motion.div>
@@ -1374,14 +1685,14 @@ export default function LandingPage() {
           </p>
         </motion.div>
 
-        <div className="relative">
+        <div className="relative w-full">
           <motion.div
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 max-w-5xl mx-auto"
+            className="flex flex-wrap justify-center gap-4 sm:gap-6 max-w-6xl mx-auto px-4"
           >
-            {banksTranslated.map(({ name, icon: Icon, color, customers }, idx) => (
+            {banksTranslated.map(({ name, logo, color, customers }, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -1389,18 +1700,18 @@ export default function LandingPage() {
                 transition={{ delay: idx * 0.08, duration: 0.3, ease: "easeOut" }}
                 whileHover={{ scale: 1.05, y: -3, transition: { duration: 0.2 } }}
                 onClick={goToLogin}
-                className="group cursor-pointer"
+                className="group cursor-pointer w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-1rem)] lg:w-[calc(20%-1.2rem)] min-w-[140px] max-w-[200px]"
               >
-                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-3 sm:p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-500 text-center relative overflow-hidden">
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-4 sm:p-5 rounded-xl shadow-md hover:shadow-xl transition-all duration-500 text-center relative overflow-hidden h-full">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#ff6600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="relative z-10">
-                    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 p-2 sm:p-3 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                      <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${color}`} />
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 p-3 sm:p-4 rounded-xl w-20 h-20 sm:w-24 sm:h-24 mb-3 group-hover:scale-110 transition-transform duration-300 shadow-sm relative">
+                      <Image src={logo} alt={name} fill className="object-contain p-2" />
                     </div>
-                    <h4 className="text-xs sm:text-sm font-bold text-gray-800 dark:text-white group-hover:text-[#ff6600] transition-colors mb-1">
+                    <h4 className="text-sm sm:text-base font-bold text-gray-800 dark:text-white group-hover:text-[#ff6600] transition-colors mb-1.5">
                       {name}
                     </h4>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                    <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                       {customers} customers
                     </div>
                   </div>
@@ -1433,12 +1744,41 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Stats Section */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
+        {/* Triangle Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <svg className="absolute top-0 left-0 w-full h-full opacity-10 dark:opacity-5">
+            <defs>
+              <linearGradient id="statsTriangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ff6600" stopOpacity="0.2" />
+                <stop offset="100%" stopColor="#13294b" stopOpacity="0.2" />
+              </linearGradient>
+            </defs>
+            <polygon 
+              points="0,0 100,0 0,100" 
+              fill="url(#statsTriangleGradient)"
+              style={{ transformOrigin: '0 0', transform: 'scale(15)' }}
+            />
+          </svg>
+          <motion.div
+            animate={{
+              opacity: [0.1, 0.3, 0.1]
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#ff6600]/10 to-[#13294b]/10 blur-3xl"
+            style={{ clipPath: 'polygon(0 0, 50% 0, 0 100%)' }}
+          />
+        </div>
+
         <motion.div
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 relative z-10"
         >
           {[
             { number: allServicesTranslated.length + '+', label: t('landing.services'), delay: 0, icon: Zap },
@@ -1547,7 +1887,7 @@ export default function LandingPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="bg-gradient-to-br from-[#13294b] to-[#1e3a8a] dark:from-gray-900 dark:to-gray-950 text-white py-12 sm:py-20"
+        className="bg-gradient-to-br from-[#13294b] via-[#0f213d] to-[#ff6600] dark:from-[#13294b] dark:to-[#ff6600] text-white py-12 sm:py-20"
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
@@ -1590,7 +1930,7 @@ export default function LandingPage() {
             <div>
               <h4 className="text-base font-semibold mb-3">{t('landing.services')}</h4>
               <div className="space-y-1.5">
-                {[t('landing.billPayments'), t('landing.moneyTransfer'), t('landing.mobileTopup'), t('landing.bankingServices'), 'Investment', 'Insurance'].map((item) => (
+                {[t('landing.billPayments'), t('landing.moneyTransfer'), t('landing.mobileTopup'), t('landing.bankingServices'), t('landing.investment'), t('landing.insurance')].map((item) => (
                   <motion.div
                     key={item}
                     whileHover={{ x: 3, color: '#ff6600' }}
@@ -1605,7 +1945,7 @@ export default function LandingPage() {
             <div>
               <h4 className="text-base font-semibold mb-3">{t('landing.support')}</h4>
               <div className="space-y-1.5">
-                {[t('landing.helpCenter'), t('landing.contactUs'), t('landing.privacyPolicy'), t('landing.termsOfService'), 'API Documentation', 'Developer Resources'].map((item) => (
+                {[t('landing.helpCenter'), t('landing.contactUs'), t('landing.privacyPolicy'), t('landing.termsOfService'), t('landing.apiDocumentation'), t('landing.developerResources')].map((item) => (
                   <motion.div
                     key={item}
                     whileHover={{ x: 3, color: '#ff6600' }}
@@ -1640,11 +1980,11 @@ export default function LandingPage() {
 
               {/* Newsletter Subscription */}
               <div className="mt-4">
-                <p className="text-gray-300 text-xs mb-2">Subscribe to our newsletter</p>
+                <p className="text-gray-300 text-xs mb-2">{t('landing.subscribeNewsletter')}</p>
                 <div className="flex gap-1.5">
                   <input
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={t('landing.enterEmail')}
                     className="flex-1 bg-white/10 border border-white/20 rounded-md px-2 py-1.5 text-white placeholder-gray-400 text-xs focus:outline-none focus:ring-1 focus:ring-[#ff6600]"
                   />
                   <motion.button
@@ -1652,7 +1992,7 @@ export default function LandingPage() {
                     whileTap={{ scale: 0.95 }}
                     className="bg-[#ff6600] text-white px-3 py-1.5 rounded-md font-medium text-xs hover:bg-[#e65c00] transition-colors"
                   >
-                    Subscribe
+                    {t('landing.subscribe')}
                   </motion.button>
                 </div>
               </div>
@@ -1669,7 +2009,7 @@ export default function LandingPage() {
               © {new Date().getFullYear()} Moola. {t('landing.allRightsReserved')}. {t('landing.madeWithLove')}
             </p>
             <div className="flex justify-center gap-4 mt-3">
-              {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'Security'].map((item) => (
+              {[t('landing.privacyPolicyFooter'), t('landing.termsOfServiceFooter'), t('landing.cookiePolicy'), t('landing.securityFooter')].map((item) => (
                 <button key={item} className="text-gray-400 hover:text-white text-xs transition-colors">
                   {item}
                 </button>

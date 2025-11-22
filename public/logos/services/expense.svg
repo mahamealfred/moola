@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#F57C00"/>
+  <rect x="60" y="70" width="80" height="60" fill="white" rx="5"/>
+  <path d="M70 85 L90 100 L130 85" stroke="#F57C00" stroke-width="3" fill="none"/>
+  <text x="100" y="165" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="white">
+    EXPENSE
+  </text>
+</svg>
