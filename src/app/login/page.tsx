@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Eye, EyeOff, AlertCircle, Loader2, Shield } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
@@ -85,20 +85,50 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 transition-colors relative overflow-hidden">
-      {/* Floating blurred background */}
+      {/* Animated Gradient Orb Background */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute w-96 h-96 bg-[#13294b]/20 dark:bg-[#13294b]/30 blur-3xl rounded-full top-10 left-1/4 animate-pulse" />
-        <div className="absolute w-64 h-64 bg-[#ff6600]/20 dark:bg-[#ff6600]/30 blur-2xl rounded-full bottom-10 right-1/4 animate-ping" />
+        <motion.div
+          animate={{
+            opacity: [0.15, 0.3, 0.15],
+            scale: [1, 1.1, 1],
+            x: [-20, 20, -20],
+            y: [0, -30, 0]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
+        />
+        
+        <motion.div
+          animate={{
+            opacity: [0.1, 0.25, 0.1],
+            scale: [1, 1.15, 1],
+            x: [20, -20, 20],
+            y: [0, 30, 0]
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-20 -right-20 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
+        />
+        
+        {/* Subtle grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }}
+        />
       </div>
 
       {/* Card */}
       <div className="relative z-10 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 shadow-2xl rounded-3xl overflow-hidden border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
-        {/* Security Indicator */}
-        <div className="absolute top-4 right-4 flex items-center gap-2 text-green-600 dark:text-green-400 text-xs">
-          <Shield className="w-3 h-3" />
-          {t('common.secure')}
-        </div>
-
         {/* Left: Login Form */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -108,7 +138,7 @@ export default function LoginPage() {
         >
           <header className="mb-6">
             <h1 className="text-2xl font-extrabold text-[#13294b] dark:text-white">
-              <span className="text-[#ff6600]">M</span>oola
+              <span className="text-[#ff6600]">M</span>oola<span className="text-[#ff6600] text-lg align-super">+</span>
             </h1>
           </header>
 
@@ -196,7 +226,7 @@ export default function LoginPage() {
               </label>
               <Link 
                 href="/forgot-password" 
-                className="text-[#13294b] dark:text-[#ff6600] hover:underline transition-colors"
+                className="text-[#ff6600] hover:underline transition-colors"
               >
                 {t('login.forgotPassword')}
               </Link>
@@ -205,7 +235,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#13294b] dark:bg-[#ff6600] hover:bg-[#0f213d] dark:hover:bg-[#e65c00] text-white font-semibold py-3 rounded-2xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-[#ff6600] to-[#ff8c00] hover:from-[#e65c00] hover:to-[#e65c00] text-white font-semibold py-3 rounded-2xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
@@ -221,7 +251,7 @@ export default function LoginPage() {
               {t('login.becomeAgent')}{' '}
               <Link 
                 href="/registration" 
-                className="text-[#13294b] dark:text-[#ff6600] font-medium hover:underline transition-colors"
+                className="text-[#ff6600] font-medium hover:underline transition-colors"
               >
                 {t('login.register')}
               </Link>

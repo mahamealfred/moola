@@ -415,17 +415,45 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Page Content */}
         <main className="flex-1 relative p-4 sm:p-6 md:p-8 overflow-y-auto overflow-x-hidden">
-          {/* Animated Background Blobs */}
+          {/* Animated Gradient Orb Background */}
           <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
             <motion.div
-              className="absolute w-48 h-48 bg-[#ff660020] rounded-full blur-2xl top-10 left-1/4"
-              animate={{ y: [0, 10, -10, 0] }}
-              transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+              animate={{
+                opacity: [0.15, 0.3, 0.15],
+                scale: [1, 1.1, 1],
+                x: [-20, 20, -20],
+                y: [0, -30, 0]
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="absolute top-10 left-20 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
             />
+            
             <motion.div
-              className="absolute w-40 h-40 bg-blue-400/20 dark:bg-blue-900/20 rounded-full blur-xl bottom-5 right-1/4"
-              animate={{ x: [0, -8, 8, 0] }}
-              transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+              animate={{
+                opacity: [0.1, 0.25, 0.1],
+                scale: [1, 1.15, 1],
+                x: [20, -20, 20],
+                y: [0, 30, 0]
+              }}
+              transition={{
+                duration: 10,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="absolute bottom-20 right-20 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
+            />
+            
+            {/* Subtle grid pattern */}
+            <div 
+              className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
+                backgroundSize: '40px 40px'
+              }}
             />
           </div>
 

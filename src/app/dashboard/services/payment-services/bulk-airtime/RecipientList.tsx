@@ -74,8 +74,8 @@ export default function RecipientList({ recipients, setRecipients }: RecipientLi
 
       {/* Add Recipient Form */}
       {showAddForm && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg mb-3 border border-blue-200 dark:border-blue-800">
-          <h3 className="font-semibold text-blue-900 dark:text-blue-100 text-sm mb-2">Add New Recipient</h3>
+        <div className="bg-[#ff6600]/5 dark:bg-[#ff6600]/10 p-3 rounded-lg mb-3 border border-[#ff6600]/20 dark:border-[#ff6600]/30">
+          <h3 className="font-semibold text-[#13294b] dark:text-[#ff6600] text-sm mb-2">Add New Recipient</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
             <div>
               <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Phone Number *</label>

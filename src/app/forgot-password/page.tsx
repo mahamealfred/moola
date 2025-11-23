@@ -2,27 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sun, Moon } from 'lucide-react';
 import Link from 'next/link';
 export const runtime = "edge";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [isDark, setIsDark] = useState(true);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    setIsDark(prefersDark);
-    document.documentElement.classList.toggle('dark', prefersDark);
-  }, []);
-
-  const toggleDarkMode = () => {
-    const nextTheme = !isDark;
-    setIsDark(nextTheme);
-    localStorage.setItem('theme', nextTheme ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', nextTheme);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +16,46 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center bg-white dark:bg-gray-950 transition-colors overflow-hidden">
-      {/* Floating blurred backgrounds */}
+      {/* Animated Gradient Orb Background */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
-        <div className="absolute w-96 h-96 bg-[#13294b]/20 dark:bg-[#13294b]/30 blur-3xl rounded-full top-10 left-1/4 animate-pulse" />
-        <div className="absolute w-64 h-64 bg-[#ff6600]/20 dark:bg-[#ff6600]/30 blur-2xl rounded-full bottom-10 right-1/4 animate-ping" />
+        <motion.div
+          animate={{
+            opacity: [0.15, 0.3, 0.15],
+            scale: [1, 1.1, 1],
+            x: [-20, 20, -20],
+            y: [0, -30, 0]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-20 left-10 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
+        />
+        
+        <motion.div
+          animate={{
+            opacity: [0.1, 0.25, 0.1],
+            scale: [1, 1.15, 1],
+            x: [20, -20, 20],
+            y: [0, 30, 0]
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-20 right-10 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
+        />
+        
+        {/* Subtle grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }}
+        />
       </div>
 
       {/* Card container */}
@@ -47,17 +67,10 @@ export default function ForgotPasswordPage() {
           transition={{ duration: 0.5 }}
           className="p-8 sm:p-10 space-y-6"
         >
-          <header className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-extrabold text-[#13294b] dark:text-white">
-              <span className="text-[#ff6600]">M</span>oola
+          <header className="mb-6">
+            <h1 className="text-2xl font-extrabold text-[#13294b] dark:text-white text-center">
+              <span className="text-[#ff6600]">M</span>oola<span className="text-[#ff6600] text-lg align-super">+</span>
             </h1>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
-              aria-label="Toggle theme"
-            >
-              {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
-            </button>
           </header>
 
           <h2 className="text-xl font-semibold text-[#13294b] dark:text-white text-center">Forgot your password?</h2>
@@ -81,14 +94,14 @@ export default function ForgotPasswordPage() {
             <motion.button
               type="submit"
               whileTap={{ scale: 0.96 }}
-              className="w-full bg-[#13294b] dark:bg-[#ff6600] hover:bg-[#0f213d] dark:hover:bg-[#e65c00] text-white font-semibold py-3 rounded-2xl transition shadow-lg hover:shadow-xl"
+              className="w-full bg-gradient-to-r from-[#ff6600] to-[#ff8c00] hover:from-[#e65c00] hover:to-[#e65c00] text-white font-semibold py-3 rounded-2xl transition shadow-lg hover:shadow-xl"
             >
               Send Reset Link
             </motion.button>
 
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">
               Remembered your password?{' '}
-              <Link href="/login" className="text-[#13294b] dark:text-[#ff6600] font-medium hover:underline">
+              <Link href="/login" className="text-[#ff6600] font-medium hover:underline">
                 Back to Sign In
               </Link>
             </p>

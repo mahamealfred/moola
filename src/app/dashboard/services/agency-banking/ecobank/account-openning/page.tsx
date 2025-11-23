@@ -143,7 +143,7 @@ export default function OpenAccount() {
           {step < 2 && (
             <button
               onClick={handleNext}
-              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl transition"
+              className="w-full sm:w-auto bg-[#13294b] hover:bg-[#0f213d] dark:bg-[#ff6600] dark:hover:bg-[#ff8c00] text-white font-semibold px-6 py-2 rounded-xl transition"
               disabled={loading}
             >
               {loading ? 'Validating...' : 'Next'}

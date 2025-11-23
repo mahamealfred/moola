@@ -590,15 +590,15 @@ export default function EcobankServicesPage() {
             icon: Clock,
             value: '24/7',
             label: t('ecobank.available'),
-            color: 'from-[#13294b] to-blue-600',
+            color: 'from-[#13294b] to-[#ff6600]',
             bg: 'bg-[#13294b]/10 dark:bg-[#13294b]/20'
           },
           {
             icon: Shield,
             value: '100%',
             label: t('ecobank.secure'),
-            color: 'from-purple-500 to-purple-400',
-            bg: 'bg-purple-100 dark:bg-purple-900/20'
+            color: 'from-[#ff6600] to-[#ff8c00]',
+            bg: 'bg-[#ff6600]/10 dark:bg-[#ff6600]/20'
           }
         ].map((stat, index) => (
           <motion.div
@@ -840,11 +840,11 @@ export default function EcobankServicesPage() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <motion.div 
-              className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800"
+              className="flex items-center gap-3 p-4 bg-[#ff6600]/5 dark:bg-[#ff6600]/10 rounded-xl border border-[#ff6600]/20 dark:border-[#ff6600]/30"
               whileHover={{ scale: 1.02 }}
             >
               <motion.div 
-                className="w-3 h-3 bg-green-500 rounded-full"
+                className="w-3 h-3 bg-[#ff6600] rounded-full"
                 animate={{ 
                   scale: [1, 1.2, 1],
                   opacity: [1, 0.7, 1]

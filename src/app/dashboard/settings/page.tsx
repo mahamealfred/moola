@@ -1085,7 +1085,7 @@ export default function SettingsComponent(props?: any) {
                       <>
                         <button
                           onClick={() => handleSetDefaultPayment(method.id)}
-                          className="p-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                          className="p-2 text-[#ff6600] hover:text-[#ff8c00] dark:text-[#ff6600] dark:hover:text-[#ff8c00]"
                           title="Set as default"
                         >
                           <FiCheck className="w-4 h-4" />

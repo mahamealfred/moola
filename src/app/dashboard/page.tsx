@@ -207,10 +207,6 @@ export default function DashboardHome() {
           <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">{t('dashboardHome.processing')}</div>
         </div>
       </motion.div>
-
-      {/* Background Decorative Elements - Fixed positioning */}
-      <div className="fixed top-0 left-0 w-72 h-72 bg-[#ff6600]/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-      <div className="fixed bottom-0 right-0 w-96 h-96 bg-[#13294b]/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 pointer-events-none" />
     </div>
   );
 }

@@ -17,8 +17,8 @@ export default function ExpenseManagement() {
       
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded border">
-            <div className="text-sm text-blue-600 dark:text-blue-300">Total Expenses</div>
+          <div className="bg-[#ff6600]/5 dark:bg-[#ff6600]/10 p-4 rounded border border-[#ff6600]/20">
+            <div className="text-sm text-[#13294b] dark:text-[#ff6600]">Total Expenses</div>
             <div className="text-xl font-bold">RWF {totalExpenses.toLocaleString()}</div>
           </div>
           <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded border">

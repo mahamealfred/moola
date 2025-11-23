@@ -1021,7 +1021,7 @@ export default function DashboardHome() {
             icon: Clock,
             value: '24/7',
             label: t('services.available'),
-            color: 'from-[#13294b] to-blue-600',
+            color: 'from-[#13294b] to-[#ff6600]',
             bg: 'bg-[#13294b]/10 dark:bg-[#13294b]/20'
           },
           {

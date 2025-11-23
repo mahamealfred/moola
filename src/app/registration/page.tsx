@@ -67,10 +67,46 @@ export default function RegistrationPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 relative overflow-hidden transition-colors">
-      {/* Floating blurred backgrounds */}
+      {/* Animated Gradient Orb Background */}
       <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
-        <div className="absolute w-96 h-96 bg-[#13294b]/20 dark:bg-[#13294b]/30 rounded-full blur-3xl top-10 left-1/4 animate-pulse" />
-        <div className="absolute w-64 h-64 bg-[#ff6600]/20 dark:bg-[#ff6600]/30 rounded-full blur-2xl bottom-10 right-1/4 animate-ping" />
+        <motion.div
+          animate={{
+            opacity: [0.15, 0.3, 0.15],
+            scale: [1, 1.1, 1],
+            x: [20, -20, 20],
+            y: [0, -30, 0]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-10 right-20 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
+        />
+        
+        <motion.div
+          animate={{
+            opacity: [0.1, 0.25, 0.1],
+            scale: [1, 1.15, 1],
+            x: [-20, 20, -20],
+            y: [0, 30, 0]
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-10 left-20 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
+        />
+        
+        {/* Subtle grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }}
+        />
       </div>
 
       {/* Card container */}
@@ -84,7 +120,7 @@ export default function RegistrationPage() {
         >
           <header className="mb-6">
             <h1 className="text-2xl font-extrabold text-[#13294b] dark:text-white">
-              <span className="text-[#ff6600]">M</span>oola
+              <span className="text-[#ff6600]">M</span>oola<span className="text-[#ff6600] text-lg align-super">+</span>
             </h1>
           </header>
 
@@ -102,7 +138,7 @@ export default function RegistrationPage() {
               <button
                 type="button"
                 onClick={handleNext}
-                className="ml-auto bg-[#13294b] dark:bg-[#ff6600] hover:bg-[#0f213d] dark:hover:bg-[#e65c00] text-white font-semibold py-3 px-6 rounded-2xl transition shadow-lg hover:shadow-xl"
+                className="ml-auto bg-gradient-to-r from-[#ff6600] to-[#ff8c00] hover:from-[#e65c00] hover:to-[#e65c00] text-white font-semibold py-3 px-6 rounded-2xl transition shadow-lg hover:shadow-xl"
               >
                 {step < 3 ? t('registration.next') : t('registration.register')}
               </button>
@@ -110,7 +146,7 @@ export default function RegistrationPage() {
 
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">
               {t('registration.alreadyHaveAccount')}{' '}
-              <Link href="/login" className="text-[#13294b] dark:text-[#ff6600] font-medium hover:underline">
+              <Link href="/login" className="text-[#ff6600] font-medium hover:underline">
                 {t('registration.signIn')}
               </Link>
             </p>

@@ -642,143 +642,153 @@ export default function LandingPage() {
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="relative text-center pt-8 sm:pt-16 pb-12 sm:pb-20 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
+        className="relative text-center pt-16 sm:pt-24 pb-16 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
       >
-        {/* Animated Background - Right Triangle from Left to Top */}
+        {/* Enhanced Animated Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Right-angled triangle shape covering left and top */}
-          <div 
-            className="absolute top-0 left-0 opacity-15 dark:opacity-10"
-            style={{
-              width: '0',
-              height: '0',
-              borderLeft: '100vw solid transparent',
-              borderTop: '100vh solid transparent',
-              borderImage: 'linear-gradient(135deg, rgba(255, 102, 0, 0.3) 0%, rgba(19, 41, 75, 0.3) 100%) 1',
-            }}
-          >
-            <svg className="absolute top-0 left-0 w-full h-full" style={{ width: '100vw', height: '100vh' }}>
-              <defs>
-                <linearGradient id="triangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ff6600" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#13294b" stopOpacity="0.3" />
-                </linearGradient>
-              </defs>
-              <polygon 
-                points="0,0 100,0 0,100" 
-                fill="url(#triangleGradient)"
-                style={{ transformOrigin: '0 0', transform: 'scale(15)' }}
-              />
-            </svg>
-          </div>
-
-          {/* Subtle glow along triangle edge */}
+          {/* Gradient orbs for depth */}
           <motion.div
             animate={{
-              opacity: [0.2, 0.4, 0.2]
+              opacity: [0.15, 0.3, 0.15],
+              scale: [1, 1.1, 1],
+              x: [-20, 20, -20],
+              y: [0, -30, 0]
             }}
             transition={{
-              duration: 6,
+              duration: 8,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#ff6600]/20 to-[#13294b]/20 blur-3xl"
-            style={{ clipPath: 'polygon(0 0, 50% 0, 0 100%)' }}
+            className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
+          />
+          
+          <motion.div
+            animate={{
+              opacity: [0.1, 0.25, 0.1],
+              scale: [1, 1.15, 1],
+              x: [20, -20, 20],
+              y: [0, 30, 0]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute top-40 -right-20 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
+          />
+          
+          {/* Subtle grid pattern */}
+          <div 
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
+              backgroundSize: '40px 40px'
+            }}
           />
         </div>
 
-        {/* Large Animated Moola Branding */}
+        {/* Enhanced Moola+ Branding Card */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.5, y: -100 }}
+          initial={{ opacity: 0, scale: 0.9, y: 30 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ 
-            duration: 1, 
+            duration: 0.8, 
             type: "spring", 
-            stiffness: 100,
-            damping: 15
+            stiffness: 120,
+            damping: 20
           }}
           className="relative mx-auto mb-8 sm:mb-12 z-10"
           style={{ maxWidth: '600px' }}
         >
           <div className="relative">
-            {/* Animated glow effects */}
+            {/* Enhanced glow effects */}
             <motion.div
               animate={{
-                opacity: [0.3, 0.6, 0.3],
-                scale: [1, 1.1, 1]
+                opacity: [0.2, 0.5, 0.2],
+                scale: [0.95, 1.05, 0.95]
               }}
               transition={{
-                duration: 3,
+                duration: 4,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-              className="absolute inset-0 bg-gradient-to-r from-[#ff6600] to-[#13294b] blur-3xl opacity-40 rounded-full"
-              style={{ transform: 'scale(1.2)' }}
+              className="absolute -inset-8 bg-gradient-to-r from-[#ff6600]/40 via-[#ff6600]/20 to-[#13294b]/40 blur-3xl rounded-full"
             />
             
-            {/* Main Moola text with shadows */}
-            <div className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 sm:p-12 border-4 border-transparent shadow-2xl"
+            {/* Main glass card with improved styling */}
+            <div className="relative backdrop-blur-2xl bg-gradient-to-br from-white/15 via-white/10 to-white/5 dark:from-gray-900/15 dark:via-gray-900/10 dark:to-gray-900/5 rounded-3xl p-8 sm:p-12 border border-white/20 dark:border-gray-700/30 shadow-2xl overflow-hidden"
               style={{
-                boxShadow: '0 20px 60px rgba(255, 102, 0, 0.3), 0 0 40px rgba(19, 41, 75, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
-                background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'
+                boxShadow: '0 25px 80px rgba(255, 102, 0, 0.15), 0 10px 40px rgba(19, 41, 75, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
               }}
             >
-              {/* Gradient border */}
-              <div
-                className="absolute inset-0 rounded-3xl p-[4px]"
+              {/* Animated gradient border */}
+              <motion.div
+                animate={{
+                  backgroundPosition: ['0% 0%', '100% 100%', '0% 0%']
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                className="absolute inset-0 rounded-[2rem] opacity-40"
                 style={{
-                  background: 'linear-gradient(45deg, #ff6600, #13294b, #ff6600, #13294b)',
-                  backgroundSize: '300% 300%',
+                  background: 'linear-gradient(135deg, rgba(255, 102, 0, 0.2), rgba(19, 41, 75, 0.2), rgba(255, 102, 0, 0.2))',
+                  backgroundSize: '200% 200%',
                   zIndex: -1
                 }}
               />
               
-              <motion.h1
+              {/* Moola+ title */}
+              <motion.div
                 animate={{
                   backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
                 }}
                 transition={{
-                  duration: 5,
+                  duration: 6,
                   repeat: Infinity,
                   ease: "linear"
                 }}
-                className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tight relative inline-block"
-                style={{
-                  background: 'linear-gradient(90deg, #ff6600 0%, #13294b 25%, #ff6600 50%, #13294b 75%, #ff6600 100%)',
-                  backgroundSize: '200% auto',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  textShadow: '0 4px 20px rgba(255, 102, 0, 0.3)',
-                  filter: 'drop-shadow(0 2px 8px rgba(19, 41, 75, 0.4))'
-                }}
+                className="relative"
               >
-                Moola
-                <span 
-                  className="font-black absolute"
+                <h1
+                  className="text-5xl xs:text-6xl sm:text-7xl md:text-8xl lg:text-8xl xl:text-9xl font-black tracking-tight relative inline-block leading-none"
                   style={{
-                    fontSize: '0.5em',
-                    top: '0.2em',
-                    marginLeft: '0.1em',
-                    background: 'linear-gradient(90deg, #ff6600 0%, #13294b 25%, #ff6600 50%, #13294b 75%, #ff6600 100%)',
+                    background: 'linear-gradient(120deg, #ff6600 0%, #ff8c00 20%, #13294b 40%, #ff6600 60%, #13294b 80%, #ff6600 100%)',
                     backgroundSize: '200% auto',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
+                    filter: 'drop-shadow(0 4px 12px rgba(255, 102, 0, 0.3))'
                   }}
                 >
-                  +
-                </span>
-              </motion.h1>
+                  Moola
+                  <span 
+                    className="font-black absolute"
+                    style={{
+                      fontSize: '0.45em',
+                      top: '0.15em',
+                      marginLeft: '0.15em',
+                      background: 'linear-gradient(120deg, #ff6600 0%, #13294b 50%, #ff6600 100%)',
+                      backgroundSize: '200% auto',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    }}
+                  >
+                    +
+                  </span>
+                </h1>
+              </motion.div>
               
-              {/* Subtitle with animation */}
+              {/* Subtitle with enhanced styling */}
               <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="text-sm sm:text-base lg:text-lg mt-3 font-semibold"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-xs xs:text-sm sm:text-base lg:text-lg mt-3 font-semibold tracking-wide px-2"
                 style={{
-                  background: 'linear-gradient(90deg, #13294b, #ff6600)',
+                  background: 'linear-gradient(100deg, #13294b 0%, #ff6600 50%, #13294b 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
@@ -787,26 +797,22 @@ export default function LandingPage() {
                 {t('landing.premiumSolutions')}
               </motion.p>
               
-              {/* Decorative elements */}
+              {/* Minimal decorative accents */}
               <motion.div
-                animate={{ rotate: 360 }}
+                animate={{ 
+                  rotate: [0, 360],
+                  scale: [1, 1.1, 1]
+                }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute -top-4 -left-4 w-8 h-8 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] shadow-lg"
+                className="absolute -top-3 -left-3 w-16 h-16 rounded-full bg-gradient-to-br from-[#ff6600]/60 to-[#ff8c00]/40 blur-xl"
               />
               <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                className="absolute -bottom-4 -right-4 w-12 h-12 rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] shadow-lg"
-              />
-              <motion.div
-                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="absolute top-1/2 -right-6 w-6 h-6 rounded-full bg-[#ff6600] blur-sm"
-              />
-              <motion.div
-                animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.7, 0.4] }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="absolute top-1/4 -left-6 w-8 h-8 rounded-full bg-[#13294b] blur-sm"
+                animate={{ 
+                  rotate: [360, 0],
+                  scale: [1, 1.15, 1]
+                }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="absolute -bottom-4 -right-4 w-20 h-20 rounded-full bg-gradient-to-br from-[#13294b]/60 to-[#1e3a5f]/40 blur-xl"
               />
             </div>
           </div>
@@ -827,7 +833,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-[#13294b] dark:text-white mb-3 sm:mb-4 leading-tight"
+          className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-bold text-[#13294b] dark:text-white mb-3 sm:mb-4 leading-tight px-2"
         >
           {t('landing.heroTitle')}
           <motion.span
@@ -844,7 +850,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="text-sm sm:text-base lg:text-lg max-w-3xl mx-auto text-gray-700 dark:text-gray-300 mb-6 sm:mb-8 leading-relaxed px-3"
+          className="text-sm sm:text-base lg:text-lg max-w-2xl mx-auto text-gray-700 dark:text-gray-300 mb-6 sm:mb-8 leading-relaxed px-4"
         >
           {t('landing.heroDescription')}
         </motion.p>
@@ -862,10 +868,10 @@ export default function LandingPage() {
           >
             <Link
               href="/registration"
-              className="relative px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-[#ff6600] to-[#ff8c00] text-white rounded-lg sm:rounded-xl font-semibold hover:shadow-lg transition-all duration-300 shadow-md hover:shadow-[#ff6600]/25 flex items-center justify-center gap-2 text-sm w-full sm:w-auto group overflow-hidden"
+              className="relative px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-[#ff6600] to-[#ff8c00] text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 shadow-md hover:shadow-[#ff6600]/25 flex items-center justify-center gap-2 text-sm sm:text-base w-full sm:w-auto group overflow-hidden min-h-[48px]"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-              {t('landing.getStarted')} <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
+              {t('landing.getStarted')} <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>
           
@@ -875,10 +881,10 @@ export default function LandingPage() {
           >
             <button
               onClick={goToServices}
-              className="px-4 sm:px-6 py-2.5 sm:py-3 border border-[#13294b] text-[#13294b] dark:border-gray-400 dark:text-gray-300 rounded-lg sm:rounded-xl font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg text-sm w-full sm:w-auto text-center group"
+              className="px-6 sm:px-8 py-3 sm:py-3.5 border-2 border-[#13294b] text-[#13294b] dark:border-[#ff6600] dark:text-[#ff6600] rounded-xl font-semibold hover:bg-[#13294b]/5 dark:hover:bg-[#ff6600]/10 transition-all duration-300 shadow-md hover:shadow-lg text-sm sm:text-base w-full sm:w-auto text-center group min-h-[48px]"
             >
               <span className="flex items-center justify-center gap-1">
-                {t('landing.exploreServices')} <GlobeIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:rotate-12 transition-transform" />
+                {t('landing.exploreServices')} <GlobeIcon className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform" />
               </span>
             </button>
           </motion.div>
@@ -889,7 +895,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.5, ease: "easeOut" }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-3xl mx-auto mt-12 sm:mt-16 pt-6 sm:pt-8 border-t border-gray-200 dark:border-gray-800 px-3"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-4xl mx-auto mt-8 sm:mt-12 md:mt-16 pt-6 sm:pt-8 border-t border-gray-200 dark:border-gray-800 px-4"
         >
           {[
             { number: '500K+', label: t('landing.happyUsers'), icon: Users },
@@ -905,12 +911,12 @@ export default function LandingPage() {
               whileHover={{ scale: 1.05, y: -3 }}
               className="text-center group cursor-pointer"
             >
-              <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-md hover:shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300">
-                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-600 p-2 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
+              <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg border border-gray-100 dark:border-gray-700 transition-all duration-300">
+                <div className="bg-gradient-to-br from-[#ff6600]/10 to-[#ff8c00]/10 dark:from-[#ff6600]/20 dark:to-[#ff8c00]/20 p-2 sm:p-3 rounded-lg w-fit mx-auto mb-2 group-hover:scale-110 transition-transform duration-300">
                   <stat.icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#ff6600]" />
                 </div>
-                <div className="text-lg sm:text-xl font-bold text-[#ff6600] mb-1">{stat.number}</div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">{stat.label}</div>
+                <div className="text-base sm:text-lg md:text-xl font-bold text-[#ff6600] mb-1">{stat.number}</div>
+                <div className="text-[10px] xs:text-xs text-gray-600 dark:text-gray-400 font-medium leading-tight">{stat.label}</div>
               </div>
             </motion.div>
           ))}
@@ -919,36 +925,45 @@ export default function LandingPage() {
 
       {/* Enhanced Services Section */}
       <section id="services" ref={servicesRef} className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
-        {/* Triangle Background */}
+        {/* Gradient Orb Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div 
-            className="absolute top-0 left-0 opacity-10 dark:opacity-5"
-          >
-            <svg className="absolute top-0 left-0 w-full h-full" style={{ width: '100%', height: '100%' }}>
-              <defs>
-                <linearGradient id="servicesTriangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ff6600" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#13294b" stopOpacity="0.2" />
-                </linearGradient>
-              </defs>
-              <polygon 
-                points="0,0 100,0 0,100" 
-                fill="url(#servicesTriangleGradient)"
-                style={{ transformOrigin: '0 0', transform: 'scale(15)' }}
-              />
-            </svg>
-          </div>
           <motion.div
             animate={{
-              opacity: [0.1, 0.3, 0.1]
+              opacity: [0.15, 0.3, 0.15],
+              scale: [1, 1.1, 1],
+              x: [-20, 20, -20],
+              y: [0, -30, 0]
             }}
             transition={{
-              duration: 6,
+              duration: 8,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#ff6600]/10 to-[#13294b]/10 blur-3xl"
-            style={{ clipPath: 'polygon(0 0, 50% 0, 0 100%)' }}
+            className="absolute top-20 left-10 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
+          />
+          
+          <motion.div
+            animate={{
+              opacity: [0.1, 0.25, 0.1],
+              scale: [1, 1.15, 1],
+              x: [20, -20, 20],
+              y: [0, 30, 0]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute bottom-20 right-10 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
+          />
+          
+          {/* Subtle grid pattern */}
+          <div 
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
+              backgroundSize: '40px 40px'
+            }}
           />
         </div>
 
@@ -1197,7 +1212,48 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Payment Features Section */}
-      <section id="features" className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl my-6 sm:my-12">
+      <section id="features" className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 rounded-2xl my-6 sm:my-12 relative overflow-hidden">
+        {/* Gradient Orb Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              opacity: [0.15, 0.3, 0.15],
+              scale: [1, 1.1, 1],
+              x: [20, -20, 20],
+              y: [0, -30, 0]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
+          />
+          
+          <motion.div
+            animate={{
+              opacity: [0.1, 0.25, 0.1],
+              scale: [1, 1.15, 1],
+              x: [-20, 20, -20],
+              y: [0, 30, 0]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute bottom-10 -left-20 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
+          />
+          
+          {/* Subtle grid pattern */}
+          <div 
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
+              backgroundSize: '40px 40px'
+            }}
+          />
+        </div>
         <motion.div
           initial="hidden"
           animate="visible"
@@ -1365,7 +1421,48 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Security Section */}
-      <section id="security" className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 rounded-2xl my-6 sm:my-12">
+      <section id="security" className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 rounded-2xl my-6 sm:my-12 relative overflow-hidden">
+        {/* Gradient Orb Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              opacity: [0.15, 0.3, 0.15],
+              scale: [1, 1.1, 1],
+              x: [-20, 20, -20],
+              y: [0, -30, 0]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute top-10 left-20 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
+          />
+          
+          <motion.div
+            animate={{
+              opacity: [0.1, 0.25, 0.1],
+              scale: [1, 1.15, 1],
+              x: [20, -20, 20],
+              y: [0, 30, 0]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute bottom-20 right-20 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
+          />
+          
+          {/* Subtle grid pattern */}
+          <div 
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
+              backgroundSize: '40px 40px'
+            }}
+          />
+        </div>
         <motion.div
           initial="hidden"
           animate="visible"
@@ -1554,7 +1651,48 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Testimonials Section */}
-      <section id="testimonials" className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20">
+      <section id="testimonials" className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
+        {/* Gradient Orb Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              opacity: [0.15, 0.3, 0.15],
+              scale: [1, 1.1, 1],
+              x: [20, -20, 20],
+              y: [0, -30, 0]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute -top-20 right-10 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
+          />
+          
+          <motion.div
+            animate={{
+              opacity: [0.1, 0.25, 0.1],
+              scale: [1, 1.15, 1],
+              x: [-20, 20, -20],
+              y: [0, 30, 0]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute bottom-10 left-20 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
+          />
+          
+          {/* Subtle grid pattern */}
+          <div 
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
+              backgroundSize: '40px 40px'
+            }}
+          />
+        </div>
         <motion.div
           initial="hidden"
           animate="visible"
@@ -1745,32 +1883,45 @@ export default function LandingPage() {
 
       {/* Enhanced Stats Section */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
-        {/* Triangle Background */}
+        {/* Gradient Orb Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <svg className="absolute top-0 left-0 w-full h-full opacity-10 dark:opacity-5">
-            <defs>
-              <linearGradient id="statsTriangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ff6600" stopOpacity="0.2" />
-                <stop offset="100%" stopColor="#13294b" stopOpacity="0.2" />
-              </linearGradient>
-            </defs>
-            <polygon 
-              points="0,0 100,0 0,100" 
-              fill="url(#statsTriangleGradient)"
-              style={{ transformOrigin: '0 0', transform: 'scale(15)' }}
-            />
-          </svg>
           <motion.div
             animate={{
-              opacity: [0.1, 0.3, 0.1]
+              opacity: [0.15, 0.3, 0.15],
+              scale: [1, 1.1, 1],
+              x: [-20, 20, -20],
+              y: [0, -30, 0]
             }}
             transition={{
-              duration: 6,
+              duration: 8,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#ff6600]/10 to-[#13294b]/10 blur-3xl"
-            style={{ clipPath: 'polygon(0 0, 50% 0, 0 100%)' }}
+            className="absolute top-0 left-0 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
+          />
+          
+          <motion.div
+            animate={{
+              opacity: [0.1, 0.25, 0.1],
+              scale: [1, 1.15, 1],
+              x: [20, -20, 20],
+              y: [0, 30, 0]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
+          />
+          
+          {/* Subtle grid pattern */}
+          <div 
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+            style={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
+              backgroundSize: '40px 40px'
+            }}
           />
         </div>
 
