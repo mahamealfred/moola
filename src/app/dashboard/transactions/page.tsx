@@ -14,11 +14,13 @@ import { motion } from 'framer-motion';
 import { CSVLink } from 'react-csv';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import html2pdf from 'html2pdf.js';
 import { FiPrinter, FiSearch, FiDownload, FiChevronLeft, FiChevronRight, FiRefreshCw, FiEye, FiX, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import StatusBadge from './StatusBadge';
 import { secureStorage } from '../../../lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
 import { api } from '@/lib/api-client';
+import ProfessionalReceipt from '@/components/ProfessionalReceipt';
 
 interface Transaction {
   id: string;
@@ -195,29 +197,27 @@ const MobileTransactionCard: React.FC<{
   );
 };
 
-const printPDF = (tx: Transaction) => {
-  const doc = new jsPDF();
-  doc.setFontSize(16);
-  doc.text(`Transaction Receipt - ${tx.id}`, 20, 20);
-  autoTable(doc, {
-    startY: 30,
-    head: [['Field', 'Value']],
-    body: [
-      ['Transaction ID', tx.id],
-      ['Date', tx.formattedDate],
-      ['Service', tx.serviceName],
-      ['Status', tx.status],
-      ['Amount', `RWF ${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
-      ['Token', tx.token || 'N/A'],
-      ['Description', tx.description],
-    ],
-    theme: 'grid',
-    headStyles: {
-      fillColor: [255, 102, 0],
-      textColor: 255
-    },
-  });
-  doc.save(`Receipt_${tx.id}.pdf`);
+const printPDF = (tx: Transaction, setReceiptTransaction: (tx: Transaction | null) => void) => {
+  setReceiptTransaction(tx);
+  
+  // Wait for the receipt to render, then generate PDF
+  setTimeout(() => {
+    const element = document.getElementById('transaction-receipt-print');
+    if (element) {
+      const opt = {
+        margin: 0.5,
+        filename: `receipt_${tx.id}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      
+      html2pdf().set(opt).from(element).save().then(() => {
+        // Close the receipt modal after PDF is generated
+        setReceiptTransaction(null);
+      });
+    }
+  }, 500);
 };
 
 // Transaction Detail Modal Component
@@ -226,7 +226,8 @@ const TransactionDetailModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   t: (key: string) => string;
-}> = ({ transaction, isOpen, onClose, t }) => {
+  setReceiptTransaction: (tx: Transaction | null) => void;
+}> = ({ transaction, isOpen, onClose, t, setReceiptTransaction }) => {
   if (!isOpen || !transaction) return null;
 
   return (
@@ -376,7 +377,7 @@ const TransactionDetailModal: React.FC<{
           </button>
           <button
             onClick={() => {
-              printPDF(transaction);
+              printPDF(transaction, setReceiptTransaction);
               onClose();
             }}
             disabled={transaction.status.toLowerCase() !== 'successful' && transaction.status.toLowerCase() !== 'complete'}
@@ -400,6 +401,7 @@ export default function TransactionsPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [receiptTransaction, setReceiptTransaction] = useState<Transaction | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -469,7 +471,13 @@ export default function TransactionsPage() {
       
       if (apiResponse.success && apiResponse.data) {
         console.log('Transactions loaded successfully:', apiResponse.data.length);
-        setData(apiResponse.data);
+        // Sort transactions by ID in descending order (newest first)
+        const sortedData = [...apiResponse.data].sort((a, b) => {
+          const idA = parseInt(a.id) || 0;
+          const idB = parseInt(b.id) || 0;
+          return idB - idA;
+        });
+        setData(sortedData);
         setError('');
       } else {
         // Display actual backend message only if provided
@@ -577,7 +585,7 @@ export default function TransactionsPage() {
             <span className="hidden xs:inline">{t('transactions.view')}</span>
           </button>
           <button
-            onClick={() => printPDF(row.original)}
+            onClick={() => printPDF(row.original, setReceiptTransaction)}
             disabled={row.original.status.toLowerCase() !== 'successful' && row.original.status.toLowerCase() !== 'complete'}
             className="text-[#ff6600] hover:text-[#e65c00] flex items-center gap-1 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[#ff6600]"
             title={t('transactions.printReceipt')}
@@ -683,7 +691,7 @@ export default function TransactionsPage() {
                   key={row.id}
                   transaction={row.original}
                   onView={handleViewTransaction}
-                  onPrint={printPDF}
+                  onPrint={(tx) => printPDF(tx, setReceiptTransaction)}
                   t={t}
                 />
               ))
@@ -802,7 +810,29 @@ export default function TransactionsPage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         t={t}
+        setReceiptTransaction={setReceiptTransaction}
       />
+
+      {/* Hidden Receipt for PDF Generation */}
+      {receiptTransaction && (
+        <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+          <div id="transaction-receipt-print">
+            <ProfessionalReceipt
+              transactionId={receiptTransaction.id}
+              date={new Date(receiptTransaction.date)}
+              status={receiptTransaction.status}
+              serviceName={receiptTransaction.serviceName}
+              serviceDescription={receiptTransaction.description}
+              amount={receiptTransaction.amount}
+              serviceFee={receiptTransaction.customerCharge}
+              totalAmount={receiptTransaction.amount + receiptTransaction.customerCharge}
+              currency="RWF"
+              additionalInfo={receiptTransaction.token ? [{ label: 'Token', value: receiptTransaction.token }] : undefined}
+              customNote="Thank you for using Moola+ payment services."
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 }

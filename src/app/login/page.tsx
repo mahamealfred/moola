@@ -57,13 +57,8 @@ export default function LoginPage() {
       // Use the auth context login function
       login(result.data);
       
-      // Show loading screen while redirecting to dashboard
+      // Show loading screen - useEffect will handle redirect once auth state updates
       setIsRedirecting(true);
-      
-      // Small delay to show loading screen, then navigate
-      setTimeout(() => {
-        router.push(redirect);
-      }, 500);
       
     } catch (err: any) {
       setError(err.message || t('login.errorGeneral'));

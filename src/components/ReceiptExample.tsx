@@ -18,7 +18,6 @@ export default function ReceiptExample() {
   // Example 1: Airtime Payment Receipt
   const airtimeReceiptData = {
     transactionId: 'TXN20250125ABC123',
-    receiptId: 'RCP-AIR-2025-001',
     date: new Date(),
     status: 'successful' as const,
     serviceName: 'Airtime Purchase',
@@ -27,13 +26,10 @@ export default function ReceiptExample() {
     customerPhone: '+250 788 123 456',
     customerReference: '0788123456',
     agentName: 'Agent Smith',
-    agentId: 'AGT-001',
     agentPhone: '+250 788 999 888',
     amount: 5000,
     serviceFee: 100,
-    vat: 18,
-    tax: 0,
-    totalAmount: 5118,
+    totalAmount: 5100,
     currency: 'RWF',
     additionalInfo: [
       { label: 'Network Provider', value: 'MTN Rwanda' },
@@ -46,7 +42,6 @@ export default function ReceiptExample() {
   // Example 2: Electricity Payment Receipt
   const electricityReceiptData = {
     transactionId: 'TXN20250125XYZ789',
-    receiptId: 'RCP-ELEC-2025-002',
     date: new Date(),
     status: 'successful' as const,
     serviceName: 'Electricity Payment',
@@ -56,9 +51,7 @@ export default function ReceiptExample() {
     customerReference: '04101234567890',
     amount: 10000,
     serviceFee: 200,
-    vat: 36,
-    tax: 50,
-    totalAmount: 10286,
+    totalAmount: 10200,
     currency: 'RWF',
     additionalInfo: [
       { label: 'Meter Number', value: '04101234567890' },
@@ -72,20 +65,16 @@ export default function ReceiptExample() {
   // Example 3: RRA Tax Payment Receipt
   const rraReceiptData = {
     transactionId: 'TXN20250125RRA456',
-    receiptId: 'RCP-RRA-2025-003',
     date: new Date(),
     status: 'successful' as const,
     serviceName: 'RRA Tax Payment',
     serviceDescription: 'Rwanda Revenue Authority Tax Payment',
     customerName: 'ABC Company Ltd',
     customerPhone: '+250 788 111 222',
-    customerEmail: 'finance@abccompany.rw',
     customerReference: '123456789',
     amount: 50000,
     serviceFee: 500,
-    vat: 90,
-    tax: 250,
-    totalAmount: 50840,
+    totalAmount: 50500,
     currency: 'RWF',
     additionalInfo: [
       { label: 'TIN Number', value: '123456789' },
@@ -103,7 +92,7 @@ export default function ReceiptExample() {
 
     const options = {
       margin: 10,
-      filename: `receipt_${airtimeReceiptData.receiptId}.pdf`,
+      filename: `receipt_${airtimeReceiptData.transactionId}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -197,7 +186,6 @@ export default function ReceiptExample() {
               <pre className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg overflow-x-auto text-xs">
 {`const receiptData = {
   transactionId: 'TXN123456',
-  receiptId: 'RCP-001',
   date: new Date(),
   status: 'successful',
   serviceName: 'Your Service Name',

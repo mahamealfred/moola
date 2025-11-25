@@ -12,7 +12,7 @@ interface SessionTimeoutProps {
 }
 
 export default function SessionTimeout({ 
-  timeoutMinutes = 5, 
+  timeoutMinutes = 10, 
   warningMinutes = 1
 }: SessionTimeoutProps) {
   const [showWarning, setShowWarning] = useState(false);

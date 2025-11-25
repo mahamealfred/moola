@@ -645,7 +645,7 @@ export default function LandingPage() {
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="relative text-center min-h-screen flex flex-col justify-center pt-16 sm:pt-24 pb-16 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
+        className="relative text-center h-screen flex flex-col justify-center pt-12 sm:pt-16 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
       >
         {/* Enhanced Animated Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -700,7 +700,7 @@ export default function LandingPage() {
             stiffness: 120,
             damping: 20
           }}
-          className="relative mx-auto mb-8 sm:mb-12 z-10"
+          className="relative mx-auto mb-4 sm:mb-6 z-10"
           style={{ maxWidth: '600px' }}
         >
           <div className="relative">
@@ -825,7 +825,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex justify-center mb-4 sm:mb-6"
+          className="flex justify-center mb-2 sm:mb-3"
         >
           <div className="inline-flex items-center bg-gradient-to-r from-[#ff6600]/10 to-[#13294b]/10 dark:from-[#ff6600]/20 dark:to-[#13294b]/20 text-[#ff6600] dark:text-[#ffcc99] px-3 py-1.5 rounded-full text-xs font-medium border border-[#ff6600]/20 backdrop-blur-sm">
             <Sparkles className="w-3 h-3 mr-1" />
@@ -838,7 +838,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-bold text-[#13294b] dark:text-white mb-3 sm:mb-4 leading-tight px-2"
+          className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-bold text-[#13294b] dark:text-white mb-2 sm:mb-3 leading-tight px-2"
         >
           {t('landing.heroTitle')}
           <motion.span
@@ -855,7 +855,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="text-sm sm:text-base lg:text-lg max-w-2xl mx-auto text-gray-700 dark:text-gray-300 mb-6 sm:mb-8 leading-relaxed px-4"
+          className="text-xs sm:text-sm lg:text-base max-w-2xl mx-auto text-gray-700 dark:text-gray-300 mb-4 sm:mb-5 leading-relaxed px-4"
         >
           {t('landing.heroDescription')}
         </motion.p>
@@ -900,7 +900,7 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.5, ease: "easeOut" }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-4xl mx-auto mt-8 sm:mt-12 md:mt-16 pt-6 sm:pt-8 border-t border-gray-200 dark:border-gray-800 px-4"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-4xl mx-auto mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-800 px-4"
         >
           {[
             { number: '500K+', label: t('landing.happyUsers'), icon: Users },

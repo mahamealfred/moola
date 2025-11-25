@@ -3,6 +3,8 @@
 import React, { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
+import ProfessionalReceipt from '@/components/ProfessionalReceipt';
+import { useTranslation } from '@/lib/i18n-context';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -16,6 +18,7 @@ interface FormData {
 }
 
 export default function WASACPayment() {
+  const { t } = useTranslation();
   const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -108,7 +111,7 @@ export default function WASACPayment() {
     if (element) {
       const opt = {
         margin: 0.5,
-        filename: `wasac_payment_receipt_${formData.receiptId}.pdf`,
+        filename: `wasac_receipt_${formData.receiptId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -361,11 +364,11 @@ export default function WASACPayment() {
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-1极速赛车开奖直播  h-3 w-3 md:h-4 md:w-4 text-white极速赛车开奖直播 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-1 h-3 w-3 md:h-4 md:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Validating...
+                  {t('wasac.validatingAccount')}
                 </>
               ) : (
                 <>
@@ -391,23 +394,12 @@ export default function WASACPayment() {
           )}
 
           {step === 4 && (
-            <div className="flex flex-col sm:flex-row gap极速赛车开奖直播 -2 md:gap-3 w-full">
-              <button
-                onClick={downloadPDF}
-                className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full font-semibold flex items-center justify-center"
-              >
-                <svg className="w-3 h-3 md:w-4 md:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 极速赛车开奖直播 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                Download Receipt
-              </button>
-              <button
-                onClick={() => window.location.reload()}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-900 px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full text-center font-semibold"
-              >
-                New Payment
-              </button>
-            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full text-center font-semibold"
+            >
+              New Payment
+            </button>
           )}
         </div>
       </motion.div>
