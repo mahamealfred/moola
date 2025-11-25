@@ -55,14 +55,6 @@ export default function DashboardHome() {
       gradient: 'from-[#ff6600] to-[#ff8c00]'
     },
     { 
-      name: t('dashboardHome.commissions'), 
-      href: '/dashboard/commission', 
-      icon: MonitorCheck,
-      description: t('dashboardHome.commissionsDesc'),
-      gradient: 'from-[#13294b] to-[#1a3a5f]',
-      showForAgent: true // Only show for agents
-    },
-    { 
       name: t('dashboardHome.services'), 
       href: '/dashboard/services', 
       icon: Zap,
@@ -86,15 +78,10 @@ export default function DashboardHome() {
   ];
 
   // Filter services based on user role
-  const services = allServices.filter(service => {
-    if (service.showForAgent && isCorporate) {
-      return false; // Hide commission for Corporate users
-    }
-    return true;
-  });
+  const services = allServices;
 
   return (
-    <div className="relative bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 transition-colors px-4 sm:px-6 py-6 sm:py-8 w-full">
+    <div className="relative bg-transparent transition-colors px-4 sm:px-6 py-6 sm:py-8 w-full">
       
       {/* Header Section */}
       <motion.div 
@@ -104,25 +91,11 @@ export default function DashboardHome() {
         className="text-center mb-8 sm:mb-12 w-full"
       >
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-3">
-          {isAgent ? (
-            <>
-              <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">{t('dashboardHome.welcomeTo')} </span>
-              <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">
-                <span className="text-[#ff6600]">M</span>oola<span className="text-[#ff6600]">X</span>
-              </span>
-            </>
-          ) : isCorporate ? (
-            <>
-              <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">{t('dashboardHome.welcomeTo')} </span>
-              <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">
-                <span className="text-[#ff6600]">M</span>oola<span className="text-[#ff6600]">P</span>lus
-              </span>
-            </>
-          ) : (
-            <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">
-              {t('dashboardHome.title')}
-            </span>
-          )}
+          <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">{t('dashboardHome.welcomeTo')} </span>
+          <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent relative">
+            M<span className="text-[#ff6600]">oola</span>
+            <span className="text-[#ff6600] absolute text-2xl sm:text-3xl lg:text-4xl" style={{ top: '-0.3em', marginLeft: '0.1em' }}>+</span>
+          </span>
         </h1>
         <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4">
           {t('dashboardHome.subtitle')}

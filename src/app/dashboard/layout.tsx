@@ -19,6 +19,7 @@ import {
 import { useAuth } from '..//../lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
 import FlagLanguageSelector from '@/components/FlagLanguageSelector';
+import SessionTimeout from '@/components/SessionTimeout';
 
 
 function SidebarItem({
@@ -177,30 +178,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Logo & Toggle */}
         <div className="flex items-center justify-between w-full mb-8">
           {isExpanded ? (
-            <h1 className="text-xl font-extrabold tracking-tight">
-              {isAgent ? (
-                <>
-                  <span className="text-[#ff6600]">M</span>
-                  <span className="text-[#13294b] dark:text-white">oola</span>
-                  <span className="text-[#ff6600]">X</span>
-                </>
-              ) : isCorporate ? (
-                <>
-                  <span className="text-[#ff6600]">M</span>
-                  <span className="text-[#13294b] dark:text-white">oola</span>
-                  <span className="text-[#ff6600]">P</span>
-                  <span className="text-[#13294b] dark:text-white">lus</span>
-                </>
-              ) : (
-                <>
-                  <span className="text-[#ff6600]">X</span>
-                  <span className="text-[#13294b] dark:text-white">-Pay</span>
-                </>
-              )}
+            <h1 className="text-xl font-extrabold tracking-tight relative">
+              <span className="text-[#ff6600]">M</span>
+              <span className="text-[#13294b] dark:text-white">oola</span>
+              <span className="text-[#ff6600] absolute text-sm" style={{ top: '-0.3em', marginLeft: '0.1em' }}>+</span>
             </h1>
           ) : (
-            <h1 className="text-xl font-extrabold tracking-tight text-[#ff6600]">
-              {isAgent ? 'M' : isCorporate ? 'M' : 'X'}
+            <h1 className="text-xl font-extrabold tracking-tight text-[#ff6600] relative">
+              M<span className="absolute text-xs" style={{ top: '-0.3em', marginLeft: '0.1em' }}>+</span>
             </h1>
           )}
           <button
@@ -270,26 +255,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               {/* Mobile Header */}
               <div className="flex items-center justify-between w-full mb-8">
-                <h1 className="text-xl font-extrabold tracking-tight">
-                  {isAgent ? (
-                    <>
-                      <span className="text-[#ff6600]">M</span>
-                      <span className="text-[#13294b] dark:text-white">oola</span>
-                      <span className="text-[#ff6600]">X</span>
-                    </>
-                  ) : isCorporate ? (
-                    <>
-                      <span className="text-[#ff6600]">M</span>
-                      <span className="text-[#13294b] dark:text-white">oola</span>
-                      <span className="text-[#ff6600]">P</span>
-                      <span className="text-[#13294b] dark:text-white">lus</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-[#ff6600]">X</span>
-                      <span className="text-[#13294b] dark:text-white">-Pay</span>
-                    </>
-                  )}
+                <h1 className="text-xl font-extrabold tracking-tight relative">
+                  <span className="text-[#ff6600]">M</span>
+                  <span className="text-[#13294b] dark:text-white">oola</span>
+                  <span className="text-[#ff6600] absolute text-sm" style={{ top: '-0.3em', marginLeft: '0.1em' }}>+</span>
                 </h1>
                 <button
                   onClick={closeMobileMenu}
@@ -463,6 +432,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </main>
       </div>
+
+      {/* Session Timeout Component */}
+      <SessionTimeout timeoutMinutes={2} warningMinutes={1.5} />
     </div>
   );
 }

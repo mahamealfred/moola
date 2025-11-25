@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2, DollarSign, CreditCard, Send, ArrowRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
 import { api } from '@/lib/api-client';
+import DashboardLoading from '@/components/DashboardLoading';
 
 export const runtime = "edge";
 
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -55,11 +57,16 @@ export default function LoginPage() {
       // Use the auth context login function
       login(result.data);
       
-      // The AuthProvider will handle the redirect automatically
+      // Show loading screen while redirecting to dashboard
+      setIsRedirecting(true);
+      
+      // Small delay to show loading screen, then navigate
+      setTimeout(() => {
+        router.push(redirect);
+      }, 500);
       
     } catch (err: any) {
       setError(err.message || t('login.errorGeneral'));
-    } finally {
       setIsLoading(false);
     }
   };
@@ -78,53 +85,145 @@ export default function LoginPage() {
     );
   }
 
+  // Show loading screen when redirecting to dashboard
+  if (isRedirecting) {
+    return <DashboardLoading />;
+  }
+
   // Don't show login page if already authenticated (will redirect)
   if (isAuthenticated) {
     return null;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 transition-colors relative overflow-hidden">
-      {/* Animated Gradient Orb Background */}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950 transition-colors duration-700 relative overflow-x-hidden">
+      {/* Payment & Money Transfer Background Pattern */}
       <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+        {/* Animated Money Flow Lines */}
+        <svg className="absolute inset-0 w-full h-full opacity-10 dark:opacity-5">
+          <defs>
+            <linearGradient id="moneyFlow" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#ff6600" />
+              <stop offset="50%" stopColor="#4CAF50" />
+              <stop offset="100%" stopColor="#2196F3" />
+            </linearGradient>
+          </defs>
+          <motion.path
+            d="M0,100 Q250,50 500,100 T1000,100"
+            stroke="url(#moneyFlow)"
+            strokeWidth="2"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.path
+            d="M0,300 Q250,250 500,300 T1000,300"
+            stroke="url(#moneyFlow)"
+            strokeWidth="2"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "linear", delay: 0.5 }}
+          />
+          <motion.path
+            d="M0,500 Q250,450 500,500 T1000,500"
+            stroke="url(#moneyFlow)"
+            strokeWidth="2"
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear", delay: 1 }}
+          />
+        </svg>
+
+        {/* Floating Payment Icons */}
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ 
+              opacity: [0.1, 0.3, 0.1],
+              scale: [1, 1.2, 1],
+              x: [0, Math.random() * 100 - 50, 0],
+              y: [0, Math.random() * 100 - 50, 0]
+            }}
+            transition={{
+              duration: 8 + i,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 0.5
+            }}
+            style={{
+              left: `${10 + i * 12}%`,
+              top: `${20 + (i % 3) * 25}%`,
+            }}
+          >
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-green-400/20 to-blue-400/20 flex items-center justify-center backdrop-blur-sm border border-green-400/30">
+              <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-green-500/40" />
+            </div>
+          </motion.div>
+        ))}
+
+        {/* Card/Wallet Icons */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={`wallet-${i}`}
+            className="absolute"
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: [0.05, 0.15, 0.05],
+              rotate: [0, 10, 0]
+            }}
+            transition={{
+              duration: 6 + i,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: i * 0.8
+            }}
+            style={{
+              right: `${5 + i * 15}%`,
+              top: `${15 + (i % 4) * 20}%`,
+            }}
+          >
+            <CreditCard className="w-10 h-10 sm:w-14 sm:h-14 text-blue-500/30" />
+          </motion.div>
+        ))}
+
+        {/* Transfer Arrow Paths */}
         <motion.div
-          animate={{
-            opacity: [0.15, 0.3, 0.15],
-            scale: [1, 1.1, 1],
-            x: [-20, 20, -20],
-            y: [0, -30, 0]
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-gradient-to-br from-[#ff6600] to-[#ff8c00] blur-3xl opacity-20"
+          className="absolute top-1/4 left-1/4 w-32 sm:w-48"
+          animate={{ x: [0, 100, 0], opacity: [0.1, 0.3, 0.1] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Send className="w-8 h-8 sm:w-12 sm:h-12 text-orange-500/30" />
+        </motion.div>
+
+        <motion.div
+          className="absolute bottom-1/3 right-1/4 w-32 sm:w-48"
+          animate={{ x: [0, -100, 0], opacity: [0.1, 0.3, 0.1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        >
+          <ArrowRight className="w-8 h-8 sm:w-12 sm:h-12 text-purple-500/30" />
+        </motion.div>
+
+        {/* Gradient Orbs */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 2, ease: "easeOut" }}
+          className="absolute w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-br from-green-400/10 to-blue-500/10 dark:from-green-400/5 dark:to-blue-500/5 blur-3xl rounded-full top-20 left-10 animate-pulse"
+        />
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 2, delay: 0.5, ease: "easeOut" }}
+          className="absolute w-64 h-64 sm:w-96 sm:h-96 bg-gradient-to-br from-orange-400/10 to-purple-500/10 dark:from-orange-400/5 dark:to-purple-500/5 blur-3xl rounded-full bottom-20 right-10 animate-pulse"
         />
         
-        <motion.div
-          animate={{
-            opacity: [0.1, 0.25, 0.1],
-            scale: [1, 1.15, 1],
-            x: [20, -20, 20],
-            y: [0, 30, 0]
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute bottom-20 -right-20 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#13294b] to-[#1e3a5f] blur-3xl opacity-15"
-        />
-        
-        {/* Subtle grid pattern */}
-        <div 
-          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, rgb(255, 102, 0) 1px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }}
-        />
+        {/* Subtle Grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(79,70,229,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(79,70,229,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(79,70,229,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(79,70,229,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
       {/* Card */}

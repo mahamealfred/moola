@@ -43,17 +43,21 @@ interface ApiResponse {
 
 // Fixed custom filter function with proper return type
 const globalFilterFn: FilterFn<Transaction> = (row, columnId, filterValue) => {
-  const search = filterValue.toLowerCase();
+  if (!filterValue) return true;
+  
+  const search = String(filterValue).toLowerCase().trim();
   
   const searchableFields = [
-    row.original.id.toLowerCase(),
-    row.original.date.toLowerCase(),
-    row.original.formattedDate.toLowerCase(),
-    row.original.status.toLowerCase(),
-    row.original.description.toLowerCase(),
-    row.original.serviceName.toLowerCase(),
-    row.original.amount.toString(),
-    row.original.token ? row.original.token.toLowerCase() : ''
+    String(row.original.id || '').toLowerCase(),
+    String(row.original.date || '').toLowerCase(),
+    String(row.original.formattedDate || '').toLowerCase(),
+    String(row.original.status || '').toLowerCase(),
+    String(row.original.description || '').toLowerCase(),
+    String(row.original.serviceName || '').toLowerCase(),
+    String(row.original.amount || ''),
+    String(row.original.formattedAmount || '').toLowerCase(),
+    String(row.original.token || '').toLowerCase(),
+    String(row.original.customerCharge || '')
   ];
 
   return searchableFields.some(field => field.includes(search));
@@ -375,7 +379,8 @@ const TransactionDetailModal: React.FC<{
               printPDF(transaction);
               onClose();
             }}
-            className="px-4 py-2 text-xs sm:text-sm font-medium text-white bg-[#ff6600] rounded-lg hover:bg-[#e65c00] transition-colors flex items-center justify-center gap-2 order-1 sm:order-2"
+            disabled={transaction.status.toLowerCase() !== 'successful' && transaction.status.toLowerCase() !== 'complete'}
+            className="px-4 py-2 text-xs sm:text-sm font-medium text-white bg-[#ff6600] rounded-lg hover:bg-[#e65c00] transition-colors flex items-center justify-center gap-2 order-1 sm:order-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#ff6600]"
           >
             <FiPrinter className="w-4 h-4" />
             {t('transactions.printReceipt')}
@@ -573,7 +578,8 @@ export default function TransactionsPage() {
           </button>
           <button
             onClick={() => printPDF(row.original)}
-            className="text-[#ff6600] hover:text-[#e65c00] flex items-center gap-1 text-xs sm:text-sm"
+            disabled={row.original.status.toLowerCase() !== 'successful' && row.original.status.toLowerCase() !== 'complete'}
+            className="text-[#ff6600] hover:text-[#e65c00] flex items-center gap-1 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[#ff6600]"
             title={t('transactions.printReceipt')}
           >
             <FiPrinter className="text-xs sm:text-sm" /> 
@@ -614,7 +620,7 @@ export default function TransactionsPage() {
 
   return (
     <>
-      <div className="p-3 sm:p-4 md:p-6 bg-white dark:bg-gray-950 transition-colors w-full max-w-full overflow-x-hidden">
+      <div className="p-3 sm:p-4 md:p-6 bg-transparent transition-colors w-full max-w-full overflow-x-hidden">
         {/* Header */}
         <div className="mb-4 sm:mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">

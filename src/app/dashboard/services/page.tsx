@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import {
   Zap,
   Phone,
@@ -54,6 +55,7 @@ import { useTranslation } from '@/lib/i18n-context';
 type PaymentService = {
   name: string;
   icon: React.ElementType;
+  logo?: string;
   content: string | React.ReactElement;
   category: string;
   popularity: number;
@@ -65,6 +67,7 @@ type PaymentService = {
 type AgencyBankingService = {
   name: string;
   icon: React.ElementType;
+  logo?: string;
   href: string;
   status: 'active' | 'coming-soon';
 };
@@ -72,6 +75,7 @@ type AgencyBankingService = {
 type BusinessService = {
   name: string;
   icon: React.ElementType;
+  logo?: string;
   content: string | React.ReactElement;
   category: string;
   description?: string;
@@ -82,7 +86,8 @@ type UserRole = 'Agent' | 'Corporate';
 const paymentServices: PaymentService[] = [
   { 
     name: 'Electricity Payment', 
-    icon: Zap, 
+    icon: Zap,
+    logo: '/logos/services/electricity.png',
     content: <ElectricityPayment />, 
     category: 'Utilities', 
     popularity: 95, 
@@ -91,7 +96,8 @@ const paymentServices: PaymentService[] = [
   },
   { 
     name: 'RRA Payment', 
-    icon: FileText, 
+    icon: FileText,
+    logo: '/logos/services/rra.jpg',
     content: <RraPayment />, 
     category: 'Government', 
     popularity: 88,
@@ -99,7 +105,8 @@ const paymentServices: PaymentService[] = [
   },
   { 
     name: 'Buy Airtime', 
-    icon: Phone, 
+    icon: Phone,
+    logo: '/logos/services/airtime.jpg',
     content: <AirtimePurchase />, 
     category: 'Telecom', 
     popularity: 92, 
@@ -108,7 +115,8 @@ const paymentServices: PaymentService[] = [
   },
   { 
     name: 'Startimes Payment', 
-    icon: Tv, 
+    icon: Tv,
+    logo: '/logos/services/startime.png',
     content: <StartimesPayment />, 
     category: 'Entertainment', 
     popularity: 78,
@@ -116,7 +124,8 @@ const paymentServices: PaymentService[] = [
   },
   { 
     name: 'Bulk SMS', 
-    icon: MessageSquare, 
+    icon: MessageSquare,
+    logo: '/logos/services/bulksms.png',
     content: <BulkSmsForm />, 
     category: 'Communication', 
     popularity: 82,
@@ -124,7 +133,8 @@ const paymentServices: PaymentService[] = [
   },
   { 
     name: 'Bulk Airtime', 
-    icon: MessageSquare, 
+    icon: MessageSquare,
+    logo: '/logos/services/airtime.jpg',
     content: <BulkAirtimeForm />, 
     category: 'Telecom', 
     popularity: 85, 
@@ -133,7 +143,8 @@ const paymentServices: PaymentService[] = [
   },
   { 
     name: 'Wasac', 
-    icon: Droplet, 
+    icon: Droplet,
+    logo: '/logos/services/wasac.jpg',
     content: <WASACPayment/>, 
     category: 'Utilities', 
     popularity: 75,
@@ -141,7 +152,8 @@ const paymentServices: PaymentService[] = [
   },
   { 
     name: 'Irembo Pay', 
-    icon: Shield, 
+    icon: Shield,
+    logo: '/logos/services/irembo.png',
     content: <IremboPayment/>, 
     category: 'Government', 
     popularity: 80,
@@ -149,7 +161,8 @@ const paymentServices: PaymentService[] = [
   },
   { 
     name: 'RNIT', 
-    icon: Building2, 
+    icon: Building2,
+    logo: '/logos/services/rnit.png',
     content: <RNITPayment/>, 
     category: 'Government', 
     popularity: 72,
@@ -157,7 +170,8 @@ const paymentServices: PaymentService[] = [
   },
   { 
     name: 'School Fees', 
-    icon: BookOpen, 
+    icon: BookOpen,
+    logo: '/logos/services/school.svg',
     content: <SchoolFeesPayment/>, 
     category: 'Education', 
     popularity: 79, 
@@ -167,37 +181,41 @@ const paymentServices: PaymentService[] = [
 ];
 
 const agencyBankingServices: AgencyBankingService[] = [
-  { name: 'Ecobank', icon: Banknote, href: '/dashboard/services/agency-banking/ecobank', status: 'active' },
-  { name: 'Bank of Kigali', icon: Building2, href: '/dashboard/balance', status: 'active' },
-  { name: 'Equity Bank', icon: Landmark, href: '/dashboard/balance', status: 'active' },
-  { name: 'GT Bank', icon: ShieldCheck, href: '/dashboard/balance', status: 'coming-soon' },
+  { name: 'Ecobank', icon: Banknote, logo: '/logos/banks/ECOBANK.jpg', href: '/dashboard/services/agency-banking/ecobank', status: 'active' },
+  { name: 'Bank of Kigali', icon: Building2, logo: '/logos/banks/bankofkigali.png', href: '/dashboard/balance', status: 'active' },
+  { name: 'Equity Bank', icon: Landmark, logo: '/logos/banks/equity.jpg', href: '/dashboard/balance', status: 'active' },
+  { name: 'GT Bank', icon: ShieldCheck, logo: '/logos/banks/gtbank.png', href: '/dashboard/balance', status: 'coming-soon' },
 ];
 
 const businessServices: BusinessService[] = [
   { 
     name: 'Bulk Salary Payment', 
-    icon: Users, 
+    icon: Users,
+    logo: '/logos/services/salary.svg',
     content: <BulkSalaryPayment />, 
     category: 'Payroll',
     description: 'Process multiple salaries at once'
   },
   { 
     name: 'Invoice Payments', 
-    icon: CreditCard, 
+    icon: CreditCard,
+    logo: '/logos/services/invoice.svg',
     content: <InvoicePayment />, 
     category: 'Finance',
     description: 'Manage and pay invoices'
   },
   { 
     name: 'Tax Calculation', 
-    icon: Calculator, 
+    icon: Calculator,
+    logo: '/logos/services/taxcalc.svg',
     content: <TaxCalculation />, 
     category: 'Finance',
     description: 'Automated tax calculations'
   },
   { 
     name: 'Expense Management', 
-    icon: FileSpreadsheet, 
+    icon: FileSpreadsheet,
+    logo: '/logos/services/expense.svg', 
     content: <ExpenseManagement />, 
     category: 'Operations',
     description: 'Track and manage expenses'
@@ -546,28 +564,40 @@ export default function DashboardHome() {
         </div>
 
         <div className="relative z-10">
-          {/* Icon with Enhanced Animation */}
+          {/* Image/Icon with Enhanced Animation */}
           <motion.div 
-            className={`p-3 rounded-2xl transition-all duration-300 group-hover:scale-110 ${colors.iconBg} ${colors.iconColor} mb-4`}
+            className={`p-3 rounded-2xl transition-all duration-300 group-hover:scale-110 ${colors.iconBg} ${colors.iconColor} mb-4 flex items-center justify-center`}
             whileHover={{ rotate: 360 }}
             transition={{ duration: 0.6 }}
           >
-            <service.icon className="w-6 h-6" />
+            {service.logo ? (
+              <div className="w-10 h-10 relative">
+                <Image 
+                  src={service.logo} 
+                  alt={service.name}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            ) : (
+              <service.icon className="w-6 h-6" />
+            )}
           </motion.div>
 
           {/* Content */}
           <div className="space-y-2">
-            <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-[#ff6600] transition-colors text-lg leading-tight">
-              {service.name} 
-            </h3>
-            
-            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-              {service.description || 
-                (sectionType === 'payment' && t('services.quickPaymentService')) ||
-                (sectionType === 'agency' && t('services.bankingServices')) ||
-                (sectionType === 'business' && t('services.businessSolutions'))
-              }
-            </p>
+            {sectionType === 'agency' ? (
+              <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-[#ff6600] transition-colors text-lg leading-tight">
+                {service.name}
+              </h3>
+            ) : (
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {service.description || 
+                  (sectionType === 'payment' && t('services.quickPaymentService')) ||
+                  (sectionType === 'business' && t('services.businessSolutions'))
+                }
+              </p>
+            )}
 
             {/* Animated Arrow */}
             <motion.div 
@@ -685,7 +715,16 @@ export default function DashboardHome() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  {selectedService.icon && React.createElement(selectedService.icon, { 
+                  {selectedService.logo ? (
+                    <div className="w-8 h-8 relative flex-shrink-0">
+                      <Image 
+                        src={selectedService.logo} 
+                        alt={selectedService.name}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  ) : selectedService.icon && React.createElement(selectedService.icon, { 
                     className: "w-6 h-6 text-[#ff6600]" 
                   })}
                   <span className="truncate">{selectedService.name}</span>

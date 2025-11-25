@@ -7,8 +7,13 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "M-oola",
-  description: "Implemented By DDIN Team",
+  title: "Moola+ | Rwanda's Leading Payment Platform",
+  description: "Moola+ is Rwanda's premier digital payment platform offering seamless bill payments, airtime top-ups, mobile money transfers, agency banking services, and business solutions. Fast, secure, and reliable payment services for individuals and businesses across Rwanda.",
+  icons: {
+    icon: '/moola-icon.svg',
+    apple: '/moola-icon.svg',
+    shortcut: '/moola-icon.svg',
+  },
 };
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

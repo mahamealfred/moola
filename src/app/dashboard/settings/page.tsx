@@ -57,7 +57,13 @@ export default function SettingsComponent(props?: any) {
   const { t } = useTranslation();
   const initialAgentInfo: AgentInfo | undefined = props?.initialAgentInfo;
   const [activeTab, setActiveTab] = useState('profile');
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => {
+    // Check if dark mode is currently active
+    if (typeof window !== 'undefined') {
+      return document.documentElement.classList.contains('dark');
+    }
+    return false;
+  });
   const [fontSize, setFontSize] = useState('medium');
   const [language, setLanguage] = useState('en');
   const [notifications, setNotifications] = useState({
@@ -1147,9 +1153,9 @@ export default function SettingsComponent(props?: any) {
                   {t('settings.getSupportHelp')}
                 </p>
                 <div className="space-y-2 text-sm">
-                  <p>📞 <strong>{t('settings.phone')}:</strong> +250 788 123 456</p>
-                  <p>✉️ <strong>{t('settings.email')}:</strong> support@moola.com</p>
-                  <p>💬 <strong>{t('settings.liveChat')}:</strong> {t('settings.available247')}</p>
+                  <p>📞 <strong>{t('settings.phone')}:</strong> +250 788 492 972</p>
+                  <p>✉️ <strong>{t('settings.email')}:</strong> info@ddin.rw</p>
+                  <p>🌐 <strong>Website:</strong> <a href="https://ddin.rw" target="_blank" rel="noopener noreferrer" className="text-[#ff6600] hover:underline">ddin.rw</a></p>
                 </div>
               </div>
 
@@ -1190,7 +1196,7 @@ export default function SettingsComponent(props?: any) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 md:p-6">
+    <div className="min-h-screen bg-transparent p-4 md:p-6">
       <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
         <div className="md:flex">
           {/* Sidebar */}

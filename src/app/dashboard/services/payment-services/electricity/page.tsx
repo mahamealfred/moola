@@ -271,19 +271,6 @@ export default function ElectricityPayment() {
         transition={{ duration: 0.3 }}
         className="w-full bg-white dark:bg-gray-800 rounded-lg p-3 md:p-4 border border-gray-200 dark:border-gray-700"
       >
-        {/* Electricity Header */}
-        <div className="mb-4 md:mb-5 text-center border-b border-gray-200 dark:border-gray-700 pb-3">
-          <div className="flex items-center justify-center space-x-2">
-            <div className="bg-[#ff6600] text-white p-1.5 md:p-2 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">{t('electricity.title')}</h1>
-          </div>
-          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">{t('electricity.subtitle')}</p>
-        </div>
-
         {/* Progress Bar */}
         <div className="mb-4 md:mb-5">
           <div className="flex justify-between items-center relative">
@@ -363,34 +350,11 @@ export default function ElectricityPayment() {
             <motion.div key="step2" {...stepAnimation}>
               <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">{t('electricity.enterPaymentAmount')}</h2>
               
-              {/* Horizontal Layout for Customer Information */}
-              <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-lg mb-4">
-                <h3 className="font-semibold mb-3 text-gray-700 dark:text-gray-300 text-sm md:text-base flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {t('messages.customerDetails')}
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 text-sm md:text-base">
-                  <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('forms.customerName')}</p>
-                    <p className="text-gray-900 dark:text-white font-semibold">{formData.customerName}</p>
-                  </div>
-                  
-                  <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('forms.meterNumber')}</p>
-                    <p className="text-gray-900 dark:text-white font-semibold">{formData.meterNumber}</p>
-                  </div>
-                  
-                  {validationData && (
-                    <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('electricity.utility')}</p>
-                      <p className="text-gray-900 dark:text-white font-semibold">
-                        {validationData.productName || t('electricity.electricity')}
-                      </p>
-                    </div>
-                  )}
+              {/* Simplified Customer Display */}
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">{formData.meterNumber}</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{formData.customerName}</span>
                 </div>
               </div>
 
@@ -437,10 +401,10 @@ export default function ElectricityPayment() {
                 </div>
                 
                 <div className="border-t pt-3">
-                  <p className="font-semibold text-[#ff6600] text-base md:text-lg">
-                    <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('electricity.totalAmountToPay')}</span>
-                    RWF {formData.amount.toLocaleString()}
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{t('electricity.totalAmountToPay')}</span>
+                    <span className="font-bold text-[#ff6600] text-lg">RWF {formData.amount.toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
             </motion.div>

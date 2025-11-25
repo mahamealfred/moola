@@ -265,19 +265,6 @@ export default function AirtimePurchase() {
         transition={{ duration: 0.3 }}
         className="w-full bg-white dark:bg-gray-800 rounded-lg p-3 md:p-4 border border-gray-200 dark:border-gray-700"
       >
-        {/* Airtime Header */}
-        <div className="mb-4 md:mb-5 text-center border-b border-gray-200 dark:border-gray-700 pb-3">
-          <div className="flex items-center justify-center space-x-2">
-            <div className="bg-[#ff6600] text-white p-1.5 md:p-2 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-            </div>
-            <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">{t('airtime.title')}</h1>
-          </div>
-          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">{t('airtime.subtitle')}</p>
-        </div>
-
         {/* Progress Bar */}
         <div className="mb-4 md:mb-5">
           <div className="flex justify-between items-center relative">
@@ -374,34 +361,11 @@ export default function AirtimePurchase() {
             <motion.div key="step2" {...stepAnimation}>
               <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">{t('airtime.enterAirtimeAmount')}</h2>
               
-              {/* Horizontal Layout for Phone Information */}
-              <div className="bg-gray-50 dark:bg-gray-700 p-3 md:p-4 rounded-lg mb-4">
-                <h3 className="font-semibold mb-3 text-gray-700 dark:text-gray-300 text-sm md:text-base flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                  {t('airtime.phoneInformation')}
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 text-sm md:text-base">
-                  <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('airtime.provider')}</p>
-                    <p className="text-gray-900 dark:text-white font-semibold">{formData.provider}</p>
-                  </div>
-                  
-                  <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                    <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('airtime.phoneNumber')}</p>
-                    <p className="text-gray-900 dark:text-white font-semibold">{formatPhoneNumber(formData.phoneNumber)}</p>
-                  </div>
-                  
-                  {validationData && (
-                    <div className="bg-white dark:bg-gray-600 p-3 rounded">
-                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('airtime.customerName')}</p>
-                      <p className="text-gray-900 dark:text-white font-semibold">
-                        {validationData.customerName || t('airtime.notAvailable')}
-                      </p>
-                    </div>
-                  )}
+              {/* Simplified Phone Display */}
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mb-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">{formData.provider}</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{formatPhoneNumber(formData.phoneNumber)}</span>
                 </div>
               </div>
 
@@ -448,10 +412,10 @@ export default function AirtimePurchase() {
                 </div>
                 
                 <div className="border-t pt-3">
-                  <p className="font-semibold text-[#ff6600] text-base md:text-lg">
-                    <span className="block text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1">{t('airtime.totalAmountToPay')}</span>
-                    RWF {formData.amount.toLocaleString()}
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{t('airtime.totalAmountToPay')}</span>
+                    <span className="font-bold text-[#ff6600] text-lg">RWF {formData.amount.toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
             </motion.div>

@@ -33,19 +33,6 @@ export default function BulkAirtimeForm() {
         transition={{ duration: 0.3 }}
         className="w-full bg-white dark:bg-gray-800 rounded-lg p-3 md:p-4 border border-gray-200 dark:border-gray-700"
       >
-        {/* Bulk Airtime Header with Same Colors */}
-        <div className="mb-4 md:mb-5 text-center border-b border-gray-200 dark:border-gray-700 pb-3">
-          <div className="flex items-center justify-center space-x-2">
-            <div className="bg-[#ff6600] text-white p-1.5 md:p-2 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h1 className="text-xl md:text-2xl font-bold text-[#ff6600] dark:text-[#ff6600]">Bulk Airtime Service</h1>
-          </div>
-          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">Send airtime to multiple phone numbers</p>
-        </div>
-
         {/* Progress Bar */}
         <div className="mb-4 md:mb-5">
           <div className="flex justify-between items-center relative">

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, Variants, easeOut, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Search, X, Quote, Download, Smartphone, Wifi, Home, Car, Heart, ShoppingCart } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, X, Quote, Download, Smartphone, Wifi, Home, Car, Heart, ShoppingCart, Mail, Phone as PhoneIcon, MessageCircle, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import {
   Sun,
@@ -548,7 +548,10 @@ export default function LandingPage() {
             >
               <div className="relative">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#ff6600] to-[#ff8533] rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-500 border border-white/20">
-                  <span className="text-white font-black text-base sm:text-lg tracking-tighter drop-shadow">M</span>
+                  <span className="text-white font-black text-base sm:text-lg tracking-tighter drop-shadow relative">
+                    M
+                    <span className="absolute text-xs font-black" style={{ top: '-0.3em', marginLeft: '0.1em' }}>+</span>
+                  </span>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-br from-[#ff6600] to-[#ff8533] rounded-lg sm:rounded-xl blur-sm opacity-50 group-hover:opacity-70 transition-opacity duration-500 -z-10" />
               </div>
@@ -642,7 +645,7 @@ export default function LandingPage() {
         initial="hidden"
         animate="visible"
         variants={fadeUp}
-        className="relative text-center pt-16 sm:pt-24 pb-16 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
+        className="relative text-center min-h-screen flex flex-col justify-center pt-16 sm:pt-24 pb-16 sm:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
       >
         {/* Enhanced Animated Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -822,11 +825,13 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="inline-flex items-center bg-gradient-to-r from-[#ff6600]/10 to-[#13294b]/10 dark:from-[#ff6600]/20 dark:to-[#13294b]/20 text-[#ff6600] dark:text-[#ffcc99] px-3 py-1.5 rounded-full text-xs font-medium mb-4 sm:mb-6 border border-[#ff6600]/20 backdrop-blur-sm"
+          className="flex justify-center mb-4 sm:mb-6"
         >
-          <Sparkles className="w-3 h-3 mr-1" />
-          {t('landing.leadingPlatform')}
-          <Award className="w-3 h-3 ml-1" />
+          <div className="inline-flex items-center bg-gradient-to-r from-[#ff6600]/10 to-[#13294b]/10 dark:from-[#ff6600]/20 dark:to-[#13294b]/20 text-[#ff6600] dark:text-[#ffcc99] px-3 py-1.5 rounded-full text-xs font-medium border border-[#ff6600]/20 backdrop-blur-sm">
+            <Sparkles className="w-3 h-3 mr-1" />
+            {t('landing.leadingPlatform')}
+            <Award className="w-3 h-3 ml-1" />
+          </div>
         </motion.div>
         
         <motion.h2
@@ -924,7 +929,7 @@ export default function LandingPage() {
       </motion.section>
 
       {/* Enhanced Services Section */}
-      <section id="services" ref={servicesRef} className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
+      <section id="services" ref={servicesRef} className="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
         {/* Gradient Orb Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -1212,7 +1217,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Payment Features Section */}
-      <section id="features" className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 rounded-2xl my-6 sm:my-12 relative overflow-hidden">
+      <section id="features" className="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 rounded-2xl my-6 sm:my-12 relative overflow-hidden">
         {/* Gradient Orb Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -1366,7 +1371,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Benefits Section */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20">
+      <section className="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -1421,7 +1426,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Security Section */}
-      <section id="security" className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 rounded-2xl my-6 sm:my-12 relative overflow-hidden">
+      <section id="security" className="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 rounded-2xl my-6 sm:my-12 relative overflow-hidden">
         {/* Gradient Orb Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -1520,7 +1525,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Mobile App Section */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20">
+      <section className="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -1651,7 +1656,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Testimonials Section */}
-      <section id="testimonials" className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
+      <section id="testimonials" className="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
         {/* Gradient Orb Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -1808,7 +1813,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Banking Partners Section */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20">
+      <section className="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -1882,7 +1887,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Stats Section */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
+      <section className="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-3 sm:px-6 py-12 sm:py-20 relative overflow-hidden">
         {/* Gradient Orb Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -1965,7 +1970,7 @@ export default function LandingPage() {
       </section>
 
       {/* Enhanced Service Request Section */}
-      <section className="max-w-3xl mx-auto px-3 sm:px-6 py-12 sm:py-20">
+      <section className="min-h-screen flex flex-col justify-center max-w-3xl mx-auto px-3 sm:px-6 py-12 sm:py-20">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -2045,15 +2050,31 @@ export default function LandingPage() {
             <div>
               {/* Enhanced Footer Logo */}
               <div className="flex items-center gap-1.5 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-[#ff6600] to-[#ff8533] rounded-lg flex items-center justify-center shadow-md">
-                  <span className="text-white font-bold text-base">M</span>
+                <div className="relative">
+                  <div className="w-8 h-8 bg-gradient-to-br from-[#ff6600] to-[#ff8533] rounded-lg flex items-center justify-center shadow-md">
+                    <span className="text-white font-black text-base tracking-tighter drop-shadow relative">
+                      M
+                      <span className="absolute text-xs font-black" style={{ top: '-0.3em', marginLeft: '0.1em' }}>+</span>
+                    </span>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#ff6600] to-[#ff8533] rounded-lg blur-sm opacity-50 -z-10" />
                 </div>
                 <div className="flex flex-col">
-                  <h1 className="text-lg font-black tracking-tight leading-none">
+                  <h1 className="text-lg font-black tracking-tight leading-none relative">
                     <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8533] bg-clip-text text-transparent">
                       M
                     </span>
                     <span className="text-white">oola</span>
+                    <span 
+                      className="text-white absolute"
+                      style={{
+                        fontSize: '0.6em',
+                        top: '-0.3em',
+                        marginLeft: '0.1em'
+                      }}
+                    >
+                      +
+                    </span>
                   </h1>
                   <p className="text-[10px] text-gray-300 font-medium tracking-wide mt-0.5 opacity-80">
                     {t('landing.premiumSolutions')}
@@ -2064,17 +2085,36 @@ export default function LandingPage() {
                 {t('landing.footerTagline')}
               </p>
               
-              {/* Social Links */}
+              {/* Contact Links */}
               <div className="flex gap-3 mt-4">
-                {['Twitter', 'Facebook', 'LinkedIn', 'Instagram'].map((social) => (
-                  <motion.button
-                    key={social}
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    className="w-8 h-8 bg-white/10 rounded-md flex items-center justify-center hover:bg-white/20 transition-colors"
-                  >
-                    <span className="text-white text-xs font-medium">{social[0]}</span>
-                  </motion.button>
-                ))}
+                <motion.button
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-[#ff6600] transition-all group"
+                  title="Email Us"
+                >
+                  <Mail className="w-4 h-4 text-white" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-[#ff6600] transition-all group"
+                  title="Call Us"
+                >
+                  <PhoneIcon className="w-4 h-4 text-white" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-[#ff6600] transition-all group"
+                  title="WhatsApp Support"
+                >
+                  <MessageCircle className="w-4 h-4 text-white" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center hover:bg-[#ff6600] transition-all group"
+                  title="Find Us"
+                >
+                  <MapPin className="w-4 h-4 text-white" />
+                </motion.button>
               </div>
             </div>
             

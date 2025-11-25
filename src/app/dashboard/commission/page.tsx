@@ -42,7 +42,7 @@ export default function CommissionPage() {
   const [withdrawSuccess, setWithdrawSuccess] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
-  const [showAmounts, setShowAmounts] = useState(false);
+  const [showAmounts, setShowAmounts] = useState(true);
   const [validationError, setValidationError] = useState('');
 
   // Extract commission accounts
@@ -67,7 +67,7 @@ export default function CommissionPage() {
         throw new Error(t('commission.authRequired'));
       }
 
-  const response = await fetch('https://core-api.ddin.rw/v1/agency/accounts/all/accounts/info/balance', {
+  const response = await fetch('http://localhost:4000/v1/agency/accounts/all/accounts/info/balance', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -82,13 +82,13 @@ export default function CommissionPage() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: AccountsResponse = await response.json();
+      const result = await response.json();
 
-      if (!data.success) {
+      if (!result.success) {
         throw new Error(t('commission.fetchFailed'));
       }
 
-      setAccounts(data.accounts || []);
+      setAccounts(result.data?.accounts || []);
     } catch (err: any) {
       setError(err.message || t('commission.fetchFailed'));
       console.error('Error fetching commission balances:', err);
@@ -243,7 +243,7 @@ export default function CommissionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-4 sm:py-6 lg:py-8">
+    <div className="min-h-screen bg-transparent py-4 sm:py-6 lg:py-8">
       <div className="container mx-auto px-3 sm:px-4 lg:px-6 max-w-4xl">
         
         {/* Header with Controls */}
@@ -316,10 +316,13 @@ export default function CommissionPage() {
                 <p className="text-xs text-[#ff6600] dark:text-[#ff8c00] mt-1 font-semibold">
                   {t('commission.minWithdrawalLabel')}: RWF {MIN_WITHDRAWAL_AMOUNT.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-500 mt-2 italic">
-                  {t('commission.clickTo')} {showAmounts ? t('commission.hide') : t('commission.show')} {t('commission.amount')} • {t('commission.readyToWithdraw')}
-                </p>
               </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleAmountsVisibility(); }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors ml-2"
+              >
+                {showAmounts ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </motion.div>
 
@@ -344,10 +347,13 @@ export default function CommissionPage() {
                   }
                 </p>
                 <p className="text-xs text-gray-400 mt-1">{t('commission.pendingRelease')}</p>
-                <p className="text-xs text-gray-500 mt-2 italic">
-                  {t('commission.clickTo')} {showAmounts ? t('commission.hide') : t('commission.show')} {t('commission.amount')}
-                </p>
               </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleAmountsVisibility(); }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors ml-2"
+              >
+                {showAmounts ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </motion.div>
         </div>
@@ -428,37 +434,6 @@ export default function CommissionPage() {
           )}
         </motion.div>
 
-        {/* Commission Information */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg"
-        >
-          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
-            {t('commission.withdrawalGuidelines')}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
-            <div>
-              <h4 className="font-semibold text-[#ff6600] mb-2">{t('commission.amountLimits')}</h4>
-              <ul className="space-y-1 text-xs">
-                <li>• {t('commission.minimumWithdrawal')}: <strong>RWF 5,000</strong></li>
-                <li>• {t('commission.maximumWithdrawal')}: {t('commission.availableBalance')}</li>
-                <li>• {t('commission.wholeNumbersOnly')}</li>
-                <li>• {t('commission.multiplesOf100')}</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-green-600 dark:text-green-400 mb-2">{t('commission.processing')}</h4>
-              <ul className="space-y-1 text-xs">
-                <li>• {t('commission.instantCommissionOnly')}</li>
-                <li>• {t('commission.processedWithin24Hours')}</li>
-                <li>• {t('commission.noWithdrawalFees')}</li>
-                <li>• {t('commission.requiresAdminApproval')}</li>
-              </ul>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </div>
   );
