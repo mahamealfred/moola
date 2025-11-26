@@ -90,7 +90,7 @@ export default function ProfessionalReceipt({
             
             <div className="flex flex-col">
               <h1 className="text-2xl font-bold tracking-tight leading-none relative">
-                <span className="text-[#ff6600]">Moola</span>
+                <span className="text-[#ff6600]">M</span><span className="text-[#13294b]">oola</span>
                 <span 
                   className="text-[#ff6600] absolute font-bold"
                   style={{

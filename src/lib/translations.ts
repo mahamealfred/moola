@@ -144,6 +144,8 @@ export const translations = {
       meterValidationError: 'Kwemeza counter byanze. Nyamuneka gerageza nanone.',
       paymentProcessingFailed: 'Gutunganya ubwishyu byanze. Nyamuneka gerageza nanone.',
       processingPayment: 'Iratunganya Ubwishyu...',
+      validatingMeter: 'Kwemeza Counter...',
+      processing: 'Gutunganya...',
     },
 
     airtime: {
@@ -195,6 +197,8 @@ export const translations = {
       phoneValidationFailed: 'Kwemeza nimero ya telefone byanze. Gerageza nanone.',
       paymentFailed: 'Ubwishyu bwanze. Nyamuneka gerageza nanone.',
       paymentProcessingFailed: 'Gutunganya ubwishyu byanze. Nyamuneka gerageza nanone.',
+      validatingPhone: 'Kwemeza Telefone...',
+      processing: 'Gutunganya...',
     },
 
     rra: {
@@ -243,9 +247,32 @@ export const translations = {
       
       validationError: 'Ikosa ryo Kwemeza',
       processingPayment: 'Iratunganya Ubwishyu...',
+      validatingTax: 'Kwemeza Umusoro...',
+      processing: 'Gutunganya...',
       
       docValidationFailed: 'Kwemeza inyandiko byanze. Nyamuneka reba nimero y\'inyandiko ugerageze nanone.',
       paymentProcessingFailed: 'Gutunganya ubwishyu byanze. Nyamuneka gerageza nanone.',
+    },
+
+    wasac: {
+      validatingAccount: 'Kwemeza Konti...',
+    },
+
+    startime: {
+      validatingCard: 'Kwemeza Ikarita...',
+      processing: 'Gutunganya...',
+    },
+
+    schools: {
+      validating: 'Kwemeza...',
+    },
+
+    rnit: {
+      validating: 'Kwemeza...',
+    },
+
+    irembopay: {
+      validating: 'Kwemeza...',
     },
 
     bulkSms: {
@@ -442,6 +469,8 @@ export const translations = {
       equityBank: 'Equity Bank',
       gtBank: 'GT Bank',
       comingSoon: 'Bizaza vuba',
+      active: 'Birakora',
+      inactive: 'Ntibirakora',
       
       businessServices: 'Serivisi z\'Ubucuruzi',
       businessServicesDesc: 'Ibikoresho byateye imbere byo gucunga ubucuruzi n\'ibikorwa',
@@ -1184,6 +1213,8 @@ export const translations = {
       meterValidationError: 'La validation du compteur a échoué. Veuillez réessayer.',
       paymentProcessingFailed: 'Le traitement du paiement a échoué. Veuillez réessayer.',
       processingPayment: 'Traitement du paiement...',
+      validatingMeter: 'Validation du compteur...',
+      processing: 'Traitement...',
     },
 
     airtime: {
@@ -1235,6 +1266,8 @@ export const translations = {
       phoneValidationFailed: 'Échec de la validation du téléphone. Réessayez.',
       paymentFailed: 'Le paiement a échoué. Veuillez réessayer.',
       paymentProcessingFailed: 'Échec du traitement du paiement. Veuillez réessayer.',
+      validatingPhone: 'Validation du téléphone...',
+      processing: 'Traitement...',
     },
 
     bulkSms: {
@@ -1359,9 +1392,32 @@ export const translations = {
       
       validationError: 'Erreur de Validation',
       processingPayment: 'Traitement du paiement...',
+      validatingTax: 'Validation de l\'impôt...',
+      processing: 'Traitement...',
       
       docValidationFailed: 'La validation du document a échoué. Veuillez vérifier le numéro de document et réessayer.',
       paymentProcessingFailed: 'Le traitement du paiement a échoué. Veuillez réessayer.',
+    },
+
+    wasac: {
+      validatingAccount: 'Validation du compte...',
+    },
+
+    startime: {
+      validatingCard: 'Validation de la carte...',
+      processing: 'Traitement...',
+    },
+
+    schools: {
+      validating: 'Validation...',
+    },
+
+    rnit: {
+      validating: 'Validation...',
+    },
+
+    irembopay: {
+      validating: 'Validation...',
     },
 
     nav: {
@@ -1482,6 +1538,8 @@ export const translations = {
       equityBank: 'Equity Bank',
       gtBank: 'GT Bank',
       comingSoon: 'Bientôt disponible',
+      active: 'Actif',
+      inactive: 'Inactif',
       
       businessServices: 'Services aux entreprises',
       businessServicesDesc: 'Outils avancés pour la gestion d\'entreprise et les opérations',
@@ -2224,6 +2282,8 @@ export const translations = {
       meterValidationError: 'Meter validation failed. Please try again.',
       paymentProcessingFailed: 'Payment processing failed. Please try again.',
       processingPayment: 'Processing Payment...',
+      validatingMeter: 'Validating Meter...',
+      processing: 'Processing...',
     },
 
     bulkSms: {
@@ -2351,6 +2411,8 @@ export const translations = {
       phoneValidationFailed: 'Phone validation failed. Try again.',
       paymentFailed: 'Payment failed. Please try again.',
       paymentProcessingFailed: 'Payment processing failed. Please try again.',
+      validatingPhone: 'Validating Phone...',
+      processing: 'Processing...',
     },
 
     rra: {
@@ -2399,9 +2461,32 @@ export const translations = {
       
       validationError: 'Validation Error',
       processingPayment: 'Processing Payment...',
+      validatingTax: 'Validating Tax...',
+      processing: 'Processing...',
       
       docValidationFailed: 'Document validation failed. Please check the document number and try again.',
       paymentProcessingFailed: 'Payment processing failed. Please try again.',
+    },
+
+    wasac: {
+      validatingAccount: 'Validating Account...',
+    },
+
+    startime: {
+      validatingCard: 'Validating Card...',
+      processing: 'Processing...',
+    },
+
+    schools: {
+      validating: 'Validating...',
+    },
+
+    rnit: {
+      validating: 'Validating...',
+    },
+
+    irembopay: {
+      validating: 'Validating...',
     },
 
     nav: {
@@ -2522,6 +2607,8 @@ export const translations = {
       equityBank: 'Equity Bank',
       gtBank: 'GT Bank',
       comingSoon: 'Coming Soon',
+      active: 'Active',
+      inactive: 'Inactive',
       
       businessServices: 'Business Services',
       businessServicesDesc: 'Advanced tools for business management and operations',

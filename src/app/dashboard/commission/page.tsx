@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Timer, Coins, Download, RefreshCw, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { secureStorage } from '../../../lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
+import { api } from '@/lib/api-client';
 
 interface Account {
   accountId: number;
@@ -67,13 +68,7 @@ export default function CommissionPage() {
         throw new Error(t('commission.authRequired'));
       }
 
-  const response = await fetch('http://localhost:4000/v1/agency/accounts/all/accounts/info/balance', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await api.getAuth('/agency/accounts/all/accounts/info/balance');
 
       if (!response.ok) {
         if (response.status === 401) {

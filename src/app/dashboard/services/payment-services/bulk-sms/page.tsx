@@ -17,7 +17,27 @@ export default function BulkSmsForm() {
   const [receiptId, setReceiptId] = useState('');
   const [senderId, setSenderId] = useState('');
 
-  const messageCost = message.length > 160 ? 30 : 15;
+  // Check if message contains special characters
+  const hasSpecialCharacters = (text: string) => {
+    const specialCharsRegex = /[^a-zA-Z0-9\s]/;
+    return specialCharsRegex.test(text);
+  };
+
+  // Calculate cost based on length and special characters
+  const calculateMessageCost = () => {
+    const hasSpecialChars = hasSpecialCharacters(message);
+    const isLongMessage = message.length > 160;
+    
+    // If has special characters, cost is always higher
+    if (hasSpecialChars) {
+      return isLongMessage ? 45 : 30; // 30 for short, 45 for long
+    }
+    
+    // No special characters
+    return isLongMessage ? 30 : 15; // 15 for short, 30 for long
+  };
+
+  const messageCost = calculateMessageCost();
   const totalCost = recipients.length * messageCost;
 
   const handleNext = () => {

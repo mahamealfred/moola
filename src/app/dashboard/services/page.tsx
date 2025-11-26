@@ -62,6 +62,7 @@ type PaymentService = {
   isNew?: boolean;
   isFeatured?: boolean;
   description?: string;
+  status?: 'active' | 'inactive';
 };
 
 type AgencyBankingService = {
@@ -69,7 +70,7 @@ type AgencyBankingService = {
   icon: React.ElementType;
   logo?: string;
   href: string;
-  status: 'active' | 'coming-soon';
+  status: 'active' | 'inactive';
 };
 
 type BusinessService = {
@@ -90,9 +91,9 @@ const paymentServices: PaymentService[] = [
     logo: '/logos/services/electricity.png',
     content: <ElectricityPayment />, 
     category: 'Utilities', 
-    popularity: 95, 
-    isFeatured: true,
-    description: 'Pay electricity bills instantly'
+    popularity: 95,
+    description: 'Pay electricity bills instantly',
+    status: 'active'
   },
   { 
     name: 'RRA Payment', 
@@ -101,7 +102,8 @@ const paymentServices: PaymentService[] = [
     content: <RraPayment />, 
     category: 'Government', 
     popularity: 88,
-    description: 'Tax payments made easy'
+    description: 'Tax payments made easy',
+    status: 'active'
   },
   { 
     name: 'Buy Airtime', 
@@ -109,9 +111,9 @@ const paymentServices: PaymentService[] = [
     logo: '/logos/services/airtime.jpg',
     content: <AirtimePurchase />, 
     category: 'Telecom', 
-    popularity: 92, 
-    isFeatured: true,
-    description: 'Instant airtime top-up'
+    popularity: 92,
+    description: 'Instant airtime top-up',
+    status: 'active'
   },
   { 
     name: 'Startimes Payment', 
@@ -120,7 +122,8 @@ const paymentServices: PaymentService[] = [
     content: <StartimesPayment />, 
     category: 'Entertainment', 
     popularity: 78,
-    description: 'TV subscription payments'
+    description: 'TV subscription payments',
+    status: 'active'
   },
   { 
     name: 'Bulk SMS', 
@@ -129,7 +132,8 @@ const paymentServices: PaymentService[] = [
     content: <BulkSmsForm />, 
     category: 'Communication', 
     popularity: 82,
-    description: 'Send messages in bulk'
+    description: 'Send messages in bulk',
+    status: 'inactive'
   },
   { 
     name: 'Bulk Airtime', 
@@ -137,9 +141,9 @@ const paymentServices: PaymentService[] = [
     logo: '/logos/services/airtime.jpg',
     content: <BulkAirtimeForm />, 
     category: 'Telecom', 
-    popularity: 85, 
-    isNew: true,
-    description: 'Airtime for multiple numbers'
+    popularity: 85,
+    description: 'Airtime for multiple numbers',
+    status: 'inactive'
   },
   { 
     name: 'Wasac', 
@@ -148,7 +152,8 @@ const paymentServices: PaymentService[] = [
     content: <WASACPayment/>, 
     category: 'Utilities', 
     popularity: 75,
-    description: 'Water bill payments'
+    description: 'Water bill payments',
+    status: 'inactive'
   },
   { 
     name: 'Irembo Pay', 
@@ -157,7 +162,8 @@ const paymentServices: PaymentService[] = [
     content: <IremboPayment/>, 
     category: 'Government', 
     popularity: 80,
-    description: 'Government services payment'
+    description: 'Government services payment',
+    status: 'inactive'
   },
   { 
     name: 'RNIT', 
@@ -166,7 +172,8 @@ const paymentServices: PaymentService[] = [
     content: <RNITPayment/>, 
     category: 'Government', 
     popularity: 72,
-    description: 'National ID services'
+    description: 'National ID services',
+    status: 'inactive'
   },
   { 
     name: 'School Fees', 
@@ -174,17 +181,17 @@ const paymentServices: PaymentService[] = [
     logo: '/logos/services/school.svg',
     content: <SchoolFeesPayment/>, 
     category: 'Education', 
-    popularity: 79, 
-    isNew: true,
-    description: 'School fee payments'
+    popularity: 79,
+    description: 'School fee payments',
+    status: 'inactive'
   },
 ];
 
 const agencyBankingServices: AgencyBankingService[] = [
-  { name: 'Ecobank', icon: Banknote, logo: '/logos/banks/ECOBANK.jpg', href: '/dashboard/services/agency-banking/ecobank', status: 'active' },
-  { name: 'Bank of Kigali', icon: Building2, logo: '/logos/banks/bankofkigali.png', href: '/dashboard/balance', status: 'active' },
-  { name: 'Equity Bank', icon: Landmark, logo: '/logos/banks/equity.jpg', href: '/dashboard/balance', status: 'active' },
-  { name: 'GT Bank', icon: ShieldCheck, logo: '/logos/banks/gtbank.png', href: '/dashboard/balance', status: 'coming-soon' },
+  { name: 'Ecobank', icon: Banknote, logo: '/logos/banks/ECOBANK.jpg', href: '/dashboard/services/agency-banking/ecobank', status: 'inactive' },
+  { name: 'Bank of Kigali', icon: Building2, logo: '/logos/banks/bankofkigali.png', href: '/dashboard/balance', status: 'inactive' },
+  { name: 'Equity Bank', icon: Landmark, logo: '/logos/banks/equity.jpg', href: '/dashboard/balance', status: 'inactive' },
+  { name: 'GT Bank', icon: ShieldCheck, logo: '/logos/banks/gtbank.png', href: '/dashboard/balance', status: 'inactive' },
 ];
 
 const businessServices: BusinessService[] = [
@@ -487,10 +494,10 @@ export default function DashboardHome() {
         onHoverStart={() => setHoveredService(service.name)}
         onHoverEnd={() => setHoveredService(null)}
         className={`${colors.bg} ${colors.border} rounded-2xl shadow-lg hover:shadow-xl p-5 cursor-pointer transition-all duration-300 group border-2 relative overflow-hidden ${
-          service.status === 'coming-soon' ? 'opacity-60' : ''
+          service.status === 'inactive' ? 'opacity-60' : ''
         }`}
         onClick={() => {
-          if (service.status === 'coming-soon') return;
+          if (service.status === 'inactive') return;
           if (service.href) {
             router.push(service.href);
           } else {
@@ -529,36 +536,24 @@ export default function DashboardHome() {
 
         {/* Badges */}
         <div className="absolute top-3 right-3 flex gap-1 z-10">
-          {service.isNew && (
+          {service.status === 'active' && (
             <motion.span 
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1"
+              className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium"
             >
-              <Rocket className="w-3 h-3" />
-              {t('services.new')}
+              {t('services.active')}
             </motion.span>
           )}
-          {service.isFeatured && (
+          {service.status === 'inactive' && (
             <motion.span 
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-              className="bg-[#ff6600] text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1"
+              transition={{ type: "spring", stiffness: 200 }}
+              className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium"
             >
-              <Crown className="w-3 h-3" />
-              {t('services.featured')}
-            </motion.span>
-          )}
-          {service.status === 'coming-soon' && (
-            <motion.span 
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-              className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full font-medium"
-            >
-              {t('services.comingSoon')}
+              {t('services.inactive')}
             </motion.span>
           )}
         </div>
@@ -611,7 +606,7 @@ export default function DashboardHome() {
               
               <motion.div
                 className={`p-2 rounded-lg bg-gray-100 dark:bg-gray-800 group-hover:bg-[#ff6600] group-hover:text-white transition-colors ${
-                  service.status === 'coming-soon' ? 'opacity-50' : ''
+                  service.status === 'inactive' ? 'opacity-50' : ''
                 }`}
                 whileHover={{ scale: 1.1 }}
               >
@@ -629,14 +624,14 @@ export default function DashboardHome() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 p-4 sm:p-6 lg:p-8"
+      className="min-h-screen bg-transparent p-4 sm:p-6 lg:p-8"
     >
       {/* Enhanced Header with Floating Elements */}
       <motion.div 
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="text-center mb-8 sm:mb-12 relative"
+        className="text-center mb-4 sm:mb-6 relative"
       >
         {/* Floating Background Elements */}
         <motion.div 
@@ -658,15 +653,15 @@ export default function DashboardHome() {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-          className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full px-4 py-2 mb-4 border border-gray-200 dark:border-gray-600 shadow-lg"
+          className="inline-flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full px-3 py-1 mb-2 border border-gray-200 dark:border-gray-600 shadow-lg"
         >
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
           >
-            <Sparkles className="w-4 h-4 text-[#ff6600]" />
+            <Sparkles className="w-3 h-3 text-[#ff6600]" />
           </motion.div>
-          <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+          <span className="text-xs text-gray-600 dark:text-gray-300 font-normal">
             {t('services.welcomeBack', { name: user?.name || t('services.user') })}
           </span>
         </motion.div>
@@ -675,7 +670,7 @@ export default function DashboardHome() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[#13294b] via-[#ff6600] to-[#13294b] bg-clip-text text-transparent mb-4"
+          className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight bg-gradient-to-r from-[#13294b] via-[#ff6600] to-[#13294b] bg-clip-text text-transparent mb-2"
         >
           {t('services.dashboard')}
         </motion.h1>
@@ -684,7 +679,7 @@ export default function DashboardHome() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-gray-500 dark:text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto"
+          className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-2xl mx-auto font-normal"
         >
           {isAgent ? t('services.comprehensiveAgencyPlatform') : t('services.advancedBusinessPlatform')}
         </motion.p>

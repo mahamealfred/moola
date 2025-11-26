@@ -1,5 +1,5 @@
 // API Client with Language Header Support
-import { translations, type Locale } from './translations';
+import { type Locale } from './translations';
 import { secureStorage } from './auth-context';
 
 // Get the current locale from localStorage or default to 'rw'
@@ -11,7 +11,7 @@ function getCurrentLocale(): Locale {
 }
 
 // Base API configuration
-const API_BASE_URL = 'http://localhost:4000/v1';
+const API_BASE_URL = 'https://core-api.ddin.rw/v1';
 
 // Function to build URL with language query parameter
 function buildUrlWithLanguage(endpoint: string, baseUrl: string = API_BASE_URL): string {

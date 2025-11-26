@@ -88,16 +88,16 @@ export default function DashboardHome() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center mb-8 sm:mb-12 w-full"
+        className="text-center mb-4 sm:mb-6 w-full"
       >
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-3">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">
           <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent">{t('dashboardHome.welcomeTo')} </span>
           <span className="bg-gradient-to-r from-[#ff6600] to-[#ff8c00] bg-clip-text text-transparent relative">
             M<span className="text-[#ff6600]">oola</span>
-            <span className="text-[#ff6600] absolute text-2xl sm:text-3xl lg:text-4xl" style={{ top: '-0.3em', marginLeft: '0.1em' }}>+</span>
+            <span className="text-[#ff6600] absolute text-lg sm:text-xl lg:text-2xl" style={{ top: '-0.3em', marginLeft: '0.1em' }}>+</span>
           </span>
         </h1>
-        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4">
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4 font-normal">
           {t('dashboardHome.subtitle')}
         </p>
       </motion.div>

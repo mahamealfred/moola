@@ -120,15 +120,6 @@ export default function LandingPage() {
       rating: 4,
       avatar: "GN",
       image: "/avatars/3.jpg"
-    },
-    {
-      id: 4,
-      name: t('landing.testimonial4Name'),
-      role: t('landing.testimonial4Role'),
-      content: t('landing.testimonial4Content'),
-      rating: 5,
-      avatar: "EH",
-      image: "/avatars/4.jpg"
     }
   ];
 

@@ -579,9 +579,9 @@ export default function AirtimePurchase() {
                 <>
                   <svg className="animate-spin -ml-1 mr-1 h-3 w-3 md:h-4 md:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  {step === 1 ? t('electricity.validating') : t('electricity.processing')}
+                  {step === 1 ? t('airtime.validatingPhone') : t('airtime.processing')}
                 </>
               ) : (
                 <>
@@ -610,7 +610,7 @@ export default function AirtimePurchase() {
                 </>
               ) : (
                 <>
-                  {t('airtime.confirmPurchase')}
+                  {t('messages.confirmPayment')}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -620,23 +620,12 @@ export default function AirtimePurchase() {
           )}
 
           {step === 4 && (
-            <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full">
-              <button
-                onClick={downloadPDF}
-                className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full font-semibold flex items-center justify-center"
-              >
-                <svg className="w-3 h-3 md:w-4 md:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                {t('electricity.downloadReceipt')}
-              </button>
-              <button
-                onClick={() => window.location.reload()}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-900 px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full text-center font-semibold"
-              >
-                {t('airtime.newPurchase')}
-              </button>
-            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-[#ff6600] hover:bg-[#e65c00] text-white px-3 py-1.5 md:px-4 md:py-2 rounded text-sm md:text-base w-full font-semibold"
+            >
+              {t('airtime.newPurchase')}
+            </button>
           )}
         </div>
       </motion.div>

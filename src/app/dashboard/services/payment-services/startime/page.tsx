@@ -3,9 +3,9 @@
 import React, { useState, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2pdf from 'html2pdf.js';
-import { secureStorage } from '@/lib/auth-context';
 import ProfessionalReceipt from '@/components/ProfessionalReceipt';
 import { useTranslation } from '@/lib/i18n-context';
+import { api } from '@/lib/api-client';
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -45,7 +45,7 @@ interface PaymentResponse {
 }
 
 export default function StartimePayment() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [step, setStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -112,20 +112,20 @@ export default function StartimePayment() {
 
   async function validateSmartcard(smartcard: string) {
     try {
-  const response = await fetch('https://core-api.ddin.rw/v1/agency/thirdpartyagency/services/validate/biller', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          billerCode: "startime",
-          productCode: "startime",
-          customerId: smartcard
-        })
+      const response = await api.post(`/agency/thirdpartyagency/services/validate/biller?language=${locale}`, {
+        billerCode: "paytv",
+        productCode: "paytv",
+        customerId: smartcard
       });
 
       if (!response.ok) {
-        throw new Error('Validation failed');
+        // Try to get backend error message
+        try {
+          const errorData = await response.json();
+          return { isValid: false, message: errorData.message || 'Validation failed' };
+        } catch {
+          return { isValid: false, message: 'Validation failed' };
+        }
       }
 
       const data: ValidationResponse = await response.json();
@@ -138,11 +138,11 @@ export default function StartimePayment() {
         }));
         return { isValid: true, validationData: data.data };
       } else {
-        // Return the API error message directly
+        // Return the backend message directly
         return { isValid: false, message: data.message };
       }
     } catch (error) {
-      console.error('Validation error:', error);
+      console.log('Validation info:', error);
       throw error;
     }
   }
@@ -153,32 +153,25 @@ export default function StartimePayment() {
     }
 
     try {
-      const accessToken = secureStorage.getAccessToken();
-            
-      if (!accessToken) {
-        throw new Error('Authentication required. Please login again.');
-      }
-
-  const response = await fetch('https://core-api.ddin.rw/v1/agency/thirdpartyagency/services/execute/bill-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({
-          email: "mahamealfred@gmail.com",
-          clientPhone: "+250789595309", // You might want to make this dynamic
-          customerId: formData.smartcardNumber,
-          billerCode: "startime",
-          productCode: "startime",
-          amount: formData.amount.toString(),
-          ccy: "RWF",
-          requestId: validationData.requestId
-        })
+      const response = await api.postAuth(`/agency/thirdpartyagency/services/execute/bill-payment?language=${locale}`, {
+        email: "mahamealfred@gmail.com",
+        clientPhone: "+250789595309", // You might want to make this dynamic
+        customerId: formData.smartcardNumber,
+        billerCode: "startime",
+        productCode: "startime",
+        amount: formData.amount.toString(),
+        ccy: "RWF",
+        requestId: validationData.requestId
       });
 
       if (!response.ok) {
-        throw new Error('Payment failed');
+        // Try to get backend error message
+        try {
+          const errorData = await response.json();
+          return { success: false, message: errorData.message || 'Payment failed' };
+        } catch {
+          return { success: false, message: 'Payment failed' };
+        }
       }
 
       const data: PaymentResponse = await response.json();
@@ -187,10 +180,11 @@ export default function StartimePayment() {
         setPaymentData(data.data);
         return { success: true, paymentData: data.data };
       } else {
+        // Return the backend message directly
         return { success: false, message: data.message };
       }
     } catch (error) {
-      console.error('Payment error:', error);
+      console.log('Payment info:', error);
       throw error;
     }
   }
@@ -542,7 +536,7 @@ export default function StartimePayment() {
                 </>
               ) : (
                 <>
-                  Next
+                  {t('common.next')}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -561,13 +555,13 @@ export default function StartimePayment() {
                 <>
                   <svg className="animate-spin -ml-1 mr-1 h-3 w-3 md:h-4 md:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Processing Payment...
+                  {t('startime.processing')}
                 </>
               ) : (
                 <>
-                  Confirm Payment
+                  {t('messages.confirmPayment')}
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 md:h-5 md:w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>

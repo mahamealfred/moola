@@ -173,7 +173,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <motion.aside
         animate={{ width: isExpanded ? 240 : 80 }}
         transition={{ duration: 0.3, type: 'spring', damping: 25 }}
-        className="hidden md:flex h-screen bg-white dark:bg-gray-900 shadow-lg py-6 px-4 flex-col sticky top-0 z-40"
+        className="hidden md:flex h-screen bg-white/30 dark:bg-gray-900/30 backdrop-blur-2xl shadow-lg py-6 px-4 flex-col sticky top-0 z-40 border-r border-gray-200/30 dark:border-gray-700/30"
       >
         {/* Logo & Toggle */}
         <div className="flex items-center justify-between w-full mb-8">
@@ -251,7 +251,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: 'spring', damping: 25 }}
-              className="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-gray-900 shadow-2xl py-6 px-4 flex flex-col z-50 md:hidden"
+              className="fixed left-0 top-0 h-screen w-64 bg-white/40 dark:bg-gray-900/40 backdrop-blur-2xl shadow-2xl py-6 px-4 flex flex-col z-50 md:hidden border-r border-gray-200/30 dark:border-gray-700/30"
             >
               {/* Mobile Header */}
               <div className="flex items-center justify-between w-full mb-8">
@@ -310,7 +310,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen md:min-h-0">
         {/* Header */}
-        <header className="px-4 sm:px-6 py-3 bg-white dark:bg-gray-900 shadow-sm flex justify-between items-center z-30 sticky top-0">
+        <header className="px-4 sm:px-6 py-3 bg-white/30 dark:bg-gray-900/30 backdrop-blur-2xl shadow-sm flex justify-between items-center z-30 sticky top-0 border-b border-gray-200/30 dark:border-gray-700/30">
           <div className="flex items-center gap-4">
             <button
               onClick={toggleSidebar}
@@ -434,7 +434,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* Session Timeout Component */}
-      <SessionTimeout timeoutMinutes={2} warningMinutes={1.5} />
+      <SessionTimeout timeoutMinutes={10} warningMinutes={9} />
     </div>
   );
 }
