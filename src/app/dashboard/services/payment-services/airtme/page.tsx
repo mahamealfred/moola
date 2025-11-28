@@ -110,7 +110,7 @@ export default function AirtimePurchase() {
 
   async function validatePhone(phone: string) {
     try {
-      const response = await api.post(`/agency/thirdpartyagency/services/validate/biller?language=${locale}`, {
+      const response = await api.post(`/agency/thirdpartyagency/services/validate/biller`, {
         billerCode: "airtime",
         productCode: "airtime",
         customerId: phone
@@ -134,7 +134,7 @@ export default function AirtimePurchase() {
         return { isValid: false, message: data.message };
       }
     } catch (error) {
-      console.log('Validation info:', error);
+      console.error('Validation error:', error);
       throw error;
     }
   }
@@ -145,7 +145,7 @@ export default function AirtimePurchase() {
     }
 
     try {
-      const response = await api.postAuth(`/agency/thirdpartyagency/services/execute/bill-payment?language=${locale}`, {
+      const response = await api.postAuth(`/agency/thirdpartyagency/services/execute/bill-payment`, {
         email: "mahamealfred@gmail.com",
         clientPhone: `${countryCode}${formData.phoneNumber}`,
         customerId: formData.phoneNumber,
@@ -174,7 +174,7 @@ export default function AirtimePurchase() {
         return { success: false, message: data.message };
       }
     } catch (error) {
-      console.log('Payment info:', error);
+      console.error('Payment error:', error);
       throw error;
     }
   }

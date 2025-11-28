@@ -12,6 +12,7 @@ function getCurrentLocale(): Locale {
 
 // Base API configuration
 const API_BASE_URL = 'https://core-api.ddin.rw/v1';
+//const API_BASE_URL = 'http://localhost:4000/v1';
 
 // Function to build URL with language query parameter
 function buildUrlWithLanguage(endpoint: string, baseUrl: string = API_BASE_URL): string {
