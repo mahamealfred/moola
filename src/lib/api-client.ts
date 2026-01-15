@@ -4,15 +4,20 @@ import { secureStorage } from './auth-context';
 
 // Get the current locale from localStorage or default to 'rw'
 function getCurrentLocale(): Locale {
-  if (typeof window === 'undefined') return 'rw';
-  
-  const savedLocale = localStorage.getItem('preferred-locale') as Locale;
-  return savedLocale && ['rw', 'fr', 'en'].includes(savedLocale) ? savedLocale : 'rw';
+  try {
+    if (typeof window === 'undefined') return 'rw';
+    if (typeof window.localStorage === 'undefined') return 'rw';
+    
+    const savedLocale = window.localStorage.getItem('preferred-locale') as Locale;
+    return savedLocale && ['rw', 'fr', 'en'].includes(savedLocale) ? savedLocale : 'rw';
+  } catch (e) {
+    return 'rw';
+  }
 }
 
 // Base API configuration
-const API_BASE_URL = 'https://core-api.ddin.rw/v1';
-//const API_BASE_URL = 'http://localhost:4000/v1';
+//const API_BASE_URL = 'https://core-api.ddin.rw/v1';
+const API_BASE_URL = 'http://localhost:4000/v1';
 
 // Function to build URL with language query parameter
 function buildUrlWithLanguage(endpoint: string, baseUrl: string = API_BASE_URL): string {

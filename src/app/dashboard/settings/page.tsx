@@ -150,6 +150,9 @@ export default function SettingsComponent(props?: any) {
   useEffect(() => {
     const loadSettings = () => {
       try {
+        if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
+          return;
+        }
         // Load agent info from secureStorage
         const userData = secureStorage.getUserData();
         if (userData) {
@@ -188,44 +191,50 @@ export default function SettingsComponent(props?: any) {
         }
 
         // Load appearance settings
-        const savedDarkMode = localStorage.getItem('darkMode');
-        if (savedDarkMode !== null) {
-          setDarkMode(savedDarkMode === 'true');
-        }
+        if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+          try {
+            const savedDarkMode = window.localStorage.getItem('darkMode');
+            if (savedDarkMode !== null) {
+              setDarkMode(savedDarkMode === 'true');
+            }
 
-        const savedFontSize = localStorage.getItem('fontSize');
-        if (savedFontSize) {
-          setFontSize(savedFontSize);
-        }
+            const savedFontSize = window.localStorage.getItem('fontSize');
+            if (savedFontSize) {
+              setFontSize(savedFontSize);
+            }
 
-        // Load language preference
-        const savedLanguage = localStorage.getItem('language');
-        if (savedLanguage) {
-          setLanguage(savedLanguage);
-        }
+            // Load language preference
+            const savedLanguage = window.localStorage.getItem('language');
+            if (savedLanguage) {
+              setLanguage(savedLanguage);
+            }
 
-        // Load notification preferences
-        const savedNotifications = localStorage.getItem('notificationPreferences');
-        if (savedNotifications) {
-          setNotifications(JSON.parse(savedNotifications));
-        }
+            // Load notification preferences
+            const savedNotifications = window.localStorage.getItem('notificationPreferences');
+            if (savedNotifications) {
+              setNotifications(JSON.parse(savedNotifications));
+            }
 
-        // Load privacy settings
-        const savedPrivacy = localStorage.getItem('privacySettings');
-        if (savedPrivacy) {
-          setPrivacySettings(JSON.parse(savedPrivacy));
-        }
+            // Load privacy settings
+            const savedPrivacy = window.localStorage.getItem('privacySettings');
+            if (savedPrivacy) {
+              setPrivacySettings(JSON.parse(savedPrivacy));
+            }
 
-        // Load 2FA setting
-        const saved2FA = localStorage.getItem('twoFactorEnabled');
-        if (saved2FA !== null) {
-          setTwoFactorEnabled(saved2FA === 'true');
-        }
+            // Load 2FA setting
+            const saved2FA = window.localStorage.getItem('twoFactorEnabled');
+            if (saved2FA !== null) {
+              setTwoFactorEnabled(saved2FA === 'true');
+            }
 
-        // Load payment methods
-        const savedPayments = localStorage.getItem('paymentMethods');
-        if (savedPayments) {
-          setPaymentMethods(JSON.parse(savedPayments));
+            // Load payment methods
+            const savedPayments = window.localStorage.getItem('paymentMethods');
+            if (savedPayments) {
+              setPaymentMethods(JSON.parse(savedPayments));
+            }
+          } catch (error) {
+            console.error('Error accessing localStorage:', error);
+          }
         }
       } catch (error) {
         console.error('Error loading settings:', error);
@@ -239,10 +248,16 @@ export default function SettingsComponent(props?: any) {
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
-      localStorage.setItem('darkMode', 'true');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.setItem('darkMode', 'false');
+    }
+    
+    if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+      try {
+        window.localStorage.setItem('darkMode', darkMode ? 'true' : 'false');
+      } catch (error) {
+        console.error('Error saving darkMode to localStorage:', error);
+      }
     }
   }, [darkMode]);
 
@@ -251,28 +266,65 @@ export default function SettingsComponent(props?: any) {
     document.documentElement.style.fontSize = 
       fontSize === 'small' ? '14px' : 
       fontSize === 'large' ? '18px' : '16px';
-    localStorage.setItem('fontSize', fontSize);
+    
+    if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+      try {
+        window.localStorage.setItem('fontSize', fontSize);
+      } catch (error) {
+        console.error('Error saving fontSize to localStorage:', error);
+      }
+    }
   }, [fontSize]);
 
   // Save settings to localStorage
   useEffect(() => {
-    localStorage.setItem('notificationPreferences', JSON.stringify(notifications));
+    if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+      try {
+        window.localStorage.setItem('notificationPreferences', JSON.stringify(notifications));
+      } catch (error) {
+        console.error('Error saving notificationPreferences to localStorage:', error);
+      }
+    }
   }, [notifications]);
 
   useEffect(() => {
-    localStorage.setItem('privacySettings', JSON.stringify(privacySettings));
+    if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+      try {
+        window.localStorage.setItem('privacySettings', JSON.stringify(privacySettings));
+      } catch (error) {
+        console.error('Error saving privacySettings to localStorage:', error);
+      }
+    }
   }, [privacySettings]);
 
   useEffect(() => {
-    localStorage.setItem('twoFactorEnabled', twoFactorEnabled.toString());
+    if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+      try {
+        window.localStorage.setItem('twoFactorEnabled', twoFactorEnabled.toString());
+      } catch (error) {
+        console.error('Error saving twoFactorEnabled to localStorage:', error);
+      }
+    }
   }, [twoFactorEnabled]);
 
   useEffect(() => {
-    localStorage.setItem('language', language);
+    if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+      try {
+        window.localStorage.setItem('language', language);
+      } catch (error) {
+        console.error('Error saving language to localStorage:', error);
+      }
+    }
   }, [language]);
 
   useEffect(() => {
-    localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+    if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+      try {
+        window.localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+      } catch (error) {
+        console.error('Error saving paymentMethods to localStorage:', error);
+      }
+    }
   }, [paymentMethods]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -325,11 +377,13 @@ export default function SettingsComponent(props?: any) {
           let accessToken = '';
           let refreshToken = '';
           try {
-            const encrypted = sessionStorage.getItem('at');
-            if (encrypted) {
-              const tokenObj = JSON.parse((window as any).atob(encrypted));
-              accessToken = tokenObj.accessToken || '';
-              refreshToken = tokenObj.refreshToken || '';
+            if (typeof window !== 'undefined' && typeof window.sessionStorage !== 'undefined') {
+              const encrypted = window.sessionStorage.getItem('at');
+              if (encrypted) {
+                const tokenObj = JSON.parse((window as any).atob(encrypted));
+                accessToken = tokenObj.accessToken || '';
+                refreshToken = tokenObj.refreshToken || '';
+              }
             }
           } catch {
             // ignore

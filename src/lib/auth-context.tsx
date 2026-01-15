@@ -48,6 +48,7 @@ class SecureStorageService {
 
   setUserData(userData: UserData & { accessToken: string; refreshToken: string }): void {
     if (typeof window === 'undefined') return;
+    if (typeof window.sessionStorage === 'undefined') return;
     try {
       const tokenData = {
         accessToken: userData.accessToken,
@@ -56,11 +57,11 @@ class SecureStorageService {
       };
 
       const encryptedTokenData = this.encrypt(JSON.stringify(tokenData));
-      sessionStorage.setItem(this.ACCESS_TOKEN_KEY, encryptedTokenData);
+      window.sessionStorage.setItem(this.ACCESS_TOKEN_KEY, encryptedTokenData);
 
       const { accessToken, refreshToken, ...safeUserData } = userData;
       const encryptedUserData = this.encrypt(JSON.stringify(safeUserData));
-      sessionStorage.setItem(this.USER_DATA_KEY, encryptedUserData);
+      window.sessionStorage.setItem(this.USER_DATA_KEY, encryptedUserData);
     } catch (error) {
       this.clearUserData();
     }
@@ -68,8 +69,9 @@ class SecureStorageService {
 
   getUserData(): UserData | null {
     if (typeof window === 'undefined') return null;
+    if (typeof window.sessionStorage === 'undefined') return null;
     try {
-      const encryptedUserData = sessionStorage.getItem(this.USER_DATA_KEY);
+      const encryptedUserData = window.sessionStorage.getItem(this.USER_DATA_KEY);
       if (!encryptedUserData) return null;
       return JSON.parse(this.decrypt(encryptedUserData));
     } catch {
@@ -80,8 +82,9 @@ class SecureStorageService {
 
   getAccessToken(): string | null {
     if (typeof window === 'undefined') return null;
+    if (typeof window.sessionStorage === 'undefined') return null;
     try {
-      const encryptedTokenData = sessionStorage.getItem(this.ACCESS_TOKEN_KEY);
+      const encryptedTokenData = window.sessionStorage.getItem(this.ACCESS_TOKEN_KEY);
       if (!encryptedTokenData) return null;
 
       const tokenData = JSON.parse(this.decrypt(encryptedTokenData));
@@ -98,8 +101,9 @@ class SecureStorageService {
 
   clearUserData(): void {
     if (typeof window === 'undefined') return;
-    sessionStorage.removeItem(this.ACCESS_TOKEN_KEY);
-    sessionStorage.removeItem(this.USER_DATA_KEY);
+    if (typeof window.sessionStorage === 'undefined') return;
+    window.sessionStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    window.sessionStorage.removeItem(this.USER_DATA_KEY);
   }
 
   isAuthenticated(): boolean {

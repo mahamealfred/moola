@@ -521,6 +521,8 @@ export const translations = {
       rnitDesc: 'Serivisi z\'indangamuntu',
       schoolfeesName: 'Amafaranga y\'Ishuri',
       schoolfeesDesc: 'Kwishyura amafaranga y\'ishuri',
+      aqsafricacollectName: 'AQS Africa Collect',
+      aqsafricacollectDesc: 'Gukurikirana no kwishyura ifishi zacu',
       
       // Agency Banking Service Descriptions
       ecobankDesc: 'Serivisi za banki',
@@ -1590,6 +1592,8 @@ export const translations = {
       rnitDesc: 'Services de carte d\'identité nationale',
       schoolfeesName: 'Frais de Scolarité',
       schoolfeesDesc: 'Paiements de frais scolaires',
+      aqsafricacollectName: 'AQS Africa Collect',
+      aqsafricacollectDesc: 'Collecte et soumission de formulaires dynamiques',
       
       // Agency Banking Service Descriptions
       ecobankDesc: 'Services bancaires',
@@ -2659,6 +2663,8 @@ export const translations = {
       rnitDesc: 'National ID services',
       schoolfeesName: 'School Fees',
       schoolfeesDesc: 'School fee payments',
+      aqsafricacollectName: 'AQS Africa Collect',
+      aqsafricacollectDesc: 'Dynamic form submission and data collection',
       
       // Agency Banking Service Descriptions
       ecobankDesc: 'Banking services',

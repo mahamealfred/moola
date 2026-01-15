@@ -14,23 +14,32 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 const LOCALE_STORAGE_KEY = 'preferred-locale';
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('rw');
+  const [locale, setLocaleState] = useState<Locale>('en');
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedLocale = localStorage.getItem(LOCALE_STORAGE_KEY) as Locale;
-      if (savedLocale && ['rw', 'fr', 'en'].includes(savedLocale)) {
-        setLocaleState(savedLocale);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const savedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY) as Locale;
+        if (savedLocale && ['rw', 'fr', 'en'].includes(savedLocale)) {
+          setLocaleState(savedLocale);
+        }
       }
+    } catch (e) {
+      console.warn('localStorage access failed:', e);
+    } finally {
       setIsInitialized(true);
     }
   }, []);
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
+      }
+    } catch (e) {
+      console.warn('localStorage set failed:', e);
     }
   };
 

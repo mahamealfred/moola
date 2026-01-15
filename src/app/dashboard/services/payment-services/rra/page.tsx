@@ -15,8 +15,6 @@ interface FormData {
   customerName: string;
   amount: number;
   serviceFee: number;
-  vat: number;
-  rraTax: number;
   receiptId: string;
 }
 
@@ -57,8 +55,6 @@ export default function RRAPayment() {
     customerName: '',
     amount: 0,
     serviceFee: 0,
-    vat: 0,
-    rraTax: 0,
     receiptId: ''
   });
   const [validationData, setValidationData] = useState<ValidationResponse['data'] | null>(null);
@@ -115,16 +111,6 @@ export default function RRAPayment() {
     return 0;
   };
 
-  // Calculate VAT (18% on service fee)
-  const calculateVAT = (serviceFee: number): number => {
-    return serviceFee * 0.18;
-  };
-
-  // RRA specific tax (1% of amount)
-  const calculateRRATax = (amount: number): number => {
-    return amount * 0.01;
-  };
-
   async function validateDocument(docNumber: string) {
     try {
       const response = await api.post(`/agency/thirdpartyagency/services/validate/biller?language=${locale}`, {
@@ -150,16 +136,12 @@ export default function RRAPayment() {
         // Calculate fees based on the amount from API
         const amount = data.data!.maxAmount || 0;
         const serviceFee = calculateServiceFee(amount);
-        const vat = calculateVAT(serviceFee);
-        const rraTax = calculateRRATax(amount);
         
         setFormData(prev => ({
           ...prev,
           customerName: data.data!.customerName,
           amount: amount,
-          serviceFee: serviceFee,
-          vat: vat,
-          rraTax: rraTax
+          serviceFee: serviceFee
         }));
         
         return { isValid: true, validationData: data.data };
@@ -179,12 +161,13 @@ export default function RRAPayment() {
 
     try {
       const response = await api.postAuth(`/agency/thirdpartyagency/services/execute/bill-payment?language=${locale}`, {
-        email: "mahamealfred@gmail.com",
+        email: "info@ddin.rw",
         clientPhone: "+250789595309",
         customerId: formData.docNumber,
         billerCode: "tax",
         productCode: "tax",
-        amount: totalAmount.toString(),
+        // amount: formData.amount.toString(),
+        amount: "100",
         ccy: "RWF",
         requestId: validationData.requestId
       });
@@ -280,7 +263,7 @@ export default function RRAPayment() {
     }
   }
 
-  const totalAmount = formData.amount + formData.serviceFee + formData.vat + formData.rraTax;
+  const totalAmount = formData.amount + formData.serviceFee;
 
   return (
     <div className="w-full h-full overflow-hidden">
@@ -388,14 +371,6 @@ export default function RRAPayment() {
                     <span className="text-gray-600 dark:text-gray-400">{t('rra.serviceFee')}:</span>
                     <span className="text-gray-900 dark:text-white">RWF {formData.serviceFee.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">{t('rra.vat18')}:</span>
-                    <span className="text-gray-900 dark:text-white">RWF {formData.vat.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">{t('rra.rraTax1')}:</span>
-                    <span className="text-gray-900 dark:text-white">RWF {formData.rraTax.toLocaleString()}</span>
-                  </div>
                 </div>
                 
                 <div className="border-t pt-3 mt-3">
@@ -449,14 +424,6 @@ export default function RRAPayment() {
                       <span>{t('rra.serviceFee')}:</span>
                       <span>RWF {formData.serviceFee.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>{t('rra.vat18')}:</span>
-                      <span>RWF {formData.vat.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{t('rra.rraTax1')}:</span>
-                      <span>RWF {formData.rraTax.toLocaleString()}</span>
-                    </div>
                   </div>
                 </div>
                 
@@ -489,8 +456,6 @@ export default function RRAPayment() {
                 currency="RWF"
                 additionalInfo={[
                   { label: t('rra.requestId'), value: paymentData.requestId },
-                  { label: t('rra.vat18'), value: `RWF ${formData.vat.toLocaleString()}` },
-                  { label: t('rra.rraTax1'), value: `RWF ${formData.rraTax.toLocaleString()}` },
                   { label: t('rra.deliveryMethod'), value: paymentData.deliveryMethod }
                 ]}
                 customNote={t('rra.thankYou')}

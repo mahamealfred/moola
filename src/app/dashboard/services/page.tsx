@@ -49,6 +49,7 @@ import ExpenseManagement from './business-services/expense-management/page';
 import IremboPayment from './payment-services/irembopay/page';
 import RNITPayment from './payment-services/rnit/page';
 import BulkAirtimeForm from './payment-services/bulk-airtime/page';
+import AQSFormsComponent from '@/app/dashboard/aqs-forms/page';
 import { useAuth } from '@/lib/auth-context';
 import { useTranslation } from '@/lib/i18n-context';
 
@@ -184,6 +185,17 @@ const paymentServices: PaymentService[] = [
     popularity: 79,
     description: 'School fee payments',
     status: 'inactive'
+  },
+  { 
+    name: 'AQS Africa Collect', 
+    icon: FileText,
+    logo: '/logos/services/aqs.jpg',
+    content: <AQSFormsComponent />, 
+    category: 'Data Collection', 
+    popularity: 85,
+    isFeatured: true,
+    description: 'Dynamic form submission and data collection',
+    status: 'active'
   },
 ];
 

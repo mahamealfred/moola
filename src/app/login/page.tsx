@@ -48,19 +48,32 @@ export default function LoginPage() {
     try {
       const res = await api.post('/agency/auth/login', { username, password });
       
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMessage = errorData.message || errorData.error || `Server error: ${res.status}`;
+        console.error('Login error:', { status: res.status, errorData });
+        throw new Error(errorMessage);
+      }
+
       const result = await res.json();
       
-      if (!res.ok || !result.success) {
+      if (!result.success && !result.data) {
         throw new Error(result.message || 'Login failed');
       }
 
-      // Use the auth context login function
-      login(result.data);
-      
-      // Show loading screen - useEffect will handle redirect once auth state updates
-      setIsRedirecting(true);
+      // Use the auth context login function with the full data including tokens
+      const loginData = result.data || result;
+      if (loginData && typeof loginData === 'object') {
+        login(loginData);
+        
+        // Show loading screen - useEffect will handle redirect once auth state updates
+        setIsRedirecting(true);
+      } else {
+        throw new Error('Invalid response format from server');
+      }
       
     } catch (err: any) {
+      console.error('Login failed:', err);
       setError(err.message || t('login.errorGeneral'));
       setIsLoading(false);
     }

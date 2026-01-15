@@ -310,10 +310,17 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = savedTheme === 'dark';
-    setIsDark(prefersDark);
-    document.documentElement.classList.toggle('dark', prefersDark);
+    try {
+      if (typeof window === 'undefined') return;
+      if (typeof window.localStorage === 'undefined') return;
+
+      const savedTheme = window.localStorage.getItem('theme');
+      const prefersDark = savedTheme === 'dark';
+      setIsDark(prefersDark);
+      document.documentElement.classList.toggle('dark', prefersDark);
+    } catch (error) {
+      console.warn('Failed to access localStorage:', error);
+    }
   }, []);
 
   // Enhanced auto-rotation with pause on hover
@@ -348,7 +355,20 @@ export default function LandingPage() {
   const toggleTheme = () => {
     const nextTheme = !isDark;
     setIsDark(nextTheme);
-    localStorage.setItem('theme', nextTheme ? 'dark' : 'light');
+    try {
+      if (typeof window === 'undefined') {
+        document.documentElement.classList.toggle('dark', nextTheme);
+        return;
+      }
+      if (typeof window.localStorage === 'undefined') {
+        document.documentElement.classList.toggle('dark', nextTheme);
+        return;
+      }
+
+      window.localStorage.setItem('theme', nextTheme ? 'dark' : 'light');
+    } catch (error) {
+      console.warn('Failed to save theme:', error);
+    }
     document.documentElement.classList.toggle('dark', nextTheme);
   };
 

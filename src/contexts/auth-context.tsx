@@ -15,26 +15,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    const storedUser = localStorage.getItem('user');
+    try {
+      if (typeof window === 'undefined') return;
+      if (typeof window.localStorage === 'undefined') return;
 
-    if (token && storedUser) {
-      setAccessToken(token);
-      setUser(JSON.parse(storedUser));
+      const token = window.localStorage.getItem('accessToken');
+      const storedUser = window.localStorage.getItem('user');
+
+      if (token && storedUser) {
+        setAccessToken(token);
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error('Error restoring auth from localStorage:', error);
     }
   }, []);
 
   const login = (userData: any, token: string) => {
     setUser(userData);
     setAccessToken(token);
-    localStorage.setItem('accessToken', token);
-    localStorage.setItem('user', JSON.stringify(userData));
+    try {
+      if (typeof window === 'undefined') return;
+      if (typeof window.localStorage === 'undefined') return;
+
+      window.localStorage.setItem('accessToken', token);
+      window.localStorage.setItem('user', JSON.stringify(userData));
+    } catch (error) {
+      console.error('Error saving auth to localStorage:', error);
+    }
   };
 
   const logout = () => {
     setUser(null);
     setAccessToken(null);
-    localStorage.clear();
+    try {
+      if (typeof window === 'undefined') return;
+      if (typeof window.localStorage === 'undefined') return;
+
+      window.localStorage.clear();
+    } catch (error) {
+      console.error('Error clearing localStorage:', error);
+    }
   };
 
   return (
