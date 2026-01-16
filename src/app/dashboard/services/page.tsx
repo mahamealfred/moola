@@ -195,7 +195,7 @@ const paymentServices: PaymentService[] = [
     popularity: 85,
     isFeatured: true,
     description: 'Dynamic form submission and data collection',
-    status: 'active'
+    status: 'inactive'
   },
 ];
 
@@ -505,7 +505,7 @@ export default function DashboardHome() {
         whileTap="tap"
         onHoverStart={() => setHoveredService(service.name)}
         onHoverEnd={() => setHoveredService(null)}
-        className={`${colors.bg} ${colors.border} rounded-2xl shadow-lg hover:shadow-xl p-5 cursor-pointer transition-all duration-300 group border-2 relative overflow-hidden ${
+        className={`${colors.bg} ${colors.border} rounded-2xl shadow-md hover:shadow-2xl p-6 cursor-pointer transition-all duration-300 group border border-gray-200 dark:border-gray-700 relative overflow-hidden ${
           service.status === 'inactive' ? 'opacity-60' : ''
         }`}
         onClick={() => {
@@ -519,8 +519,8 @@ export default function DashboardHome() {
       >
         {/* Animated Background Gradient */}
         <motion.div 
-          className="absolute inset-0 bg-gradient-to-br from-[#ff6600]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          whileHover={{ scale: 1.1 }}
+          className="absolute inset-0 bg-gradient-to-br from-[#ff6600]/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          whileHover={{ scale: 1.15 }}
           transition={{ duration: 0.3 }}
         />
         
@@ -547,23 +547,23 @@ export default function DashboardHome() {
         </AnimatePresence>
 
         {/* Badges */}
-        <div className="absolute top-3 right-3 flex gap-1 z-10">
+        <div className="absolute top-4 right-4 flex gap-2 z-10">
           {service.status === 'active' && (
             <motion.span 
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium"
+              initial={{ scale: 0, y: -10 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs px-3 py-1 rounded-full font-semibold shadow-lg shadow-green-500/30"
             >
               {t('services.active')}
             </motion.span>
           )}
           {service.status === 'inactive' && (
             <motion.span 
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium"
+              initial={{ scale: 0, y: -10 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs px-3 py-1 rounded-full font-semibold shadow-lg shadow-red-500/30"
             >
               {t('services.inactive')}
             </motion.span>
@@ -636,14 +636,14 @@ export default function DashboardHome() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="min-h-screen bg-transparent p-4 sm:p-6 lg:p-8"
+      className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 p-4 sm:p-6 lg:p-8"
     >
       {/* Enhanced Header with Floating Elements */}
       <motion.div 
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="text-center mb-4 sm:mb-6 relative"
+        className="text-center mb-4 sm:mb-8 relative"
       >
         {/* Floating Background Elements */}
         <motion.div 
@@ -691,10 +691,47 @@ export default function DashboardHome() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-2xl mx-auto font-normal"
+          className="text-gray-500 dark:text-gray-400 text-sm sm:text-base max-w-2xl mx-auto font-normal mb-6"
         >
           {isAgent ? t('services.comprehensiveAgencyPlatform') : t('services.advancedBusinessPlatform')}
         </motion.p>
+
+        {/* Prominent Search Box in Header */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 }}
+          className="w-full max-w-2xl mx-auto"
+        >
+          <div className="relative group">
+            <motion.div 
+              className="absolute inset-0 bg-gradient-to-r from-[#ff6600] to-orange-500 rounded-2xl blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-300"
+              whileHover={{ scale: 1.02 }}
+            />
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#ff6600] w-5 h-5 z-10" />
+              <input
+                type="text"
+                placeholder={t('services.searchServices')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-6 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all shadow-md hover:shadow-xl dark:shadow-black/30"
+              />
+              {searchTerm && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#ff6600] transition-colors z-10"
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X className="w-5 h-5" />
+                </motion.button>
+              )}
+            </div>
+          </div>
+        </motion.div>
       </motion.div>
 
       {/* Service Modal */}
@@ -776,10 +813,10 @@ export default function DashboardHome() {
           transition={{ delay: 0.3, type: "spring" }}
           className="space-y-6"
         >
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b-2 border-gray-100 dark:border-gray-700">
             <div>
               <motion.h2 
-                className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white"
+                className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-[#13294b] to-[#ff6600] bg-clip-text text-transparent"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
@@ -808,31 +845,12 @@ export default function DashboardHome() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border-2 border-gray-100 dark:border-gray-800 shadow-lg"
+            className="bg-white dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-shadow"
           >
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
-              {/* Search Box */}
-              <motion.div 
-                className="flex-1 w-full sm:max-w-xs"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6 }}
-              >
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder={t('services.searchServices')}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all"
-                  />
-                </div>
-              </motion.div>
-
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               {/* Category Filter */}
               <motion.div 
-                className="flex flex-wrap gap-2"
+                className="flex flex-wrap gap-2 w-full sm:flex-1"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
@@ -844,10 +862,10 @@ export default function DashboardHome() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.8 + index * 0.1 }}
                     onClick={() => setActiveCategory(category)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                       activeCategory === category
-                        ? 'bg-[#ff6600] text-white shadow-lg'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                        ? 'bg-gradient-to-r from-[#ff6600] to-orange-500 text-white shadow-lg shadow-[#ff6600]/30'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600'
                     }`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -859,16 +877,16 @@ export default function DashboardHome() {
 
               {/* Sort Dropdown */}
               <motion.div 
-                className="flex items-center gap-2"
+                className="flex items-center gap-3 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.9 }}
               >
-                <Filter className="w-4 h-4 text-gray-400" />
+                <Filter className="w-5 h-5 text-[#ff6600]" />
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff6600] transition-all"
+                  className="bg-transparent border-0 px-2 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-0 cursor-pointer"
                 >
                   <option value="popularity">{t('services.mostPopular')}</option>
                   <option value="name">{t('services.alphabetical')}</option>
@@ -884,17 +902,18 @@ export default function DashboardHome() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 flex flex-wrap gap-2"
+                  className="mt-6 flex flex-wrap gap-2 pt-4 border-t border-gray-100 dark:border-gray-700"
                 >
                   {searchTerm && (
                     <motion.span 
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="inline-flex items-center gap-1 bg-[#13294b]/10 dark:bg-[#13294b]/20 text-[#13294b] dark:text-[#1a3a5f] text-sm px-3 py-1 rounded-full"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#13294b]/10 to-[#13294b]/5 dark:from-[#13294b]/30 dark:to-[#13294b]/20 text-[#13294b] dark:text-[#60a5fa] text-sm px-4 py-2 rounded-full border border-[#13294b]/20 dark:border-[#13294b]/40"
                     >
+                      <Search className="w-4 h-4" />
                       {t('services.search')}: "{searchTerm}"
-                      <button onClick={() => setSearchTerm('')} className="hover:text-[#ff6600]">
-                        <X className="w-3 h-3" />
+                      <button onClick={() => setSearchTerm('')} className="hover:text-[#ff6600] transition-colors">
+                        <X className="w-4 h-4" />
                       </button>
                     </motion.span>
                   )}
@@ -902,11 +921,12 @@ export default function DashboardHome() {
                     <motion.span 
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="inline-flex items-center gap-1 bg-[#ff6600]/10 dark:bg-[#ff6600]/20 text-[#ff6600] dark:text-[#ff8c00] text-sm px-3 py-1 rounded-full"
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#ff6600]/10 to-[#ff6600]/5 dark:from-[#ff6600]/30 dark:to-[#ff6600]/20 text-[#ff6600] dark:text-[#fbbf24] text-sm px-4 py-2 rounded-full border border-[#ff6600]/20 dark:border-[#ff6600]/40"
                     >
+                      <Filter className="w-4 h-4" />
                       {t('services.category')}: {translateCategory(activeCategory)}
-                      <button onClick={() => setActiveCategory('All')} className="hover:text-green-600">
-                        <X className="w-3 h-3" />
+                      <button onClick={() => setActiveCategory('All')} className="hover:text-[#ff6600] transition-colors">
+                        <X className="w-4 h-4" />
                       </button>
                     </motion.span>
                   )}
@@ -940,18 +960,37 @@ export default function DashboardHome() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="text-center py-12"
+                className="text-center py-20 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700"
               >
-                <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <div className="text-gray-400 dark:text-gray-500 text-lg mb-2">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <Target className="w-20 h-20 text-gray-300 dark:text-gray-600 mx-auto mb-6" />
+                </motion.div>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-gray-600 dark:text-gray-400 text-lg font-medium mb-4"
+                >
                   {t('services.noServicesFound')}
-                </div>
+                </motion.p>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-gray-500 dark:text-gray-500 text-sm mb-8"
+                >
+                  {t('services.tryAdjustingFilters')}
+                </motion.p>
                 <motion.button
                   onClick={() => {
                     setSearchTerm('');
                     setActiveCategory('All');
                   }}
-                  className="text-[#ff6600] hover:text-[#e65c00] font-medium"
+                  className="bg-gradient-to-r from-[#ff6600] to-orange-500 text-white font-semibold px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-[#ff6600]/30 transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -970,21 +1009,15 @@ export default function DashboardHome() {
             transition={{ delay: 0.7, type: "spring" }}
             className="space-y-6"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pb-4 border-b-2 border-gray-100 dark:border-gray-700">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white">
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-[#13294b] to-[#ff6600] bg-clip-text text-transparent">
                   {t('services.agencyBanking')}
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400 mt-2">
                   {t('services.agencyBankingDesc')}
                 </p>
               </div>
-              <motion.div 
-                className="w-12 sm:w-16 h-1 bg-gradient-to-r from-[#ff6600] to-orange-400 rounded-full"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.8 }}
-              />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {translatedAgencyServices.map((service, index) => (
@@ -1009,21 +1042,15 @@ export default function DashboardHome() {
             transition={{ delay: 0.7, type: "spring" }}
             className="space-y-6"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pb-4 border-b-2 border-gray-100 dark:border-gray-700">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#13294b] dark:text-white">
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-[#13294b] to-[#ff6600] bg-clip-text text-transparent">
                   {t('services.businessServices')}
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400 mt-2">
                   {t('services.businessServicesDesc')}
                 </p>
               </div>
-              <motion.div 
-                className="w-12 sm:w-16 h-1 bg-gradient-to-r from-[#ff6600] to-orange-400 rounded-full"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.8 }}
-              />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {translatedBusinessServices.map((service, index) => (

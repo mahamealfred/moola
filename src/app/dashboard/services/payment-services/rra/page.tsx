@@ -166,8 +166,8 @@ export default function RRAPayment() {
         customerId: formData.docNumber,
         billerCode: "tax",
         productCode: "tax",
-        // amount: formData.amount.toString(),
-        amount: "100",
+        amount: formData.amount.toString(),
+        // amount: "100",
         ccy: "RWF",
         requestId: validationData.requestId
       });

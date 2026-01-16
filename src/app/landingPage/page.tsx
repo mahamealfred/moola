@@ -133,9 +133,7 @@ export default function LandingPage() {
     { name: t('landing.wasacWater'), logo: '/logos/services/wasac.jpg', category: 'Utilities', description: t('landing.wasacWaterDesc'), color: 'text-cyan-500', popularity: 82 },
     { name: t('landing.schoolFees'), logo: '/logos/services/school.svg', category: 'Education', description: t('landing.schoolFeesDesc'), color: 'text-orange-500', popularity: 87 },
     { name: t('landing.rnit'), logo: '/logos/services/rnit.png', category: 'Government', description: t('landing.rnitDesc'), color: 'text-blue-600', popularity: 91 },
-    { name: t('landing.bulkSalary'), logo: '/logos/services/salary.svg', category: 'Business', description: t('landing.bulkSalaryDesc'), color: 'text-teal-500', popularity: 93 },
-    { name: t('landing.invoicePayments'), logo: '/logos/services/invoice.svg', category: 'Business', description: t('landing.invoicePaymentsDesc'), color: 'text-pink-500', popularity: 89 },
-    { name: t('landing.taxCalculation'), logo: '/logos/services/taxcalc.svg', category: 'Business', description: t('landing.taxCalculationDesc'), color: 'text-gray-600', popularity: 84 },
+    { name: t('services.aqsafricacollectName'), logo: '/logos/services/aqs.jpg', category: 'Data Collection', description: t('services.aqsafricacollectDesc'), color: 'text-green-500', popularity: 80 },
     { name: t('landing.expenseManagement'), logo: '/logos/services/expense.svg', category: 'Business', description: t('landing.expenseManagementDesc'), color: 'text-amber-600', popularity: 86 }
   ];
 
@@ -1013,8 +1011,8 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg mb-6 sm:mb-8 backdrop-blur-sm bg-white/80 dark:bg-gray-900/80"
         >
-          <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 items-center">
-            <div className="flex-1 w-full lg:max-w-md">
+          <div className="flex flex-col gap-4 sm:gap-6 items-center">
+            <div className="w-full max-w-md">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
                 <input
@@ -1022,27 +1020,27 @@ export default function LandingPage() {
                   placeholder={t('landing.searchServices')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all text-sm sm:text-base shadow-inner"
+                  className="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-2.5 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg sm:rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#ff6600] focus:border-transparent transition-all text-sm sm:text-base shadow-inner"
                 />
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm('')}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1"
                   >
-                    <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <X className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 )}
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center w-full lg:w-auto">
+            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
               {categories.map((category) => (
                 <motion.button
                   key={category}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveCategory(category)}
-                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all relative overflow-hidden group ${
+                  className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all relative overflow-hidden group whitespace-nowrap ${
                     activeCategory === category
                       ? 'bg-gradient-to-r from-[#ff6600] to-[#ff8c00] text-white shadow-md'
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-sm'
@@ -1521,18 +1519,6 @@ export default function LandingPage() {
           ))}
         </motion.div>
 
-        {/* Security Badge */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-center mt-8 sm:mt-12"
-        >
-          <div className="inline-flex items-center gap-2 bg-[#ff6600]/10 text-[#ff6600] dark:text-[#ff8533] px-4 py-2 rounded-full border border-[#ff6600]/20 text-sm">
-            <ShieldCheck className="w-4 h-4" />
-            <span className="font-semibold">ISO 27001 Certified & PCI DSS Compliant</span>
-          </div>
-        </motion.div>
       </section>
 
       {/* Enhanced Mobile App Section */}
