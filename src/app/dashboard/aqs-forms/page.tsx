@@ -208,8 +208,8 @@ export default function AQSFormsPage() {
 
       {/* Forms Grid */}
       {!loading && forms.length > 0 && (
-        <>
-          <div className="flex justify-center">
+        <div className="flex flex-col items-center w-full">
+          <div className="flex justify-center w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {forms.map((form) => (
                 <FormCard key={form._id} form={form} onSelect={handleSelectForm} />
@@ -219,7 +219,7 @@ export default function AQSFormsPage() {
 
           {/* Pagination */}
           {paginationButtons && paginationButtons.length > 0 && (
-            <div className="flex justify-center gap-2 mt-8">
+            <div className="flex gap-2 mt-8">
               <button
                 onClick={() => setPage(Math.max(1, page - 1))}
                 disabled={page === 1}
@@ -251,7 +251,7 @@ export default function AQSFormsPage() {
               </button>
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* No Forms Message */}

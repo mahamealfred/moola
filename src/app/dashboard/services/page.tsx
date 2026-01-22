@@ -195,7 +195,7 @@ const paymentServices: PaymentService[] = [
     popularity: 85,
     isFeatured: true,
     description: 'Dynamic form submission and data collection',
-    status: 'inactive'
+    status: 'active'
   },
 ];
 

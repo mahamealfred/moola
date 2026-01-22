@@ -2,7 +2,9 @@
 // Handles all interactions with the AQS Africa Collect API for dynamic forms
 // Optimized with caching and performance improvements
 
-const AQS_API_BASE = 'http://localhost:4000/v1/agency/external';
+
+const AQS_API_BASE = 'https://core-api.ddin.rw/v1/datacollection/external';
+//const AQS_API_BASE = 'http://localhost:4000/v1/datacollection/external';
 
 // Simple in-memory cache for form data
 const formCache = new Map<string, { data: GetFormsResponse; timestamp: number }>();
