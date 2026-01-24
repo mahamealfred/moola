@@ -1,11 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { getAQSForms, AQSForm } from '@/lib/services/aqs-africa-collect';
-
-// Lazy load the DynamicAQSForm component to reduce initial bundle size
-const DynamicAQSForm = lazy(() => import('@/components/DynamicAQSForm').then((mod) => ({ default: mod.DynamicAQSForm })));
 
 // Skeleton loading component
 const FormCardSkeleton = () => (
@@ -24,10 +21,9 @@ const FormCardSkeleton = () => (
 );
 
 // Memoized form card component
-const FormCard = React.memo(({ form, onSelect }: { form: AQSForm; onSelect: (id: string) => void }) => (
+const FormCard = React.memo(({ form }: { form: AQSForm }) => (
   <div
-    className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer w-full max-w-sm"
-    onClick={() => onSelect(form._id)}
+    className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 dark:border-gray-700 w-full max-w-sm"
   >
     <div className="h-32 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center p-4">
       <div className="relative w-24 h-24">
@@ -69,12 +65,14 @@ const FormCard = React.memo(({ form, onSelect }: { form: AQSForm; onSelect: (id:
           <span className="font-semibold">Fields:</span> {form.formDefinition.components.length}
         </p>
       </div>
-      <button
-        onClick={() => onSelect(form._id)}
-        className="w-full px-4 py-2 bg-[#ff6600] text-white text-sm font-medium rounded-md hover:bg-[#e55a00] active:scale-95 transition-colors"
+      <a
+        href="https://ee.kobotoolbox.org/x/NXTZ9h8r"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="w-full px-4 py-2 bg-[#ff6600] text-white text-sm font-medium rounded-md hover:bg-[#e55a00] active:scale-95 transition-colors inline-block text-center"
       >
         Fill Form
-      </button>
+      </a>
     </div>
   </div>
 ));
@@ -86,7 +84,6 @@ FormCard.displayName = 'FormCard';
  */
 export default function AQSFormsPage() {
   const [forms, setForms] = useState<AQSForm[]>([]);
-  const [selectedForm, setSelectedForm] = useState<AQSForm | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -100,7 +97,6 @@ export default function AQSFormsPage() {
       const response = await getAQSForms(pageNum, 10);
       setForms(response.forms);
       setTotalPages(response.pagination.totalPages);
-      setSelectedForm(null);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch forms';
       setError(errorMessage);
@@ -115,39 +111,7 @@ export default function AQSFormsPage() {
     fetchForms(page);
   }, [page, fetchForms]);
 
-  // Memoize form selection handler
-  const handleSelectForm = useCallback((formId: string) => {
-    const form = forms.find((f) => f._id === formId);
-    if (form) {
-      setSelectedForm(form);
-    } else {
-      setError('Form not found in the loaded list');
-    }
-  }, [forms]);
-
-  const handleBackToList = useCallback(() => {
-    setSelectedForm(null);
-  }, []);
-
-  const handleSubmitSuccess = useCallback(() => {
-    setSelectedForm(null);
-    fetchForms(page);
-  }, [page, fetchForms]);
-
-  // Memoize pagination buttons
-  const paginationButtons = useMemo(() => {
-    if (totalPages <= 1) return null;
-    // Show max 5 page buttons to avoid rendering too many
-    const maxButtons = 5;
-    let startPage = Math.max(1, page - Math.floor(maxButtons / 2));
-    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
-    if (endPage - startPage + 1 < maxButtons) {
-      startPage = Math.max(1, endPage - maxButtons + 1);
-    }
-    return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
-  }, [page, totalPages]);
-
-  if (error && !selectedForm) {
+  if (error) {
     return (
       <div className="w-full">
         <div className="max-w-md mx-auto bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md">
@@ -161,31 +125,6 @@ export default function AQSFormsPage() {
     );
   }
 
-  // Show selected form
-  if (selectedForm) {
-    return (
-      <div className="w-full flex flex-col items-center justify-start min-h-screen px-4">
-        <div className="w-full max-w-2xl">
-          <button
-            onClick={handleBackToList}
-            className="mb-6 px-4 py-2 text-black hover:text-gray-800 dark:text-white dark:hover:text-gray-200 underline flex items-center gap-2"
-          >
-            ← Back to Forms
-          </button>
-          <Suspense fallback={<div className="text-center py-12 text-gray-600">Loading form...</div>}>
-            <DynamicAQSForm
-              form={selectedForm}
-              onSubmitSuccess={handleSubmitSuccess}
-              onSubmitError={(error) => {
-                console.error('Form submission error:', error);
-              }}
-            />
-          </Suspense>
-        </div>
-      </div>
-    );
-  }
-
   // Show forms list
   return (
     <div className="w-full">
@@ -193,13 +132,25 @@ export default function AQSFormsPage() {
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">AQS Africa Collect Forms</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">Select a form to fill out and submit</p>
+        
+        {/* External Form Link */}
+        <div className="mt-6 flex justify-center">
+          <a
+            href="https://ee.kobotoolbox.org/x/NXTZ9h8r"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-8 py-3 bg-[#ff6600] text-white font-semibold rounded-lg hover:bg-[#e55a00] transition-colors shadow-md hover:shadow-lg"
+          >
+            Open AQS Form Directly
+          </a>
+        </div>
       </div>
 
       {/* Loading State with Skeletons */}
       {loading && (
         <div className="flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 max-w-7xl">
+            {Array.from({ length: 6 }).map((_, i) => (
               <FormCardSkeleton key={i} />
             ))}
           </div>
@@ -212,13 +163,13 @@ export default function AQSFormsPage() {
           <div className="flex justify-center w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {forms.map((form) => (
-                <FormCard key={form._id} form={form} onSelect={handleSelectForm} />
+                <FormCard key={form._id} form={form} />
               ))}
             </div>
           </div>
 
           {/* Pagination */}
-          {paginationButtons && paginationButtons.length > 0 && (
+          {totalPages > 1 && (
             <div className="flex gap-2 mt-8">
               <button
                 onClick={() => setPage(Math.max(1, page - 1))}
@@ -228,19 +179,23 @@ export default function AQSFormsPage() {
                 Previous
               </button>
               <div className="flex items-center gap-2">
-                {paginationButtons.map((pageNum) => (
-                  <button
-                    key={pageNum}
-                    onClick={() => setPage(pageNum)}
-                    className={`px-3 py-2 rounded-md transition-colors ${
-                      pageNum === page 
-                        ? 'bg-[#ff6600] text-white' 
-                        : 'border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                ))}
+                {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+                  const pageNum = Math.max(1, page - Math.floor(5 / 2)) + i;
+                  if (pageNum > totalPages) return null;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setPage(pageNum)}
+                      className={`px-3 py-2 rounded-md transition-colors ${
+                        pageNum === page 
+                          ? 'bg-[#ff6600] text-white' 
+                          : 'border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
               </div>
               <button
                 onClick={() => setPage(Math.min(totalPages, page + 1))}

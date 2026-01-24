@@ -57,7 +57,9 @@ type PaymentService = {
   name: string;
   icon: React.ElementType;
   logo?: string;
-  content: string | React.ReactElement;
+  content?: string | React.ReactElement;
+  href?: string;
+  externalUrl?: string;
   category: string;
   popularity: number;
   isNew?: boolean;
@@ -190,7 +192,7 @@ const paymentServices: PaymentService[] = [
     name: 'AQS Africa Collect', 
     icon: FileText,
     logo: '/logos/services/aqs.jpg',
-    content: <AQSFormsComponent />, 
+    externalUrl: 'https://ee.kobotoolbox.org/x/NXTZ9h8r',
     category: 'Data Collection', 
     popularity: 85,
     isFeatured: true,
@@ -510,7 +512,9 @@ export default function DashboardHome() {
         }`}
         onClick={() => {
           if (service.status === 'inactive') return;
-          if (service.href) {
+          if (service.externalUrl) {
+            window.open(service.externalUrl, '_blank', 'noopener,noreferrer');
+          } else if (service.href) {
             router.push(service.href);
           } else {
             setSelectedService(service as PaymentService | BusinessService);

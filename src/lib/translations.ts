@@ -763,6 +763,7 @@ export const translations = {
       phoneNumber: 'Numero ya telefone',
       agencyName: 'Izina ry\'ikigo',
       agencyCode: 'Kode y\'ikigo',
+      agentId: 'Kimere cy\'Umukozi',
       status: 'Uko bimeze',
       role: 'Uruhare',
       
@@ -1834,6 +1835,7 @@ export const translations = {
       phoneNumber: 'Numéro de téléphone',
       agencyName: 'Nom de l\'agence',
       agencyCode: 'Code de l\'agence',
+      agentId: 'ID de l\'agent',
       status: 'Statut',
       role: 'Rôle',
       
@@ -2898,6 +2900,7 @@ export const translations = {
       phoneNumber: 'Phone Number',
       agencyName: 'Agency Name',
       agencyCode: 'Agency Code',
+      agentId: 'Agent ID',
       status: 'Status',
       role: 'Role',
       

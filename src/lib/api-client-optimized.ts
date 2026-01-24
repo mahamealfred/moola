@@ -62,9 +62,10 @@ class APICache {
 }
 
 class MoolaAPIClient {
-  // private baseURL = 'http://localhost:4000';
+  //private baseURL = 'http://localhost:4000/v1';
   private baseURL = 'https://core-api.ddin.rw/v1';
   private cache = new APICache();
+  private requestQueue = new Map<string, Promise<any>>();
   private defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
   };
