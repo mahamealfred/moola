@@ -146,10 +146,17 @@ export class UniqueItemSet<T> {
   add(item: T): boolean {
     if (this.set.size >= this.maxSize && !this.set.has(item)) {
       // Remove oldest item (first added)
-      const first = this.set.values().next().value;
-      this.set.delete(first);
+      const iter = this.set.values().next();
+      if (!iter.done) {
+        this.set.delete(iter.value);
+      }
     }
-    return this.set.add(item) === this.set;
+    const existed = this.set.has(item);
+    if (!existed) {
+      this.set.add(item);
+      return true;
+    }
+    return false;
   }
 
   has(item: T): boolean {

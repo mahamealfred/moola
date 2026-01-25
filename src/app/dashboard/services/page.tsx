@@ -73,6 +73,7 @@ type AgencyBankingService = {
   icon: React.ElementType;
   logo?: string;
   href: string;
+  externalUrl?: string;
   status: 'active' | 'inactive';
 };
 
@@ -83,6 +84,8 @@ type BusinessService = {
   content: string | React.ReactElement;
   category: string;
   description?: string;
+  href?: string;
+  externalUrl?: string;
 };
 
 type UserRole = 'Agent' | 'Corporate';
@@ -192,11 +195,11 @@ const paymentServices: PaymentService[] = [
     name: 'AQS Africa Collect', 
     icon: FileText,
     logo: '/logos/services/aqs.jpg',
-    externalUrl: 'https://ee.kobotoolbox.org/x/NXTZ9h8r',
+    externalUrl: 'https://ee.kobotoolbox.org/x/p6HRmkv9',
     category: 'Data Collection', 
     popularity: 85,
     isFeatured: true,
-    description: 'Dynamic form submission and data collection',
+    description: 'Data collection',
     status: 'active'
   },
 ];
